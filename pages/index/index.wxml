@@ -1,0 +1,36 @@
+<!--index.wxml-->
+<view class="container">
+  <scroll-view 
+    class="imglab"
+    scroll-x
+    scroll-y
+  >
+    <canvas
+      style="width:{{imgWidth}};height:{{imgHeight}};position:absolute;top:0;left:0;"
+      canvas-id="first"
+      disable-scroll=true
+      bindtouchstart="bindtouchstart"
+      bindtouchmove="bindtouchmove"
+      bindtouchend="bindtouchend"
+      bindtap="bindtap"
+      bindlongpress="bindlongpress"
+    >
+    </canvas>
+    <image 
+      wx:if="{{imgArr.length !== 0}}" 
+      class="imglab-imgage" 
+      style="width:{{imgWidth}};height:{{imgHeight}}" 
+      src="{{imgArr[0]}}" 
+      bindload="imageLoad"
+    >
+    </image>
+  </scroll-view>
+  <view class="doSomething">
+    <view class="btn">
+        <button type="primary" bindtap="deleteImg">提交</button>
+    </view>
+    <view class="btn">
+        <button type="warn" bindtap="deleteImg">放弃</button>
+    </view>
+  </view>
+</view>
