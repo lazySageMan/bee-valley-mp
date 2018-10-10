@@ -1,0 +1,17 @@
+.imglab{
+  height: 1000rpx;
+  width: 95%;
+  margin-top: 10rpx;
+  background: gray;
+  position: relative;
+}
+.doSomething{
+  width: 100%;
+  height:100rpx;
+  display: flex;
+  justify-content:center;
+  margin-top: 30rpx;
+}
+.doSomething .btn{
+  margin:10rpx 30rpx;
+}
