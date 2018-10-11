@@ -7,7 +7,7 @@ const app = getApp()
 
 Page({
   data: {
-    imgArr : ["../../image/1.jpg","../../image/2.jpg","../../image/3.jpg","../../image/5.jpg"],
+    imgArr : ["../../image/5.jpg","../../image/2.jpg","../../image/3.jpg","../../image/1.jpg"],
     wxCanvas : null,
     imgHeight : '',
     imgWidth : '',
@@ -17,10 +17,15 @@ Page({
       canvasW : 0,
       canvasH : 0
     },
-    circle:{},
+    arrPoints:[],
     rect:null,
-    isMove : true
+    isMove : true,
+    isShowPoint :true,
 
+    isEdit: null,
+    editCanvasPosition:{
+
+    }
   },
   // //事件处理函数
 
@@ -30,16 +35,9 @@ Page({
       imgArr : arr
     })
   },
-  onLoad: function() {
-    var context = wx.createCanvasContext('first');
-    this.wxCanvas = new wxDraw(context);
-  },
   imageLoad: function(e){
     var $imgWidth = e.detail.width,
         $imgHeight = e.detail.height;
-        // ratio = $imgWidth/$imgHeight,
-        // viewHeight = 1000,
-        // viewWidth = 1000*ratio;
     this.setData({
       imgHeight : $imgHeight+'rpx',
       imgWidth : $imgWidth+'rpx'
@@ -49,91 +47,107 @@ Page({
   //画框从此开始
   bindtouchstart:function(e){
     // 检测手指点击开始事件
-    if(!this.data.rect){
-      this.wxCanvas.touchstartDetect(e);
+    this.wxCanvas.touchstartDetect(e);
+
+    if(this.rect.Shape.Option.x === 0){
       this.data.canvasPosition.canvasX = e.touches[0].x;
       this.data.canvasPosition.canvasY = e.touches[0].y;
-
-      this.data.rect = new Shape('rect', {
-          x: this.data.canvasPosition.canvasX, 
-          y: this.data.canvasPosition.canvasY, 
-          w: 0, 
-          h: 0, 
-          lineWidth: 2, 
-          lineCap: 'round',
-          strokeStyle:"#339933",
-      }, 'stroke', false);
-      this.wxCanvas.add(this.data.rect)
-      this.data.isMove = "move";
+      this.rect.updateOption({
+        x: this.data.canvasPosition.canvasX, 
+        y: this.data.canvasPosition.canvasY
+      })
     }else{
-      this.data.isMove = false;
-      var that = this;
-      function sayHai(){
-        if(!that.data.circle.leftTop){ 
-            var pointArr = [ //四个角的每个点
-              {x : that.data.canvasPosition.canvasX, y : that.data.canvasPosition.canvasY, name:"leftTop"},
-              {x : that.data.canvasPosition.canvasX,  y : that.data.canvasPosition.canvasY + that.data.canvasPosition.canvasH, name:"leftBottom"},
-              {x : that.data.canvasPosition.canvasX + that.data.canvasPosition.canvasW, y : that.data.canvasPosition.canvasY, name:"rightTop"},
-              {x : that.data.canvasPosition.canvasX + that.data.canvasPosition.canvasW, y : that.data.canvasPosition.canvasY + that.data.canvasPosition.canvasH, name:"rightBottom"}
-            ]
-            //添加四个角的点
-            for(var i = 0 ; i < pointArr.length ; i++){
-              var point 
-              that.data.circle[pointArr[i].name] = new Shape("circle",
-                    {
-                      x : pointArr[i].x,
-                      y : pointArr[i].y,
-                      r : 8,
-                      fillStyle:"#FF0033",
-                    },'mix', false)
-                that.wxCanvas.add(that.data.circle[pointArr[i].name]);
-            }
-          }else{
-            
-            console.log(that.data.circle.leftTop)
+      var disX = e.touches[0].x - this.data.canvasPosition.canvasX; //左边最小距离
+      var disY = e.touches[0].y - this.data.canvasPosition.canvasY; //上边最小距离
+      var diaX = (this.data.canvasPosition.canvasX + this.data.canvasPosition.canvasW) - e.touches[0].x; //右边最小距离
+      var diaY = (this.data.canvasPosition.canvasY + this.data.canvasPosition.canvasH) - e.touches[0].y; //下边最小距离
+      if(
+          e.touches[0].x > this.data.canvasPosition.canvasX
+          &&
+          e.touches[0].y > this.data.canvasPosition.canvasY
+          &&
+          (this.data.canvasPosition.canvasX + this.data.canvasPosition.canvasW) > e.touches[0].x
+          &&
+          (this.data.canvasPosition.canvasY + this.data.canvasPosition.canvasH) > e.touches[0].y
+        ){
+          if(disX < 10){
+            this.data.isEdit = "left";
+          }else if(disY < 10){
+            this.data.isEdit = "top";
+          }else if(diaX < 10){
+            this.data.isEdit = "right";
+          }else if(diaY < 10){
+            this.data.isEdit = "bottom";
+          }else {
+            this.data.isEdit = false;
           }
-        console.log("kkkkkkkkkkk")
-      }
-      this.data.rect.bind("touchstart", sayHai);
-      console.log(this.data.rect)
-      // this.data.rect.updateLayer("+2");
-
-      //   e.touches[0].x > this.data.canvasPosition.canvasX
-      //   &&
-      //   e.touches[0].y > this.data.canvasPosition.canvasY
-      //   &&
-      //   (this.data.canvasPosition.canvasX + this.data.canvasPosition.canvasW) > e.touches[0].x
-      //   &&
-      //   (this.data.canvasPosition.canvasY + this.data.canvasPosition.canvasH) > e.touches[0].y
-
-          
-      
+        }else{
+          this.data.isEdit = false
+        };
     }
   },
   bindtouchmove:function(e){
+    this.wxCanvas.touchmoveDetect(e);
     // 检测手指点击 之后的移动事件
-    if(this.data.isMove === "move"){
+    if(this.data.isMove){ //在这里修改框的大小
       this.wxCanvas.touchmoveDetect(e);
       this.data.canvasPosition.canvasW = e.touches[0].x - this.data.canvasPosition.canvasX
       this.data.canvasPosition.canvasH = e.touches[0].y - this.data.canvasPosition.canvasY
-      this.data.rect.updateOption({
+      this.rect.updateOption({
         x : this.data.canvasPosition.canvasX + this.data.canvasPosition.canvasW/2,
         y : this.data.canvasPosition.canvasY + this.data.canvasPosition.canvasH/2,
         w : this.data.canvasPosition.canvasW,
         h : this.data.canvasPosition.canvasH
       })
-    }else if(this.data.isMove === "edit"){
-      // console.log(1)
-      this.data.circle.leftTop.bind("touchmove", function(){
-        console.log(1)
-      })
+    }else{
+      if(this.data.isEdit === "bottom"){
+        this.data.editCanvasPosition.h = e.touches[0].y  - this.data.canvasPosition.canvasY;
+        this.data.editCanvasPosition.y = this.data.canvasPosition.canvasY + this.data.editCanvasPosition.h/2;
+        this.rect.updateOption({
+          y : this.data.editCanvasPosition.y,
+          h : this.data.editCanvasPosition.h
+        })
+      }else if(this.data.isEdit === "top"){
+        this.data.editCanvasPosition.h1 = this.data.canvasPosition.canvasH + (this.data.canvasPosition.canvasY - e.touches[0].y);
+        this.data.editCanvasPosition.y1 = e.touches[0].y;
+        this.rect.updateOption({
+          y : this.data.editCanvasPosition.y1 + this.data.editCanvasPosition.h1/2,
+          h : this.data.editCanvasPosition.h1
+        })
+      }else if(this.data.isEdit === "left"){
+        this.data.editCanvasPosition.w = this.data.canvasPosition.canvasW + (this.data.canvasPosition.canvasX - e.touches[0].x);
+        this.data.editCanvasPosition.x = e.touches[0].x;
+        this.rect.updateOption({
+          x : this.data.editCanvasPosition.x + this.data.editCanvasPosition.w/2,
+          w : this.data.editCanvasPosition.w
+        })
+      }else if(this.data.isEdit === "right"){
+        this.data.editCanvasPosition.w1 = e.touches[0].x  - this.data.canvasPosition.canvasX;
+        this.data.editCanvasPosition.x1 = this.data.canvasPosition.canvasX + this.data.editCanvasPosition.w1/2;
+        this.rect.updateOption({
+          x : this.data.editCanvasPosition.x1,
+          w : this.data.editCanvasPosition.w1
+        })
+      }
     }
-    
-    
   },
   bindtouchend:function(){
      //检测手指点击 移出事件
     this.wxCanvas.touchendDetect();
+    this.data.isMove = false;
+    if(this.data.isEdit === "bottom"){ //将数据同步到 this.data.canvasPosition 好做下一次的编辑
+      this.data.canvasPosition.canvasH = this.data.editCanvasPosition.h;
+      this.data.canvasPosition.canvasY = this.data.editCanvasPosition.y;
+    }else if(this.data.isEdit === "top"){
+      this.data.canvasPosition.canvasH = this.data.editCanvasPosition.h1;
+      this.data.canvasPosition.canvasY = this.data.editCanvasPosition.y1;
+    }else if(this.data.isEdit === "left"){
+      this.data.canvasPosition.canvasW = this.data.editCanvasPosition.w;
+      this.data.canvasPosition.canvasX = this.data.editCanvasPosition.x;
+    }else if(this.data.isEdit === "right"){
+      this.data.canvasPosition.canvasW = this.data.editCanvasPosition.w1;
+      this.data.canvasPosition.canvasX = this.data.editCanvasPosition.x1;
+    }
   },
   bindtap:function(e){
     // 检测tap事件
@@ -141,6 +155,23 @@ Page({
   },
   bindlongpress:function(e){
        // 检测longpress事件
-      this.wxCanvas.longpressDetect(e);
+    this.wxCanvas.longpressDetect(e);
+  },
+  onLoad: function() {
+    var context = wx.createCanvasContext('first');
+    this.wxCanvas = new wxDraw(context,0,0,400,500);
+    var arrPoints = [1,2,3,4];
+    this.circle = [];
+    var rect = new Shape('rect', {
+      x: 0, 
+      y: 0, 
+      w: 0, 
+      h: 0, 
+      lineWidth: 5, 
+      lineCap: 'round',
+      strokeStyle:"#339933",
+    }, 'stroke', false);
+    this.wxCanvas.add(rect);
+    this.rect = rect;
   },
 })
