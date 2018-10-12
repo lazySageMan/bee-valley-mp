@@ -1,7 +1,7 @@
 {
   "pages": [
-    "pages/task/index",
-    "pages/index/index"
+    "pages/task_list/index",
+    "pages/rect_task/index"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -8,7 +8,7 @@ Page({
     },
     intoIfram: function () {
         wx.navigateTo({
-            url: "../index/index"
+            url: "../rect_task/index"
         })
     }
 })
