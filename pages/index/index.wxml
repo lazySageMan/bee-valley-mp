@@ -6,6 +6,7 @@
     scroll-y
   >
     <canvas
+      wx:if="{{imgArr.length !== 0}}" 
       style="width:{{imgWidth}};height:{{imgHeight}};position:absolute;top:0;left:0;"
       canvas-id="first"
       disable-scroll=true
