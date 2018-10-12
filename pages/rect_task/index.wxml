@@ -1,9 +1,7 @@
 <!--index.wxml-->
 <view class="container">
-  <scroll-view 
+  <view 
     class="imglab"
-    scroll-x
-    scroll-y
   >
     <canvas
       wx:if="{{currentWork}}" 
@@ -25,7 +23,7 @@
       bindload="imageLoad"
     >
     </image>
-  </scroll-view>
+  </view>
   <view class="doSomething">
     <view class="btn">
         <button type="primary" bindtap="deleteImg">提交</button>

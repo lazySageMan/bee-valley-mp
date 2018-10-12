@@ -1,7 +1,10 @@
 {
   "pages": [
     "pages/task_list/index",
+    "pages/table/index",
     "pages/rect_task/index"
+    
+    
   ],
   "window": {
     "backgroundTextStyle": "light",
