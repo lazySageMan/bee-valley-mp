@@ -12,7 +12,6 @@ Page({
     works: [],
     currentWork: null,
     currentImgSrc: null,
-    // imgArr: ["../../image/5.jpg", "../../image/2.jpg", "../../image/3.jpg", "../../image/1.jpg"],
     imgHeight: '',
     imgWidth: '',
     rectPosition: {
@@ -26,24 +25,29 @@ Page({
 
   deleteImg: function() {
     let arr = this.data.works.slice(1)
+    if (this.rect) {
+      this.rect.destroy();
+      this.rect = null;
+    }
     this.setData({
-      works: arr
-    })
-    // TODO fetch next work file
-    this.rect.destroy();
-    this.rect = null;
-    this.setData({
+      works: arr,
+      currentWork: null,
+      currentImgSrc: null,
       rectInitialized: false
-    });
+    })
     if (arr.length === 0) {
+      // TODO fetch next batch
       this.wxCanvas.clear();
+    } else {
+      this.processFirstWork();
     }
   },
 
   imageLoad: function(e) {
-    var proportion = e.detail.width/e.detail.height,
-        imgW = 750 * 0.95,
-        imgH = imgW/proportion;
+    // TODO remove hardcoded width
+    var proportion = e.detail.width / e.detail.height,
+      imgW = 750 * 0.95,
+      imgH = imgW / proportion;
 
     this.setData({
       imgHeight: imgH + 'rpx',
@@ -88,13 +92,16 @@ Page({
     let deltaYmin = Math.abs(y - this.data.rectPosition.yMin);
     let deltaYmax = Math.abs(y - this.data.rectPosition.yMax);
     let minimum = Math.min(deltaXmin, deltaXmax, deltaYmin, deltaYmax);
-    if (deltaXmax === minimum) {
+    if (minimum > 20) {
+      return;
+    }
+    if (deltaXmax === minimum && this.data.rectPosition.yMin < y && this.data.rectPosition.yMax > y) {
       this.data.rectPosition.xMax = x;
-    } else if (deltaXmin === minimum) {
+    } else if (deltaXmin === minimum && this.data.rectPosition.yMin < y && this.data.rectPosition.yMax > y) {
       this.data.rectPosition.xMin = x;
-    } else if (deltaYmax === minimum) {
+    } else if (deltaYmax === minimum && this.data.rectPosition.xMin < x && this.data.rectPosition.xMax > x) {
       this.data.rectPosition.yMax = y;
-    } else if (deltaYmin === minimum) {
+    } else if (deltaYmin === minimum && this.data.rectPosition.xMin < x && this.data.rectPosition.xMax > x) {
       this.data.rectPosition.yMin = y;
     }
   },
@@ -167,17 +174,29 @@ Page({
       pointer.setData({
         works: works
       });
-      if (works.length > 0) {
-        let currentWork = works[0];
+      pointer.processFirstWork();
+    });
+  },
+
+  processFirstWork: function() {
+    // TODO preload next work when user working current work
+    if (this.data.works.length > 0) {
+      let currentWork = this.data.works[0];
+      this.setData({
+        currentWork: currentWork
+      });
+      this.downloadWorkFile(currentWork.id);
+    }
+  },
+
+  downloadWorkFile: function(workId) {
+    let pointer = this;
+    beevalley.downloadWorkFile(this.data.apitoken, workId, function(res) {
+      var base64 = wx.arrayBufferToBase64(res.data);
+      var base64Data = 'data:image/jpeg;base64,' + base64;
+      if (pointer.data.currentWork && pointer.data.currentWork.id === workId) {
         pointer.setData({
-          currentWork: currentWork
-        });
-        beevalley.downloadWorkFile(pointer.data.apitoken, currentWork.id, function(res) {
-          var base64 = wx.arrayBufferToBase64(res.data);
-          var base64Data = 'data:image/jpeg;base64,' + base64;
-          pointer.setData({
-            currentImgSrc: base64Data
-          });
+          currentImgSrc: base64Data
         });
       }
     });
