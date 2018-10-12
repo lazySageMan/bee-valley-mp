@@ -1,11 +1,12 @@
 {
-  "pages":[
+  "pages": [
+    "pages/task/index",
     "pages/index/index"
   ],
-  "window":{
-    "backgroundTextStyle":"light",
+  "window": {
+    "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#000000",
     "navigationBarTitleText": "玉峰谷",
-    "navigationBarTextStyle":"#fff"
+    "navigationBarTextStyle": "#fff"
   }
 }

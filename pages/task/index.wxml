@@ -1,0 +1,8 @@
+<view>
+    <view class="btn1">
+        <button type="primary" size="default" bindtap="intoIfram">方框任务</button>
+    </view>
+    <view class="btn">
+        <button type="primary" size="default">数点任务</button>
+    </view>
+</view>
