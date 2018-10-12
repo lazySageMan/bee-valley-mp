@@ -6,7 +6,7 @@
     scroll-y
   >
     <canvas
-      wx:if="{{imgArr.length !== 0}}" 
+      wx:if="{{currentWork}}" 
       style="width:{{imgWidth}};height:{{imgHeight}};position:absolute;top:0;left:0;"
       canvas-id="first"
       disable-scroll=true
@@ -18,10 +18,10 @@
     >
     </canvas>
     <image 
-      wx:if="{{imgArr.length !== 0}}" 
+      wx:if="{{currentImgSrc}}" 
       class="imglab-imgage" 
       style="width:{{imgWidth}};height:{{imgHeight}}" 
-      src="{{imgArr[0]}}" 
+      src="{{currentImgSrc}}" 
       bindload="imageLoad"
     >
     </image>

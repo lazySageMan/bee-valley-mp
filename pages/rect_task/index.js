@@ -3,11 +3,16 @@
 const app = getApp()
 var wxDraw = require("../../utils/wxdraw.min.js").wxDraw;
 var Shape = require("../../utils/wxdraw.min.js").Shape;
+let beevalley = require("../../utils/beevalley.js");
 
 Page({
 
   data: {
-    imgArr: ["../../image/5.jpg", "../../image/2.jpg", "../../image/3.jpg", "../../image/1.jpg"],
+    apitoken: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1YjkwZjZkOWE1NmY4MzAwMDE5NWYwM2UiLCJyb2xlcyI6WyJXT1JLRVIiLCJSRVFVRVNURVIiLCJBRE1JTiIsIlJFVklFV0VSIl0sImlhdCI6MTUzOTMzNjc3NCwiZXhwIjoxNTM5NDIzMTc0fQ.42Y7uOc0lOA3iMfUI-mk2msXpCJKc_Y9FADf0J5UY9k',
+    works: [],
+    currentWork: null,
+    currentImgSrc: null,
+    // imgArr: ["../../image/5.jpg", "../../image/2.jpg", "../../image/3.jpg", "../../image/1.jpg"],
     imgHeight: '',
     imgWidth: '',
     rectPosition: {
@@ -20,10 +25,11 @@ Page({
   },
 
   deleteImg: function() {
-    let arr = this.data.imgArr.slice(1)
+    let arr = this.data.works.slice(1)
     this.setData({
-      imgArr: arr
+      works: arr
     })
+    // TODO fetch next work file
     this.rect.destroy();
     this.rect = null;
     this.setData({
@@ -107,6 +113,9 @@ Page({
       this.createRect();
       this.data.rectPosition.xMin = e.touches[0].x;
       this.data.rectPosition.yMin = e.touches[0].y;
+    } else {
+      this.adjustRectPosition(e.touches[0].x, e.touches[0].y);
+      this.renderRect();
     }
   },
 
@@ -141,8 +150,33 @@ Page({
   },
 
   onLoad: function() {
-    var context = wx.createCanvasContext('first');
+    let context = wx.createCanvasContext('first');
     this.wxCanvas = new wxDraw(context, 0, 0, 400, 500);
+    this.fetchWorks();
+  },
+
+  fetchWorks: function() {
+    let pointer = this;
+    beevalley.fetchWorks(this.data.apitoken, 'rect', 2, function(res) {
+      console.log(res.data);
+      let works = res.data;
+      pointer.setData({
+        works: works
+      });
+      if (works.length > 0) {
+        let currentWork = works[0];
+        pointer.setData({
+          currentWork: currentWork
+        });
+        beevalley.downloadWorkFile(pointer.data.apitoken, currentWork.id, function(res) {
+          var base64 = wx.arrayBufferToBase64(res.data);
+          var base64Data = 'data:image/jpeg;base64,' + base64;
+          pointer.setData({
+            currentImgSrc: base64Data
+          });
+        });
+      }
+    });
   }
 
 })
