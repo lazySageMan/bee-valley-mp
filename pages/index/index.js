@@ -71,12 +71,16 @@ Page({
           (this.data.canvasPosition.canvasY + this.data.canvasPosition.canvasH) > e.touches[0].y
         ){
           if(disX < 10){
+            this.rect.draggable = false;
             this.data.isEdit = "left";
           }else if(disY < 10){
+            this.rect.draggable = false;
             this.data.isEdit = "top";
           }else if(diaX < 10){
+            this.rect.draggable = false;
             this.data.isEdit = "right";
           }else if(diaY < 10){
+            this.rect.draggable = false;
             this.data.isEdit = "bottom";
           }else {
             this.data.isEdit = false;
@@ -135,6 +139,7 @@ Page({
      //检测手指点击 移出事件
     this.wxCanvas.touchendDetect();
     this.data.isMove = false;
+    this.rect.draggable = true;
     if(this.data.isEdit === "bottom"){ //将数据同步到 this.data.canvasPosition 好做下一次的编辑
       this.data.canvasPosition.canvasH = this.data.editCanvasPosition.h;
       this.data.canvasPosition.canvasY = this.data.editCanvasPosition.y;
@@ -170,8 +175,13 @@ Page({
       lineWidth: 5, 
       lineCap: 'round',
       strokeStyle:"#339933",
-    }, 'stroke', false);
+    }, 'stroke', true);
     this.wxCanvas.add(rect);
     this.rect = rect;
+    var that = this;
+    rect.bind("drag", function(e){
+      that.data.canvasPosition.canvasX = e.Shape.Option.x - e.Shape.Option.w/2
+      that.data.canvasPosition.canvasY = e.Shape.Option.y - e.Shape.Option.h/2
+    })
   },
 })
