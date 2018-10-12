@@ -41,9 +41,13 @@ Page({
   },
 
   imageLoad: function(e) {
+    var proportion = e.detail.width/e.detail.height,
+        imgW = 750 * 0.95,
+        imgH = imgW/proportion;
+
     this.setData({
-      imgHeight: e.detail.height + 'rpx',
-      imgWidth: e.detail.width + 'rpx'
+      imgHeight: imgH + 'rpx',
+      imgWidth: imgW + 'rpx'
     })
   },
 
