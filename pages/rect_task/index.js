@@ -27,7 +27,7 @@ Page({
     rectInitialized: false
   },
 
-  submitWork: function () {
+  submitWork: function() {
     if (this.data.currentWork && this.data.rectInitialized) {
       let that = this;
       let relativeAnchorX = this.data.anchorPosition.x / this.data.imgRatio;
@@ -38,16 +38,16 @@ Page({
           this.data.apitoken,
           this.data.currentWork.id, [
             [{
-              x: Math.round(this.data.rectPosition.xMin * this.data.imgRatio),
-              y: Math.round(this.data.rectPosition.yMin * this.data.imgRatio)
-            },
-            {
-              x: Math.round(this.data.rectPosition.xMax * this.data.imgRatio),
-              y: Math.round(this.data.rectPosition.yMax * this.data.imgRatio)
-            }
+                x: Math.round(this.data.rectPosition.xMin * this.data.imgRatio),
+                y: Math.round(this.data.rectPosition.yMin * this.data.imgRatio)
+              },
+              {
+                x: Math.round(this.data.rectPosition.xMax * this.data.imgRatio),
+                y: Math.round(this.data.rectPosition.yMax * this.data.imgRatio)
+              }
             ]
           ],
-          function (res) {
+          function(res) {
             that.handleError(res);
             that.deleteImg();
           });
@@ -55,17 +55,17 @@ Page({
     }
   },
 
-  cancelWork: function () {
+  cancelWork: function() {
     if (this.data.currentWork) {
       let that = this;
-      beevalley.cancelWork(this.data.apitoken, this.data.currentWork.id, function (res) {
+      beevalley.cancelWork(this.data.apitoken, [this.data.currentWork.id], function(res) {
         // TODO handle error
         that.deleteImg();
       })
     }
   },
 
-  deleteImg: function () {
+  deleteImg: function() {
     let arr = this.data.works.slice(1)
     if (this.rect) {
       this.rect.destroy();
@@ -88,7 +88,7 @@ Page({
     }
   },
 
-  imageLoad: function (e) {
+  imageLoad: function(e) {
     var imgW = this.data.windowWidth,
       imgH = imgW * e.detail.height / e.detail.width;
 
@@ -100,7 +100,7 @@ Page({
     this.createAnchor();
   },
 
-  createAnchor: function () {
+  createAnchor: function() {
     if (!this.circle) {
       var circle = new Shape('circle', {
         x: this.data.anchorPosition.x / this.data.imgRatio,
@@ -113,7 +113,7 @@ Page({
     }
   },
 
-  createRect: function () {
+  createRect: function() {
     if (!this.rect) {
       var rect = new Shape('rect', {
         x: 0,
@@ -129,7 +129,7 @@ Page({
     }
   },
 
-  initializeRectPosition: function (x, y) {
+  initializeRectPosition: function(x, y) {
     if (x > this.data.rectPosition.xMin) {
       this.data.rectPosition.xMax = x;
     } else {
@@ -144,7 +144,7 @@ Page({
     }
   },
 
-  adjustRectPosition: function (x, y) {
+  adjustRectPosition: function(x, y) {
     let deltaXmin = Math.abs(x - this.data.rectPosition.xMin);
     let deltaXmax = Math.abs(x - this.data.rectPosition.xMax);
     let deltaYmin = Math.abs(y - this.data.rectPosition.yMin);
@@ -164,7 +164,7 @@ Page({
     }
   },
 
-  renderRect: function () {
+  renderRect: function() {
 
     this.rect.updateOption({
       x: (this.data.rectPosition.xMin + this.data.rectPosition.xMax) / 2,
@@ -176,7 +176,7 @@ Page({
   },
 
   //画框从此开始
-  bindtouchstart: function (e) {
+  bindtouchstart: function(e) {
     // 检测手指点击开始事件
     this.wxCanvas.touchstartDetect(e);
 
@@ -194,7 +194,7 @@ Page({
     }
   },
 
-  bindtouchmove: function (e) {
+  bindtouchmove: function(e) {
     this.wxCanvas.touchmoveDetect(e);
 
     if (e.touches[0].x < 0 || e.touches[0].y < 0 || e.touches[0].x > this.data.imgWidth || e.touches[0].y > this.data.imgHeight) {
@@ -209,7 +209,7 @@ Page({
     this.renderRect();
   },
 
-  bindtouchend: function (e) {
+  bindtouchend: function(e) {
     //检测手指点�移出事件
     this.wxCanvas.touchendDetect();
     if (!this.data.rectInitialized) {
@@ -221,17 +221,17 @@ Page({
     }
   },
 
-  bindtap: function (e) {
+  bindtap: function(e) {
     // 检测tap事件
     this.wxCanvas.tapDetect(e);
   },
 
-  bindlongpress: function (e) {
+  bindlongpress: function(e) {
     // 检测longpress事件
     this.wxCanvas.longpressDetect(e);
   },
 
-  onLoad: function () {
+  onLoad: function() {
     this.setData({
       apitoken: wx.getStorageSync('apitoken')
     });
@@ -239,7 +239,7 @@ Page({
     this.wxCanvas = new wxDraw(context, 0, 0, 400, 500);
     let that = this;
     wx.getSystemInfo({
-      success: function (res) {
+      success: function(res) {
         that.setData({
           pixelRatio: res.pixelRatio,
           windowWidth: res.windowWidth
@@ -249,17 +249,12 @@ Page({
     });
   },
 
-  onUnload: function () {
+  onUnload: function() {
     this.wxCanvas.clear();
-    let that = this;
-    this.data.works.forEach(function (work, index) {
-      beevalley.cancelWork(that.data.apitoken, work.id, function (res) {
-        // console.log(res);
-      })
-    })
+    beevalley.cancelWork(this.data.apitoken, this.data.works.map(w => w.id), function(res) {})
   },
 
-  fetchWorks: function () {
+  fetchWorks: function() {
     let that = this;
     wx.showToast({
       title: '加载中',
@@ -267,7 +262,7 @@ Page({
       icon: 'loading',
       duraton: 60000
     });
-    beevalley.fetchWorks(this.data.apitoken, 'rect', 2, function (res) {
+    beevalley.fetchWorks(this.data.apitoken, 'rect', 2, function(res) {
       that.handleError(res);
       // console.log(res.data);
       let works = res.data;
@@ -278,7 +273,7 @@ Page({
     });
   },
 
-  processFirstWork: function () {
+  processFirstWork: function() {
     // TODO preload next work when user working current work
     if (this.data.works.length > 0) {
       wx.showToast({
@@ -305,9 +300,9 @@ Page({
     }
   },
 
-  downloadWorkFile: function (workId) {
+  downloadWorkFile: function(workId) {
     let that = this;
-    beevalley.downloadWorkFile(this.data.apitoken, workId, function (res) {
+    beevalley.downloadWorkFile(this.data.apitoken, workId, function(res) {
       that.handleError(res);
       var base64 = wx.arrayBufferToBase64(res.data);
       var base64Data = 'data:image/jpeg;base64,' + base64;
@@ -320,7 +315,7 @@ Page({
     });
   },
 
-  handleError: function (res) {
+  handleError: function(res) {
     if (res.statusCode === 401) {
       wx.removeStorageSync('apitoken');
       wx.navigateTo({

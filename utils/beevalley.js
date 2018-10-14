@@ -46,9 +46,9 @@ function submitWork(token, workId, result, callback) {
   });
 }
 
-function cancelWork(token, workId, callback) {
+function cancelWork(token, workIds, callback) {
   wx.request({
-    url: TODVIEW_API_BASE_URL + 'works/' + workId + '/cancel',
+    url: TODVIEW_API_BASE_URL + 'works/' + workIds.join(',') + '/cancel',
     method: 'DELETE',
     header: {
       'Authorization': 'Bearer ' + token
