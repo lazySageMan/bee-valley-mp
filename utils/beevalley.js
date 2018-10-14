@@ -30,5 +30,55 @@ function downloadWorkFile(token, workId, callback) {
   });
 }
 
+function submitWork(token, workId, result, callback) {
+  wx.request({
+    url: TODVIEW_API_BASE_URL + 'works',
+    method: 'POST',
+    data: {
+      'id': workId,
+      'result': result
+    },
+    header: {
+      'content-type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    success: callback
+  });
+}
+
+function cancelWork(token, workId, callback) {
+  wx.request({
+    url: TODVIEW_API_BASE_URL + 'works/' + workId + '/cancel',
+    method: 'DELETE',
+    header: {
+      'Authorization': 'Bearer ' + token
+    },
+    success: callback
+  });
+}
+
+function login(code, callback) {
+  wx.request({
+    url: TODVIEW_API_BASE_URL + 'login/weixin_mp/' + code,
+    method: 'POST',
+    success: callback
+  });
+}
+
+function listAuthorizedWorkType(token, callback) {
+  wx.request({
+    url: TODVIEW_API_BASE_URL + 'works/authorized_types',
+    method: 'GET',
+    header: {
+      'Authorization': 'Bearer ' + token
+    },
+    success: callback
+  });
+}
+
 module.exports.fetchWorks = fetchWorks
 exports.downloadWorkFile = downloadWorkFile
+exports.submitWork = submitWork
+exports.cancelWork = cancelWork
+exports.login = login
+exports.listAuthorizedWorkType = listAuthorizedWorkType

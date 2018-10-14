@@ -2,5 +2,6 @@
     "navigationBarBackgroundColor": "#000000",
     "navigationBarTextStyle": "#fff",
     "navigationBarTitleText": "接任务",
-    "backgroundColor": "#eeeeee"
+    "backgroundColor": "#eeeeee",
+    "enablePullDownRefresh": true
   }

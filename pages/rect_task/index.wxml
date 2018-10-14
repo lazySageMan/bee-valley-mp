@@ -5,7 +5,7 @@
   >
     <canvas
       wx:if="{{currentWork}}" 
-      style="width:{{imgWidth}};height:{{imgHeight}};position:absolute;top:0;left:0;"
+      style="width:{{imgWidth}}px;height:{{imgHeight}}px;position:absolute;top:0;left:0;"
       canvas-id="first"
       disable-scroll=true
       bindtouchstart="bindtouchstart"
@@ -18,7 +18,7 @@
     <image 
       wx:if="{{currentImgSrc}}" 
       class="imglab-imgage" 
-      style="width:{{imgWidth}};height:{{imgHeight}}" 
+      style="width:{{imgWidth}}px;height:{{imgHeight}}px" 
       src="{{currentImgSrc}}" 
       bindload="imageLoad"
     >
@@ -26,10 +26,10 @@
   </view>
   <view class="doSomething">
     <view class="btn">
-        <button type="primary" bindtap="deleteImg">提交</button>
+        <button type="primary" bindtap="submitWork">提交</button>
     </view>
     <view class="btn">
-        <button type="warn" bindtap="deleteImg">放弃</button>
+        <button type="warn" bindtap="cancelWork">放弃</button>
     </view>
   </view>
 </view>
