@@ -4,6 +4,7 @@
   justify-content: center;
   margin-top: 400rpx;
   font-size: 50rpx;
+  padding: 0 50rpx; 
 }
 
 .btn1{
