@@ -59,7 +59,7 @@ Page({
     }
   },
 
-  navToRectTask: function (e) {
+  navToTask: function (e) {
     let taskType = e.currentTarget.dataset.tasktype;
     wx.navigateTo({
       url: "../" + taskType + "_task/index"
