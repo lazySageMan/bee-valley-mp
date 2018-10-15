@@ -1,11 +1,3 @@
-.message {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 400rpx;
-  font-size: 50rpx;
-}
-
 .btn1{
     width: 75%;
     height: 100rpx;

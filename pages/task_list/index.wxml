@@ -1,5 +1,5 @@
 <view class="message" wx:if="{{!authenticated}}">
-  <text>登陆中</text>
+  <text>登录中</text>
 </view>
 
 <view wx:if="{{authenticated}}">
