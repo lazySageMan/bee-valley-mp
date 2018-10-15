@@ -6,7 +6,7 @@
 
   <view wx:for="{{taskTypes}}" wx:key="type">
     <!-- {{index}}: {{item.message}} -->
-    <view class="btn">
+    <view class='{{index === 0 ? "btn1" : "btn" }}'>
       <button type="primary" size="default" bindtap="navToRectTask" data-tasktype="{{item.type}}">{{item.displayName}}</button>
     </view>
   </view>
