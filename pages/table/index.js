@@ -1,23 +1,26 @@
 let beevalley = require("../../utils/beevalley.js");
 Page({
   data: {
-    rectPending: 0,
-    rectRejected: 0,
-    rectApproved: 0,
-    rectMoney: 0,
-
-    pointPending: 0,
-    pointRejected: 0,
-    pointApproved: 0,
-    pointMoney: 0,
+    rect:{
+      Pending: 0,
+      Rejected: 0,
+      Approved: 0,
+      Money: 0
+    },
+    count:{
+      Pending: 0,
+      Rejected: 0,
+      Approved: 0,
+      Money: 0
+    }
   },
   setPendingData: function (data) {
     if (data.length !== 0) {
       var rect = data.filter((item) => item.type === "rect");
       var point = data.filter((item) => item.type === "point");
       this.setData({
-        rectPending: rect.length,
-        PointPending: point.length
+        ["rect.Pending"]: rect.length,
+        ["count.Pending"]: point.length
       })
     }
   },
@@ -26,8 +29,8 @@ Page({
       var rect = data.filter((item) => item.type === "rect");
       var point = data.filter((item) => item.type === "point");
       this.setData({
-        rectRejected: rect.length,
-        pointRejected: point.length
+        ["rect.Rejected"]: rect.length,
+        ["count.Rejected"]: point.length
       })
     }
   },
@@ -45,15 +48,14 @@ Page({
         pointMoney += item.price;
       })
       this.setData({
-        rectMoney: rectMoney,
-        pointMoney: pointMoney,
-        rectApproved: rect.length,
-        pointApproved: point.length
+        ["rect.Money"]: rectMoney.toFixed(2),
+        ["count.Money"]: pointMoney.toFixed(2),
+        ["rect.Approved"]: rect.length,
+        ["count.Approved"]: point.length
       })
     }
   },
   onLoad: function () {
-    console.log('任务记录')
     var nowTime = new Date().getTime();
     var token = wx.getStorageSync('apitoken');
     var apiType = ["rejected", "pending", "approved"];
