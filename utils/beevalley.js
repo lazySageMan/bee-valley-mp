@@ -14,7 +14,7 @@ function fetchWorks(token, type, num, callback) {
       'content-type': 'application/json',
       'Authorization': 'Bearer ' + token
     },
-    success: callback
+    success: wrap(callback)
   });
 }
 
@@ -26,7 +26,7 @@ function downloadWorkFile(token, workId, callback) {
       'Authorization': 'Bearer ' + token
     },
     responseType: 'arraybuffer',
-    success: callback
+    success: wrap(callback)
   });
 }
 
@@ -42,7 +42,7 @@ function submitWork(token, workId, result, callback) {
       'content-type': 'application/json',
       'Authorization': 'Bearer ' + token
     },
-    success: callback
+    success: wrap(callback)
   });
 }
 
@@ -53,7 +53,7 @@ function cancelWork(token, workIds, callback) {
     header: {
       'Authorization': 'Bearer ' + token
     },
-    success: callback
+    success: wrap(callback)
   });
 }
 
@@ -61,7 +61,7 @@ function login(code, callback) {
   wx.request({
     url: TODVIEW_API_BASE_URL + 'login/weixin_mp/' + code,
     method: 'POST',
-    success: callback
+    success: wrap(callback)
   });
 }
 
@@ -72,7 +72,7 @@ function listAuthorizedWorkType(token, callback) {
     header: {
       'Authorization': 'Bearer ' + token
     },
-    success: callback
+    success: wrap(callback)
   });
 }
 
@@ -84,8 +84,29 @@ function getWorkHistory(token, nowTime, apiType, callback) {
       'Authorization': 'Bearer ' + token
     },
     method: 'GET',
-    success: callback
+    success: wrap(callback)
   })
+}
+
+function wrap(callback) {
+  return (res) => {
+    handleError(res);
+    callback(res);
+  }
+}
+
+function handleError(res) {
+  if (res.statusCode === 401) {
+    wx.removeStorageSync('apitoken');
+    wx.reLaunch({
+      url: "../index/index"
+    });
+  } else if (res.statusCode === 403) {
+    // TODO handle conflict case
+    // wx.navigateTo({
+    //   url: "../index/index"
+    // });
+  }
 }
 
 module.exports.fetchWorks = fetchWorks

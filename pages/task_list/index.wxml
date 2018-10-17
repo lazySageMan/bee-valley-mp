@@ -1,8 +1,4 @@
-<view class="message" wx:if="{{!authenticated}}">
-  <text>登录中</text>
-</view>
-
-<view wx:if="{{authenticated}}">
+<view>
 
   <view wx:for="{{taskTypes}}" wx:key="type">
     <view class='{{index === 0 ? "btn1" : "btn" }}'>

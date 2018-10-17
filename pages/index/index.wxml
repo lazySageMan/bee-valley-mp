@@ -1,4 +1,7 @@
-<view>
+<view class="message" wx:if="{{!authenticated}}">
+  <text>登录中</text>
+</view>
+<view wx:if="{{authenticated}}">
     <view class="btn1">
         <button type="primary" size="default" bindtap="intoChoose">任务选择</button>
     </view>
