@@ -25,13 +25,7 @@ Page({
                     pixelRatio: res.pixelRatio,
                     windowWidth: res.windowWidth
                 });
-                beevalley.fetchAuditWorks(that.data.apiToken, 'rect', 2, function (res) { //这边接受一个query确定是什么类型的请求
-                    wx.showLoading({
-                        title: "加载中",
-                        mask: true,
-                    })
-                    that.changePosition(res.data, 'rect')
-                })
+                that.fetchWorks("rect")
             }
         });
     },
@@ -67,15 +61,7 @@ Page({
             imgDataArr: imgA
         })
         if (imgA.length === 0) {
-            var that = this;
-            beevalley.fetchAuditWorks(that.data.apiToken, 'rect', 2, function (res) { //这边接受一个query确定是什么类型的请求
-                wx.showLoading({
-                    title: "加载中",
-                    mask: true,
-                })
-                that.changePosition(res.data, 'rect')
-            })
-
+            this.fetchWorks("rect")
         } else {
             this.createAnchor(this.data.imgDataArr[0].id);
             this.createRect(this.data.imgDataArr[0].id);
@@ -105,6 +91,30 @@ Page({
         beevalley.cancelAuditWork(this.data.apiToken, imgId, function (res) {
             if (res.statusCode === 200) {
                 that.deleteImg(imgId);
+            }
+        })
+    },
+    fetchWorks: function(type){
+        var that = this;
+        beevalley.fetchAuditWorks(that.data.apiToken, type, 2, function (res) { //这边接受一个query确定是什么类型的请求
+            if(res.data.length > 0){
+                wx.showLoading({
+                    title: "加载中",
+                    mask: true,
+                })
+                that.changePosition(res.data, type)
+            }else{
+                wx.showToast({
+                    title: "没有任务，请联系客服",
+                    icon: "loading",
+                    mask: true,
+                    duration:2000,
+                    success: function(){
+                        wx.navigateTo({
+                            url: "../index/index"
+                        })
+                    }
+                })
             }
         })
     },
