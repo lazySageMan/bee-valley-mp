@@ -88,6 +88,24 @@ function getWorkHistory(token, nowTime, apiType, callback) {
   })
 }
 
+//audit
+
+function fetchAuditWorks(token, type, num, callback){
+  wx.request({
+    url: `${TODVIEW_API_BASE_URL}reviews/fetch`,
+    method: 'POST',
+    data: {
+      'type': type,
+      'num': num
+    },
+    header: {
+      'content-type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    success: callback
+  })
+}
+
 module.exports.fetchWorks = fetchWorks
 exports.downloadWorkFile = downloadWorkFile
 exports.submitWork = submitWork
@@ -95,3 +113,4 @@ exports.cancelWork = cancelWork
 exports.login = login
 exports.listAuthorizedWorkType = listAuthorizedWorkType
 exports.getWorkHistory = getWorkHistory
+exports.fetchAuditWorks = fetchAuditWorks

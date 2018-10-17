@@ -257,7 +257,7 @@ Page({
     this.setData({
       apitoken: wx.getStorageSync('apitoken')
     });
-    let context = wx.createCanvasContext('first');
+    let context = wx.createCanvasContext('rectTask');
     this.wxCanvas = new wxDraw(context, 0, 0, 400, 500);
     let that = this;
     wx.getSystemInfo({
