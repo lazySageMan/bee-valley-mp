@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/rect_audit/index",
     "pages/index/index",
     "pages/task_list/index",
     "pages/table/index",

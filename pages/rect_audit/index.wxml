@@ -1,0 +1,34 @@
+<view class="container">
+    <view class="rectAudit">
+        <canvas
+            wx:if="{{imgDataArr.length > 0}}"
+            style="width:{{imgWidth}}px;height:{{imgHeight}}px;position:absolute;top:0;left:0;"
+            canvas-id="rectAudit"
+            disable-scroll=true
+            bindtouchstart="bindtouchstart"
+            bindtouchmove="bindtouchmove"
+            bindtouchend="bindtouchend"
+            bindtap="bindtap"
+            bindlongpress="bindlongpress"
+        ></canvas>
+        <image
+            wx:if="{{imgDataArr.length > 0}}"
+            style="width:{{imgWidth}}px;height:{{imgHeight}}px"
+            class="rectAuditImg"
+            src="{{imgDataArr[0].src}}" 
+            bindload="imageLoad"
+            data-imgId="{{imgDataArr[0].id}}"
+        ></image>
+    </view>
+    <view class="doSomething">
+        <view class="btn">
+            <button type="primary" bindtap="submitWork" data-imgId="{{imgDataArr[0].id}}">通过</button>
+        </view>
+        <view class="btn">
+            <button type="warn" bindtap="rejectWork" data-imgId="{{imgDataArr[0].id}}">驳回</button>
+        </view>
+        <view class="btn">
+            <button type="warn" bindtap="cancelWork" data-imgId="{{imgDataArr[0].id}}">放弃</button>
+        </view>
+    </view>
+</view>

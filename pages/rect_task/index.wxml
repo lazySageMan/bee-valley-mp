@@ -6,7 +6,7 @@
     <canvas
       wx:if="{{imgDataArr.length > 0}}" 
       style="width:{{imgWidth}}px;height:{{imgHeight}}px;position:absolute;top:0;left:0;"
-      canvas-id="first"
+      canvas-id="rectTask"
       disable-scroll=true
       bindtouchstart="bindtouchstart"
       bindtouchmove="bindtouchmove"

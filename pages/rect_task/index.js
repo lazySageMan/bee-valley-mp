@@ -75,7 +75,6 @@ Page({
           })
         }
       })
-
     }
   },
 
@@ -110,7 +109,7 @@ Page({
 
   imageLoad: function (e) {
     var imgW = this.data.windowWidth,
-      imgH = imgW * e.detail.height / e.detail.width;
+        imgH = imgW * e.detail.height / e.detail.width;
 
     this.setData({
       imgHeight: imgH,
@@ -338,16 +337,11 @@ Page({
   },
 
   handleError: function (res) {
-    if (res.statusCode === 401) {
-      wx.removeStorageSync('apitoken');
-      wx.navigateTo({
-        url: "../task_list/index"
-      });
-    } else if (res.statusCode === 403) {
+    if (res.statusCode === 403) {
       // TODO handle conflict case
-      wx.navigateTo({
-        url: "../task_list/index"
-      });
+      wx.navigateBack({
+        delta: 1
+      })
     }
   }
 

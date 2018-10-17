@@ -14,7 +14,7 @@ function fetchWorks(token, type, num, callback) {
       'content-type': 'application/json',
       'Authorization': 'Bearer ' + token
     },
-    success: callback
+    success: wrap(callback)
   });
 }
 
@@ -26,7 +26,7 @@ function downloadWorkFile(token, workId, callback) {
       'Authorization': 'Bearer ' + token
     },
     responseType: 'arraybuffer',
-    success: callback
+    success: wrap(callback)
   });
 }
 
@@ -42,7 +42,7 @@ function submitWork(token, workId, result, callback) {
       'content-type': 'application/json',
       'Authorization': 'Bearer ' + token
     },
-    success: callback
+    success: wrap(callback)
   });
 }
 
@@ -53,7 +53,7 @@ function cancelWork(token, workIds, callback) {
     header: {
       'Authorization': 'Bearer ' + token
     },
-    success: callback
+    success: wrap(callback)
   });
 }
 
@@ -61,7 +61,7 @@ function login(code, callback) {
   wx.request({
     url: TODVIEW_API_BASE_URL + 'login/weixin_mp/' + code,
     method: 'POST',
-    success: callback
+    success: wrap(callback)
   });
 }
 
@@ -72,7 +72,7 @@ function listAuthorizedWorkType(token, callback) {
     header: {
       'Authorization': 'Bearer ' + token
     },
-    success: callback
+    success: wrap(callback)
   });
 }
 
@@ -84,15 +84,36 @@ function getWorkHistory(token, nowTime, apiType, callback) {
       'Authorization': 'Bearer ' + token
     },
     method: 'GET',
-    success: callback
+    success: wrap(callback)
   })
 }
 
-//audit
+function wrap(callback) {
+  return (res) => {
+    handleError(res);
+    callback(res);
+  }
+}
 
-function fetchAuditWorks(token, type, num, callback){
+function handleError(res) {
+  if (res.statusCode === 401) {
+    wx.removeStorageSync('apitoken');
+    wx.reLaunch({
+      url: "../index/index"
+    });
+  } else if (res.statusCode === 403) {
+    // TODO handle conflict case
+    // wx.navigateTo({
+    //   url: "../index/index"
+    // });
+  }
+}
+
+//audit 
+
+function fetchAuditWorks(token, type, num, callback) {
   wx.request({
-    url: `${TODVIEW_API_BASE_URL}reviews/fetch`,
+    url: TODVIEW_API_BASE_URL + 'reviews/fetch',
     method: 'POST',
     data: {
       'type': type,
@@ -102,9 +123,49 @@ function fetchAuditWorks(token, type, num, callback){
       'content-type': 'application/json',
       'Authorization': 'Bearer ' + token
     },
-    success: callback
-  })
+    success: wrap(callback)
+  });
 }
+
+function downloadAuditWorkFile(token, workId, callback) {
+  wx.request({
+    url: TODVIEW_API_BASE_URL + 'reviews/' + workId + '/file',
+    method: 'GET',
+    header: {
+      'Authorization': 'Bearer ' + token
+    },
+    responseType: 'arraybuffer',
+    success: wrap(callback)
+  });
+}
+
+function submitAuditWork(token, workId, result, callback) {
+  wx.request({
+    url: TODVIEW_API_BASE_URL + 'reviews',
+    method: 'POST',
+    data: {
+      'id': workId,
+      'result': result
+    },
+    header: {
+      'content-type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    success: wrap(callback)
+  });
+}
+
+function cancelAuditWork(token, workId, callback) {
+  wx.request({
+    url: TODVIEW_API_BASE_URL + 'reviews/' + workId + '/cancel',
+    method: 'DELETE',
+    header: {
+      'Authorization': 'Bearer ' + token
+    },
+    success: wrap(callback)
+  });
+}
+
 
 module.exports.fetchWorks = fetchWorks
 exports.downloadWorkFile = downloadWorkFile
@@ -114,3 +175,6 @@ exports.login = login
 exports.listAuthorizedWorkType = listAuthorizedWorkType
 exports.getWorkHistory = getWorkHistory
 exports.fetchAuditWorks = fetchAuditWorks
+exports.downloadAuditWorkFile = downloadAuditWorkFile
+exports.submitAuditWork = submitAuditWork
+exports.cancelAuditWork = cancelAuditWork
