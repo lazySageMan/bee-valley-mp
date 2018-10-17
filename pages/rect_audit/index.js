@@ -12,6 +12,13 @@ Page({
         imgWidth: 0,
     },
     onLoad: function () {
+
+        var query = wx.createSelectorQuery();
+        query.select('.rectAudit').boundingClientRect()
+        query.exec(function (res) {  
+            //console.log(res);  
+            console.log(res[0].height, res[0].width);
+        })
         console.log("audit pages");
         this.setData({
             apiToken: wx.getStorageSync('apitoken')
