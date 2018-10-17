@@ -25,6 +25,7 @@ Page({
                 wx.setStorage({
                   key: 'apitoken', data: token, success: function () {
                     that.setData({ authenticated: true });
+                    that.fetchTaskTypes();//将apitoken存起来之后，马上调用让按钮渲染出来
                   }
                 });
               }
@@ -34,17 +35,18 @@ Page({
       });
     } else {
       this.setData({ authenticated: true });
+      this.fetchTaskTypes();//存在apitoken时，就直接让按按钮渲染出来
     }
 
   },
 
-  onShow: function () {
-    this.fetchTaskTypes();
-  },
+  // onShow: function () {
+  //   this.fetchTaskTypes();
+  // },
 
-  onPullDownRefresh: function () {
-    this.fetchTaskTypes();
-  },
+  // onPullDownRefresh: function () {
+  //   this.fetchTaskTypes();
+  // },
 
   fetchTaskTypes: function () {
     let apitoken = wx.getStorageSync('apitoken');
@@ -52,10 +54,8 @@ Page({
       let that = this;
       beevalley.listAuthorizedWorkType(apitoken, function (res) {
         that.setData({ taskTypes: res.data });
-        wx.stopPullDownRefresh();
+        //wx.stopPullDownRefresh();//不需要下拉刷新了
       });
-    } else {
-      wx.stopPullDownRefresh();
     }
   },
 
