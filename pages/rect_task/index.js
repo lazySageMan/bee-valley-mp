@@ -27,15 +27,15 @@ Page({
     rectInitialized: false,
 
     //在这里改变
-    pointsPosition: [],
+    // pointsPosition: [],
     imgDataArr: []
   },
 
   submitWork: function (e) {
-    if (this.data.pointsPosition && this.data.rectInitialized) {
+    if (this.data.rectInitialized) {
       let imgId = e.currentTarget.dataset.imgid
       let that = this;
-      this.data.pointsPosition.forEach((item) => {
+      this.data.imgDataArr.forEach((item) => {
         if (item.id === imgId) {
           var relativeAnchorX = item.x / this.data.imgRatio;
           var relativeAnchorY = item.y / this.data.imgRatio;
@@ -44,12 +44,12 @@ Page({
               this.data.apitoken,
               item.id, [
                 [{
-                  x: Math.round(this.data.rectPosition.xMin * this.data.imgRatio),
-                  y: Math.round(this.data.rectPosition.yMin * this.data.imgRatio)
+                  x: item.xOffset + Math.round(this.data.rectPosition.xMin * this.data.imgRatio),
+                  y: item.yOffset + Math.round(this.data.rectPosition.yMin * this.data.imgRatio)
                 },
                 {
-                  x: Math.round(this.data.rectPosition.xMax * this.data.imgRatio),
-                  y: Math.round(this.data.rectPosition.yMax * this.data.imgRatio)
+                  x: item.xOffset + Math.round(this.data.rectPosition.xMax * this.data.imgRatio),
+                  y: item.yOffset + Math.round(this.data.rectPosition.yMax * this.data.imgRatio)
                 }
                 ]
               ],
@@ -82,7 +82,7 @@ Page({
     this.data.imgDataArr.forEach((item) => {
       if (item.id === imgId) {
         let arr = this.data.works.filter((item) => item.id !== imgId);
-        let pointP = this.data.pointsPosition.filter((item) => item.id !== imgId);
+        // let pointP = this.data.pointsPosition.filter((item) => item.id !== imgId);
         let imgA = this.data.imgDataArr.filter((item) => item.id !== imgId);
         if (this.rect) {
           this.rect.destroy();
@@ -94,11 +94,11 @@ Page({
         }
         this.setData({
           works: arr,
-          pointsPosition: pointP,
+          // pointsPosition: pointP,
           imgDataArr: imgA,
           rectInitialized: false
         })
-        if (arr.length === 0 && pointP.length === 0 && imgA.length === 0) {
+        if (arr.length === 0 && imgA.length === 0) {
           this.fetchWorks();
         } else {//这边判断请求来的图片，没有就将对应图片的point创建出来
           this.createAnchor(this.data.imgDataArr[0].id)//一直让imgDataArr的第一个作为显示的图片
@@ -120,12 +120,12 @@ Page({
   },
 
   createAnchor: function (id) {
-    this.data.pointsPosition.forEach((item) => {
+    this.data.imgDataArr.forEach((item) => {
       if (item.id === id && !this.circle) {
         var circle = new Shape('circle', {
           x: item.x / this.data.imgRatio,
           y: item.y / this.data.imgRatio,
-          r: 2,
+          r: 5,
           fillStyle: "#E6324B"
         });
         this.wxCanvas.add(circle);
@@ -171,7 +171,7 @@ Page({
     let deltaYmin = Math.abs(y - this.data.rectPosition.yMin);
     let deltaYmax = Math.abs(y - this.data.rectPosition.yMax);
     let minimum = Math.min(deltaXmin, deltaXmax, deltaYmin, deltaYmax);
-    if (minimum > 50) {
+    if (minimum > 100) {
       return;
     }
     if (deltaXmax === minimum && this.data.rectPosition.yMin < y && this.data.rectPosition.yMax > y) {
@@ -263,7 +263,8 @@ Page({
       success: function (res) {
         that.setData({
           pixelRatio: res.pixelRatio,
-          windowWidth: res.windowWidth
+          windowWidth: res.windowWidth,
+          windowHeight: res.windowHeight
         });
         that.fetchWorks();
       }
@@ -276,9 +277,10 @@ Page({
   },
   fetchWorks: function () {
     let that = this;
-    wx.showLoading({ //调用这个可以不用传显示时间，请求链结束后，调用关闭的api就好了
+    wx.showToast({ //调用这个可以不用传显示时间，请求链结束后，调用关闭的api就好了
       title: "加载中",
       mask: true,
+      icon: 'loading'
     })
     beevalley.fetchWorks(this.data.apitoken, 'rect', 2, function (res) {//传不同的数字，请求不同数量的图片
       that.handleError(res);
@@ -294,18 +296,18 @@ Page({
   processFirstWork: function () {
     // TODO preload next work when user working current work
     if (this.data.works.length > 0) {
-      var that = this;
-      var pointsArr = []
-      this.data.works.forEach((item) => { //将请求的到点，放到
-        pointsArr.push({
-          id: item.id,
-          x: item.prerequisites[0].result[item.meta.index].x,
-          y: item.prerequisites[0].result[item.meta.index].y
-        })
-        that.setData({
-          pointsPosition: pointsArr
-        })
-      })
+      // var that = this;
+      // var pointsArr = []
+      // this.data.works.forEach((item) => { //将请求的到点，放到
+      //   pointsArr.push({
+      //     id: item.id,
+      //     x: item.prerequisites[0].result[item.meta.index].x,
+      //     y: item.prerequisites[0].result[item.meta.index].y
+      //   })
+      //   that.setData({
+      //     pointsPosition: pointsArr
+      //   })
+      // })
       this.downloadWorkFile()
     } else {
       wx.showToast({
@@ -319,21 +321,50 @@ Page({
     let that = this;
     if (this.data.works.length !== 0) {
       var imgArr = [];
-      console.log(this.data.pointsPosition)
+      // console.log(this.data.pointsPosition)
       this.data.works.forEach((item) => {
-        beevalley.downloadWorkFile(this.data.apitoken, item.id, function (res) {
+        let anchorX = Math.round(item.prerequisites[0].result[item.meta.index].x);
+        let anchorY = Math.round(item.prerequisites[0].result[item.meta.index].y);
+        // TODO remove default image width height 
+        let options = that.calculateWorkarea(item.meta.imageWidth ? item.meta.imageWidth : 1536, item.meta.imageHeight ? item.meta.imageHeight : 1900, anchorX, anchorY, that.data.windowWidth, that.data.windowHeight - 80);
+        options['format'] = 'png';
+        beevalley.downloadWorkFile(this.data.apitoken, item.id, options, function (res) {
           that.handleError(res);
           imgArr.push({
-            src: 'data:image/jpeg;base64,' + wx.arrayBufferToBase64(res.data),
-            id: item.id
+            src: 'data:image/png;base64,' + wx.arrayBufferToBase64(res.data),
+            id: item.id,
+            xOffset: options.x,
+            yOffset: options.y,
+            x: anchorX - options.x,
+            y: anchorY - options.y
           })
           that.setData({
             imgDataArr: imgArr
           })
-          wx.hideLoading();
+          wx.hideToast();
         })
       })
     }
+  },
+
+  calculateWorkarea: function (imageWidth, imageHeight, anchorX, anchorY, windowWidth, windowHeight) {
+    var x;
+    if (anchorX < windowWidth / 2) {
+      x = 0;
+    } else if (anchorX > imageWidth - windowWidth / 2) {
+      x = imageWidth - windowWidth;
+    } else {
+      x = anchorX - windowWidth / 2
+    }
+    var y;
+    if (anchorY < windowHeight / 2) {
+      y = 0;
+    } else if (anchorY > imageHeight - windowHeight / 2) {
+      y = imageHeight - windowHeight;
+    } else {
+      y = anchorY - windowHeight / 2
+    }
+    return { x: x, y: y, width: windowWidth, height: windowHeight };
   },
 
   handleError: function (res) {

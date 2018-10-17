@@ -18,9 +18,9 @@ function fetchWorks(token, type, num, callback) {
   });
 }
 
-function downloadWorkFile(token, workId, callback) {
+function downloadWorkFile(token, workId, options, callback) {
   wx.request({
-    url: TODVIEW_API_BASE_URL + 'works/' + workId + '/file',
+    url: options ? `${TODVIEW_API_BASE_URL}works/${workId}/file?format=${options.format}&x=${options.x}&y=${options.y}&width=${options.width}&height=${options.height}` : `${TODVIEW_API_BASE_URL}works/${workId}/file`,
     method: 'GET',
     header: {
       'Authorization': 'Bearer ' + token
