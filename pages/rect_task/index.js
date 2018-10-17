@@ -44,12 +44,12 @@ Page({
               this.data.apitoken,
               item.id, [
                 [{
-                  x: item.xOffset + Math.round(this.data.rectPosition.xMin * this.data.imgRatio),
-                  y: item.yOffset + Math.round(this.data.rectPosition.yMin * this.data.imgRatio)
+                  x: item.xOffset + Math.floor(this.data.rectPosition.xMin * this.data.imgRatio),
+                  y: item.yOffset + Math.floor(this.data.rectPosition.yMin * this.data.imgRatio)
                 },
                 {
-                  x: item.xOffset + Math.round(this.data.rectPosition.xMax * this.data.imgRatio),
-                  y: item.yOffset + Math.round(this.data.rectPosition.yMax * this.data.imgRatio)
+                  x: item.xOffset + Math.floor(this.data.rectPosition.xMax * this.data.imgRatio),
+                  y: item.yOffset + Math.floor(this.data.rectPosition.yMax * this.data.imgRatio)
                 }
                 ]
               ],
@@ -108,7 +108,7 @@ Page({
   },
 
   imageLoad: function (e) {
-    var imgW = this.data.windowWidth,
+    var imgW = this.data.imageAreaWidth,
         imgH = imgW * e.detail.height / e.detail.width;
 
     this.setData({
@@ -259,16 +259,18 @@ Page({
     let context = wx.createCanvasContext('rectTask');
     this.wxCanvas = new wxDraw(context, 0, 0, 400, 500);
     let that = this;
-    wx.getSystemInfo({
-      success: function (res) {
-        that.setData({
-          pixelRatio: res.pixelRatio,
-          windowWidth: res.windowWidth,
-          windowHeight: res.windowHeight
-        });
-        that.fetchWorks();
-      }
-    });
+    var query = wx.createSelectorQuery();
+    query.select('.imglab').boundingClientRect()
+    query.exec(function (res) {
+      //console.log(res);  
+      that.setData({
+        imageAreaWidth: Math.floor(res[0].width),
+        imageAreaHeight: Math.floor(res[0].height)
+      });
+      // console.log(res[0].height, res[0].width);
+      that.fetchWorks();
+    })
+
   },
 
   onUnload: function () {
@@ -323,10 +325,10 @@ Page({
       var imgArr = [];
       // console.log(this.data.pointsPosition)
       this.data.works.forEach((item) => {
-        let anchorX = Math.round(item.prerequisites[0].result[item.meta.index].x);
-        let anchorY = Math.round(item.prerequisites[0].result[item.meta.index].y);
+        let anchorX = Math.floor(item.prerequisites[0].result[item.meta.index].x);
+        let anchorY = Math.floor(item.prerequisites[0].result[item.meta.index].y);
         // TODO remove default image width height 
-        let options = that.calculateWorkarea(item.meta.imageWidth ? item.meta.imageWidth : 1536, item.meta.imageHeight ? item.meta.imageHeight : 1900, anchorX, anchorY, that.data.windowWidth, that.data.windowHeight - 80);
+        let options = that.calculateWorkarea(item.meta.imageWidth ? item.meta.imageWidth : 1536, item.meta.imageHeight ? item.meta.imageHeight : 1900, anchorX, anchorY, that.data.imageAreaWidth, that.data.imageAreaHeight);
         options['format'] = 'png';
         beevalley.downloadWorkFile(this.data.apitoken, item.id, options, function (res) {
           that.handleError(res);
@@ -364,7 +366,7 @@ Page({
     } else {
       y = anchorY - windowHeight / 2
     }
-    return { x: x, y: y, width: windowWidth, height: windowHeight };
+    return { x: Math.floor(x), y: Math.floor(y), width: windowWidth, height: windowHeight };
   },
 
   handleError: function (res) {
