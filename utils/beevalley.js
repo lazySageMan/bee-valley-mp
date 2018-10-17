@@ -109,6 +109,64 @@ function handleError(res) {
   }
 }
 
+//audit 
+
+function fetchAuditWorks(token, type, num, callback) {
+  wx.request({
+    url: TODVIEW_API_BASE_URL + 'reviews/fetch',
+    method: 'POST',
+    data: {
+      'type': type,
+      'num': num
+    },
+    header: {
+      'content-type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    success: wrap(callback)
+  });
+}
+
+function downloadAuditWorkFile(token, workId, callback) {
+  wx.request({
+    url: TODVIEW_API_BASE_URL + 'reviews/' + workId + '/file',
+    method: 'GET',
+    header: {
+      'Authorization': 'Bearer ' + token
+    },
+    responseType: 'arraybuffer',
+    success: wrap(callback)
+  });
+}
+
+function submitAuditWork(token, workId, result, callback) {
+  wx.request({
+    url: TODVIEW_API_BASE_URL + 'reviews',
+    method: 'POST',
+    data: {
+      'id': workId,
+      'result': result
+    },
+    header: {
+      'content-type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    success: wrap(callback)
+  });
+}
+
+function cancelAuditWork(token, workId, callback) {
+  wx.request({
+    url: TODVIEW_API_BASE_URL + 'reviews/' + workId + '/cancel',
+    method: 'DELETE',
+    header: {
+      'Authorization': 'Bearer ' + token
+    },
+    success: wrap(callback)
+  });
+}
+
+
 module.exports.fetchWorks = fetchWorks
 exports.downloadWorkFile = downloadWorkFile
 exports.submitWork = submitWork
@@ -116,3 +174,7 @@ exports.cancelWork = cancelWork
 exports.login = login
 exports.listAuthorizedWorkType = listAuthorizedWorkType
 exports.getWorkHistory = getWorkHistory
+exports.fetchAuditWorks = fetchAuditWorks
+exports.downloadAuditWorkFile = downloadAuditWorkFile
+exports.submitAuditWork = submitAuditWork
+exports.cancelAuditWork = cancelAuditWork

@@ -109,7 +109,7 @@ Page({
 
   imageLoad: function (e) {
     var imgW = this.data.windowWidth,
-      imgH = imgW * e.detail.height / e.detail.width;
+        imgH = imgW * e.detail.height / e.detail.width;
 
     this.setData({
       imgHeight: imgH,
@@ -256,7 +256,7 @@ Page({
     this.setData({
       apitoken: wx.getStorageSync('apitoken')
     });
-    let context = wx.createCanvasContext('first');
+    let context = wx.createCanvasContext('rectTask');
     this.wxCanvas = new wxDraw(context, 0, 0, 400, 500);
     let that = this;
     wx.getSystemInfo({
