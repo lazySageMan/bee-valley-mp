@@ -1,12 +1,11 @@
 {
   "pages": [
-    "pages/rect_audit/index",
     "pages/index/index",
+    "pages/rect_audit/index",
     "pages/task_list/index",
     "pages/table/index",
-    "pages/rect_task/index"
-    
-    
+    "pages/rect_task/index",
+    "pages/audit_list/index"
   ],
   "window": {
     "backgroundTextStyle": "light",

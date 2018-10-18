@@ -15,7 +15,7 @@ Page({
 
         var query = wx.createSelectorQuery();
         query.select('.rectAudit').boundingClientRect()
-        query.exec(function (res) {  
+        query.exec(function (res) {
             //console.log(res);  
             console.log(res[0].height, res[0].width);
         })
@@ -36,6 +36,15 @@ Page({
             }
         });
     },
+    clickIcon(e) {
+        // e.target.dataset.imgdescription
+        wx.showModal({
+            title: "提示",
+            content: e.target.dataset.imgdescription,
+            showCancel: false,
+            confirmText: "知道了"
+        })
+    },
     imageLoad: function (e) {
         var imgW = this.data.windowWidth,
             imgH = imgW * e.detail.height / e.detail.width;
@@ -44,15 +53,12 @@ Page({
             imgWidth: imgW,
             imgRatio: e.detail.width / imgW
         })
-        if (this.data.pointsPosition.length > 0) {
-            this.createAnchor(e.currentTarget.dataset.imgid);
-        } else if (this.data.rectsPosition.length > 0) {
-            this.createRect(e.currentTarget.dataset.imgid);
-        }
+        console.log(this.data.imgDataArr)
+        this.createRect(e.currentTarget.dataset.imgid)
     },
     deleteImg: function (imgId) {
-        let pointP = this.data.pointsPosition.filter((item) => item.id !== imgId);
-        let rectP = this.data.rectsPosition.filter((item) => item.id !== imgId);
+        // let pointP = this.data.pointsPosition.filter((item) => item.id !== imgId);
+        // let rectP = this.data.rectsPosition.filter((item) => item.id !== imgId);
         let imgA = this.data.imgDataArr.filter((item) => item.id !== imgId);
         if (this.rect) {
             this.rect.destroy();
@@ -63,8 +69,6 @@ Page({
             this.circle = null;
         }
         this.setData({
-            pointsPosition: pointP,
-            rectsPosition: rectP,
             imgDataArr: imgA
         })
         if (imgA.length === 0) {
@@ -101,22 +105,22 @@ Page({
             }
         })
     },
-    fetchWorks: function(type){
+    fetchWorks: function (type) {
         var that = this;
         beevalley.fetchAuditWorks(that.data.apiToken, type, 2, function (res) { //这边接受一个query确定是什么类型的请求
-            if(res.data.length > 0){
+            if (res.data.length > 0) {
                 wx.showLoading({
                     title: "加载中",
                     mask: true,
                 })
                 that.changePosition(res.data, type)
-            }else{
+            } else {
                 wx.showToast({
                     title: "没有任务，请联系客服",
                     icon: "loading",
                     mask: true,
-                    duration:2000,
-                    success: function(){
+                    duration: 2000,
+                    success: function () {
                         wx.navigateTo({
                             url: "../index/index"
                         })
@@ -127,20 +131,21 @@ Page({
     },
     changePosition: function (data, type) {
         if (type === 'rect' && data.length > 0) {//根据类型分别处理数据
-            var positionArr = [];
-            data.forEach((item) => {
-                positionArr.push({
-                    id: item.id,
-                    minX: item.work.result[0][0].x,
-                    minY: item.work.result[0][0].y,
-                    maxX: item.work.result[0][1].x,
-                    maxY: item.work.result[0][1].y
-                })
-                this.setData({
-                    rectsPosition: positionArr
-                })
-            })
-            this.getImgFiles(this.data.rectsPosition);
+            // console.log(data)
+            // var positionArr = [];
+            // data.forEach((item) => {
+            //     positionArr.push({
+            //         id: item.id,
+            //         minX: item.work.result[0][0].x,
+            //         minY: item.work.result[0][0].y,
+            //         maxX: item.work.result[0][1].x,
+            //         maxY: item.work.result[0][1].y
+            //     })
+            //     this.setData({
+            //         rectsPosition: positionArr
+            //     })
+            // })
+            this.getImgFiles(data);
         } else if (type === 'count' && data.length > 0) {
             //这里吧对应的点放入
         }
@@ -153,7 +158,12 @@ Page({
                 beevalley.downloadAuditWorkFile(this.data.apiToken, item.id, function (res) {
                     imgArr.push({
                         src: 'data:image/jpeg;base64,' + wx.arrayBufferToBase64(res.data),
-                        id: item.id
+                        id: item.id,
+                        minX: item.work.result[0][0].x,
+                        minY: item.work.result[0][0].y,
+                        maxX: item.work.result[0][1].x,
+                        maxY: item.work.result[0][1].y,
+                        description: item.work.description
                     })
                     that.setData({
                         imgDataArr: imgArr
@@ -181,7 +191,8 @@ Page({
     },
     createRect: function (id) {
         if (!this.rect) {
-            this.data.rectsPosition.forEach((item) => {
+            console.log(this.data.imgDataArr)
+            this.data.imgDataArr.forEach((item) => {
                 if (item.id === id) {
                     var rect = new Shape('rect', {
                         x: ((item.maxX / this.data.imgRatio) + (item.minX / this.data.imgRatio)) / 2,

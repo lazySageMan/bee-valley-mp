@@ -166,6 +166,17 @@ function cancelAuditWork(token, workId, callback) {
   });
 }
 
+function listAuthorizedReviewsType(token, callback){
+  wx.request({
+    url: TODVIEW_API_BASE_URL + 'reviews/authorized_types',
+    method: 'GET',
+    header: {
+      'Authorization': 'Bearer ' + token
+    },
+    success: wrap(callback)
+  });
+}
+
 
 module.exports.fetchWorks = fetchWorks
 exports.downloadWorkFile = downloadWorkFile
@@ -178,3 +189,4 @@ exports.fetchAuditWorks = fetchAuditWorks
 exports.downloadAuditWorkFile = downloadAuditWorkFile
 exports.submitAuditWork = submitAuditWork
 exports.cancelAuditWork = cancelAuditWork
+exports.listAuthorizedReviewsType = listAuthorizedReviewsType

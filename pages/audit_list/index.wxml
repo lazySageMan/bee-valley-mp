@@ -1,0 +1,13 @@
+<view>
+
+    <view wx:for="{{taskTypes}}" wx:key="type">
+      <view class='{{index === 0 ? "btn1" : "btn" }}'>
+        <button type="primary" size="default" bindtap="navToTask" data-tasktype="{{item.type}}">{{item.displayName}}</button>
+      </view>
+    </view>
+  
+    <view class="message" wx:if="{{taskTypes && taskTypes.length === 0}}">
+      <text>暂无可接任务，请联系客服获取相应权限</text>
+    </view>
+  
+  </view>

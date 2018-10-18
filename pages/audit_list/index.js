@@ -8,7 +8,7 @@ Page({
   },
 
   onLoad: function () {
-    console.log("任务面板");
+    console.log("审核面板");
 
     let that = this;
     let apitoken = wx.getStorageSync('apitoken');
@@ -27,8 +27,8 @@ Page({
 
   fetchTaskTypes: function () {
     let that = this;
-    beevalley.listAuthorizedWorkType(this.data.apitoken, function (res) {
-      console.log(res)//等待后端改数据类型
+    beevalley.listAuthorizedReviewsType(this.data.apitoken, function (res) {
+      console.log(res)
       that.setData({ taskTypes: res.data });
       wx.stopPullDownRefresh();
     });
@@ -37,7 +37,7 @@ Page({
   navToTask: function (e) {
     let taskType = e.currentTarget.dataset.tasktype;
     wx.navigateTo({
-      url: "../" + taskType + "_task/index"
+      url: "../" + taskType + "audit/index"
     })
   }
 

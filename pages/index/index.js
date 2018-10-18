@@ -44,6 +44,12 @@ Page({
     wx.navigateTo({
       url: '../table/index'
     })
+  },
+
+  intoAuditChoose: function () {
+    wx.navigateTo({
+      url: '../audit_list/index'
+    })
   }
 
 })
