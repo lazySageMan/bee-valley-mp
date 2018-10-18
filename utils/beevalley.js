@@ -57,6 +57,17 @@ function cancelWork(token, workIds, callback) {
   });
 }
 
+function cancelReview(token, reviewIds, callback) {
+  wx.request({
+    url: TODVIEW_API_BASE_URL + 'reviews/' + reviewIds.join(',') + '/cancel',
+    method: 'DELETE',
+    header: {
+      'Authorization': 'Bearer ' + token
+    },
+    success: wrap(callback)
+  });
+}
+
 function login(code, callback) {
   wx.request({
     url: TODVIEW_API_BASE_URL + 'login/weixin_mp/' + code,
@@ -139,7 +150,7 @@ function downloadAuditWorkFile(token, workId, callback) {
   });
 }
 
-function submitAuditWork(token, workId, result, callback) {
+function submitReview(token, workId, result, callback) {
   wx.request({
     url: TODVIEW_API_BASE_URL + 'reviews',
     method: 'POST',
@@ -155,16 +166,16 @@ function submitAuditWork(token, workId, result, callback) {
   });
 }
 
-function cancelAuditWork(token, workId, callback) {
-  wx.request({
-    url: TODVIEW_API_BASE_URL + 'reviews/' + workId + '/cancel',
-    method: 'DELETE',
-    header: {
-      'Authorization': 'Bearer ' + token
-    },
-    success: wrap(callback)
-  });
-}
+// function cancelAuditWork(token, workId, callback) {
+//   wx.request({
+//     url: TODVIEW_API_BASE_URL + 'reviews/' + workId + '/cancel',
+//     method: 'DELETE',
+//     header: {
+//       'Authorization': 'Bearer ' + token
+//     },
+//     success: wrap(callback)
+//   });
+// }
 
 function listAuthorizedReviewsType(token, callback){
   wx.request({
@@ -187,6 +198,6 @@ exports.listAuthorizedWorkType = listAuthorizedWorkType
 exports.getWorkHistory = getWorkHistory
 exports.fetchAuditWorks = fetchAuditWorks
 exports.downloadAuditWorkFile = downloadAuditWorkFile
-exports.submitAuditWork = submitAuditWork
-exports.cancelAuditWork = cancelAuditWork
+exports.submitReview = submitReview
+exports.cancelReview = cancelReview
 exports.listAuthorizedReviewsType = listAuthorizedReviewsType

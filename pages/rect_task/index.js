@@ -287,6 +287,7 @@ Page({
     this.wxCanvas.clear();
     beevalley.cancelWork(this.data.apitoken, this.data.works.map(w => w.id), function (res) { })
   },
+  
   fetchWorks: function () {
     let that = this;
     wx.showToast({ //调用这个可以不用传显示时间，请求链结束后，调用关闭的api就好了

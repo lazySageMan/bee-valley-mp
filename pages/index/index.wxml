@@ -3,12 +3,12 @@
 </view>
 <view wx:if="{{authenticated}}">
     <view class="btn1">
-        <button type="primary" size="default" bindtap="intoChoose">任务选择</button>
+        <button type="primary" size="default" bindtap="intoChoose">任务</button>
     </view>
     <view class="btn">
-        <button type="primary" size="default" bindtap="intoAuditChoose">审核选择</button>
+        <button type="primary" size="default" bindtap="intoAuditChoose">审核</button>
     </view>
     <view class="btn">
-        <button type="primary" size="default" bindtap="intoList">任务记录</button>
+        <button type="primary" size="default" bindtap="intoList">工作记录</button>
     </view>
 </view>
