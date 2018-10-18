@@ -10,8 +10,6 @@ Page({
   data: {
     errorMessage: null,
     works: [],
-    // currentWork: null,
-    // currentImgSrc: null,
     imgHeight: '',
     imgWidth: '',
     rectPosition: {
@@ -20,17 +18,18 @@ Page({
       yMin: 0,
       yMax: 0
     },
-    // anchorPosition: {
-    //   x: 0,
-    //   y: 0
-    // },
     rectInitialized: false,
-
-    //在这里改变
-    // pointsPosition: [],
     imgDataArr: []
   },
-
+  clickIcon(e){
+    // e.target.dataset.imgdescription
+    wx.showModal({
+      title: "提示",
+      content: e.target.dataset.imgdescription,
+      showCancel: false,
+      confirmText: "知道了"
+    })
+  },
   submitWork: function (e) {
     if (this.data.rectInitialized) {
       let imgId = e.currentTarget.dataset.imgid
@@ -117,6 +116,7 @@ Page({
       imgRatio: e.detail.width / imgW
     })
     this.createAnchor(e.currentTarget.dataset.imgid);
+    this.createRect(e.currentTarget.dataset.imgid);
   },
 
   createAnchor: function (id) {
@@ -134,20 +134,30 @@ Page({
     })
   },
 
-  createRect: function () {
-    if (!this.rect) {
-      var rect = new Shape('rect', {
-        x: 0,
-        y: 0,
-        w: 0,
-        h: 0,
-        lineWidth: 2,
-        lineCap: 'round',
-        strokeStyle: "#339933",
-      }, 'stroke', false);
-      this.wxCanvas.add(rect);
-      this.rect = rect;
-    }
+  createRect: function (id) {
+    this.data.imgDataArr.forEach((item) => {
+        if (item.id === id && !this.rect) {
+          var rect = new Shape('rect', {
+            x: ((item.PreviousWork.xMax / this.data.imgRatio) + (item.PreviousWork.xMin / this.data.imgRatio))/2,
+            y: ((item.PreviousWork.yMin / this.data.imgRatio) + (item.PreviousWork.yMax / this.data.imgRatio))/2,
+            w: (item.PreviousWork.xMax / this.data.imgRatio) - (item.PreviousWork.xMin / this.data.imgRatio),
+            h: (item.PreviousWork.yMax / this.data.imgRatio) - (item.PreviousWork.yMin / this.data.imgRatio),
+            lineWidth: 2,
+            lineCap: 'round',
+            strokeStyle: "#339933",
+          }, 'stroke', false);
+          this.wxCanvas.add(rect);
+          this.rect = rect;
+          this.data.rectPosition.xMax = (item.PreviousWork.xMax / this.data.imgRatio);
+          this.data.rectPosition.xMin = (item.PreviousWork.xMin / this.data.imgRatio);
+          this.data.rectPosition.yMax = (item.PreviousWork.yMax / this.data.imgRatio);
+          this.data.rectPosition.yMin = (item.PreviousWork.yMin / this.data.imgRatio);
+          if(this.data.rectPosition.xMax !== 0 && this.data.rectPosition.xMin !==0 && this.data.rectPosition.yMax !== 0 && this.data.rectPosition.yMin !== 0){
+            this.data.rectInitialized = true //如果有驳回的方框，就开始编辑
+          }
+        }
+    })
+    
   },
 
   initializeRectPosition: function (x, y) {
@@ -206,7 +216,7 @@ Page({
     }
 
     if (!this.data.rectInitialized) {
-      this.createRect();
+      // this.createRect();
       this.data.rectPosition.xMin = e.touches[0].x;
       this.data.rectPosition.yMin = e.touches[0].y;
     } else {
@@ -298,18 +308,6 @@ Page({
   processFirstWork: function () {
     // TODO preload next work when user working current work
     if (this.data.works.length > 0) {
-      // var that = this;
-      // var pointsArr = []
-      // this.data.works.forEach((item) => { //将请求的到点，放到
-      //   pointsArr.push({
-      //     id: item.id,
-      //     x: item.prerequisites[0].result[item.meta.index].x,
-      //     y: item.prerequisites[0].result[item.meta.index].y
-      //   })
-      //   that.setData({
-      //     pointsPosition: pointsArr
-      //   })
-      // })
       this.downloadWorkFile()
     } else {
       wx.showToast({
@@ -327,18 +325,27 @@ Page({
       this.data.works.forEach((item) => {
         let anchorX = Math.floor(item.prerequisites[0].result[item.meta.index].x);
         let anchorY = Math.floor(item.prerequisites[0].result[item.meta.index].y);
+        let PreviousRect = that.getPreviousRect(item.previousWork);
+        // console.log(PreviousRect)
         // TODO remove default image width height 
         let options = that.calculateWorkarea(item.meta.imageWidth ? item.meta.imageWidth : 1536, item.meta.imageHeight ? item.meta.imageHeight : 1900, anchorX, anchorY, that.data.imageAreaWidth, that.data.imageAreaHeight);
         options['format'] = 'png';
         beevalley.downloadWorkFile(this.data.apitoken, item.id, options, function (res) {
           that.handleError(res);
           imgArr.push({
+            description:item.description,
             src: 'data:image/png;base64,' + wx.arrayBufferToBase64(res.data),
             id: item.id,
             xOffset: options.x,
             yOffset: options.y,
             x: anchorX - options.x,
-            y: anchorY - options.y
+            y: anchorY - options.y,
+            PreviousWork: {
+              xMin: PreviousRect ? PreviousRect.xMin  : 0,
+              xMax: PreviousRect ? PreviousRect.xMax  : 0,
+              yMin: PreviousRect ? PreviousRect.yMin  : 0,
+              yMax: PreviousRect ? PreviousRect.yMax  : 0
+            }
           })
           that.setData({
             imgDataArr: imgArr
@@ -348,7 +355,20 @@ Page({
       })
     }
   },
-
+  getPreviousRect: function(PreviousWork){
+    // console.log(PreviousWork)
+    if(PreviousWork && PreviousWork.result.length === 1){
+      var result = PreviousWork.result[0];
+      return {
+        xMin: result[0].x,
+        yMin: result[0].y,
+        xMax: result[1].x,
+        yMax: result[1].y
+      }
+    } else {
+      return false
+    }
+  },
   calculateWorkarea: function (imageWidth, imageHeight, anchorX, anchorY, windowWidth, windowHeight) {
     var x;
     if (anchorX < windowWidth / 2) {

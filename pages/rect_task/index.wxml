@@ -32,5 +32,6 @@
     <view class="btn">
         <button type="warn" bindtap="cancelWork" data-imgId="{{imgDataArr[0].id}}">放弃</button>
     </view>
+    <icon type="warn" class="icon" bindtap="clickIcon" size="20" data-imgdescription="{{imgDataArr[0].description}}" color="#33CCFF"/>
   </view>
 </view>

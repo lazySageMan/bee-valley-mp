@@ -10,7 +10,13 @@
   display: flex;
   justify-content:center;
   align-items: center;
+  position: relative;
 }
 .doSomething .btn{
   margin:0 30rpx;
+}
+.icon{
+  position: absolute;
+  top:8vh;
+  right: 4vh;
 }
