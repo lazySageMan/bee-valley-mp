@@ -365,10 +365,9 @@ Page({
 
   fetchWorks: function () {
     let that = this;
-    wx.showToast({ //调用这个可以不用传显示时间，请求链结束后，调用关闭的api就好了
+    wx.showLoading({ //调用这个可以不用传显示时间，请求链结束后，调用关闭的api就好了
       title: "加载中",
       mask: true,
-      icon: 'loading'
     })
     beevalley.fetchWorks(this.data.apitoken, 'rect', 2, function (res) {//传不同的数字，请求不同数量的图片
       that.handleError(res);
@@ -386,9 +385,11 @@ Page({
     if (this.data.works.length > 0) {
       this.downloadWorkFile()
     } else {
+      wx.hideLoading()
       wx.showToast({
         title: '暂时没有任务，请稍后再试。',
-        mask: true
+        mask: true,
+        icon: "loading"
       });
     }
   },
@@ -427,7 +428,7 @@ Page({
           that.setData({
             imgDataArr: imgArr
           })
-          wx.hideToast();
+          wx.hideLoading()
         })
       })
     }
