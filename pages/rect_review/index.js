@@ -11,10 +11,24 @@ Page({
     imgDataArr: [],
     imgHeight: 0,
     imgWidth: 0,
+    showboxInfo: {
+      boxWidth: 0,
+      boxHeight: 0,
+      top: 0,
+      left: 0,
+      width: 0,
+      height: 0
+    },
+    cutTime: {
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0
+    },
+    timer: null
   },
 
   onLoad: function () {
-
     var query = wx.createSelectorQuery();
     query.select('.rectAudit').boundingClientRect()
     query.exec(function (res) {
@@ -34,9 +48,43 @@ Page({
           pixelRatio: res.pixelRatio,
           windowWidth: res.windowWidth
         });
-        that.fetchWorks("rect")
+        var query = wx.createSelectorQuery();
+        query.select('.rectAudit').boundingClientRect()
+        query.exec(function (res) {
+          that.setData({
+            imageAreaWidth: Math.floor(res[0].width),
+            imageAreaHeight: Math.floor(res[0].height)
+          });
+          that.fetchWorks("rect");
+        })
       }
     });
+  },
+
+  getCutTime(time) {
+    var that = this;
+    this.data.timer = setInterval(function () {
+      var date = new Date(time).getTime() - new Date().getTime();
+      var days = Math.floor(date / (24 * 3600 * 1000));
+
+      var leave1 = date % (24 * 3600 * 1000);
+      var hours = Math.floor(leave1 / (3600 * 1000));
+
+      var leave2 = leave1 % (3600 * 1000);
+      var minutes = Math.floor(leave2 / (60 * 1000));
+
+      var leave3 = leave2 % (60 * 1000);
+      var seconds = Math.round(leave3 / 1000);
+
+      that.setData({
+        cutTime: {
+          days: days,
+          hours: hours,
+          minutes: minutes,
+          seconds: seconds
+        }
+      })
+    }, 1000)
   },
 
   onUnload: function () {
@@ -45,7 +93,6 @@ Page({
   },
 
   clickIcon(e) {
-    // e.target.dataset.imgdescription
     wx.showModal({
       title: "提示",
       content: e.target.dataset.imgdescription,
@@ -67,19 +114,21 @@ Page({
   },
 
   deleteImg: function (imgId) {
-    // let pointP = this.data.pointsPosition.filter((item) => item.id !== imgId);
-    // let rectP = this.data.rectsPosition.filter((item) => item.id !== imgId);
     let imgA = this.data.imgDataArr.filter((item) => item.id !== imgId);
     if (this.rect) {
       this.rect.destroy();
       this.rect = null;
     }
-    // if (this.circle) {
-    //     this.circle.destroy();
-    //     this.circle = null;
-    // }
     this.setData({
-      imgDataArr: imgA
+      imgDataArr: imgA,
+      showboxInfo: {
+        boxWidth: 0,
+        boxHeight: 0,
+        top: 0,
+        left: 0,
+        width: 0,
+        height: 0
+      },
     })
     if (imgA.length === 0) {
       this.fetchWorks("rect")
@@ -146,20 +195,7 @@ Page({
 
   changePosition: function (data, type) {
     if (type === 'rect' && data.length > 0) {//根据类型分别处理数据
-      // console.log(data)
-      // var positionArr = [];
-      // data.forEach((item) => {
-      //     positionArr.push({
-      //         id: item.id,
-      //         minX: item.work.result[0][0].x,
-      //         minY: item.work.result[0][0].y,
-      //         maxX: item.work.result[0][1].x,
-      //         maxY: item.work.result[0][1].y
-      //     })
-      //     this.setData({
-      //         rectsPosition: positionArr
-      //     })
-      // })
+
       this.getImgFiles(data);
     } else if (type === 'count' && data.length > 0) {
       //这里吧对应的点放入
@@ -179,7 +215,8 @@ Page({
             minY: item.work.result[0][0].y,
             maxX: item.work.result[0][1].x,
             maxY: item.work.result[0][1].y,
-            description: item.work.description
+            description: item.work.description,
+            cutOutTime: item.expiredAt
           })
           that.setData({
             imgDataArr: imgArr
@@ -189,22 +226,10 @@ Page({
 
       })
     }
-
   },
 
   createAnchor: function (id) {
-    // this.data.pointsPosition.forEach((item) => {
-    //   if (item.id === id && !this.circle) {
-    //     var circle = new Shape('circle', {
-    //         x: item.x / this.data.imgRatio,
-    //         y: item.y / this.data.imgRatio,
-    //         r: 2,
-    //         fillStyle: "#E6324B"
-    //     });
-    //     this.wxCanvas.add(circle);
-    //     this.circle = circle;
-    //   }
-    // })
+
   },
 
   createRect: function (id) {
@@ -223,9 +248,39 @@ Page({
           }, 'stroke', false);
           this.wxCanvas.add(rect);
           this.rect = rect;
+          clearInterval(this.data.timer);
+          this.getCutTime(item.cutOutTime);
+          this.changeBox(id);
         }
       })
     }
-  }
+  },
+
+  changeBox(id) { //随方框的大小改变显示的位置
+    this.data.imgDataArr.forEach((item) => {
+      if (id === item.id) {
+        var top = 0;
+        if ((item.minY / this.data.imgRatio - 5 - 33) < 0) {
+          if ((item.maxY / this.data.imgRatio + 5 + 33) > this.data.imageAreaHeight) {
+            top = item.minY / this.data.imgRatio + 20
+          } else {
+            top = item.maxY / this.data.imgRatio + 5;
+          }
+        } else {
+          top = item.minY / this.data.imgRatio - 10 - 33;
+        }
+        this.setData({
+          showboxInfo: {
+            boxWidth: Math.floor(item.maxX / this.data.imgRatio - item.minX / this.data.imgRatio),
+            boxHeight: Math.floor(item.maxY / this.data.imgRatio - item.minY / this.data.imgRatio),
+            top: top,
+            left: item.minX / this.data.imgRatio,
+            width: 65,
+            height: 33
+          }
+        })
+      }
+    })
+  },
 
 })

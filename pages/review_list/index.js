@@ -37,7 +37,7 @@ Page({
   navToTask: function (e) {
     let taskType = e.currentTarget.dataset.tasktype;
     wx.navigateTo({
-      url: "../" + taskType + "_audit/index"
+      url: "../" + taskType + "_review/index"
     })
   }
 

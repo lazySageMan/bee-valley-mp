@@ -48,7 +48,7 @@ Page({
 
   intoAuditChoose: function () {
     wx.navigateTo({
-      url: '../audit_list/index'
+      url: '../review_list/index'
     })
   }
 

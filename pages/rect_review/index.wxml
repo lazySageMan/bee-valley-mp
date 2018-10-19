@@ -19,8 +19,23 @@
             bindload="imageLoad"
             data-imgId="{{imgDataArr[0].id}}"
         ></image>
+        <view 
+            wx:if="{{showboxInfo.width !== 0}}"
+            style="width: {{showboxInfo.width}}px;height:{{showboxInfo.height}}px;background:black;font-size: 12px;color: #fff;padding: 2px;position: absolute;top:{{showboxInfo.top}}px;left: {{showboxInfo.left}}px;vertical-align:top;"
+        >宽：{{showboxInfo.boxWidth}}px 高：{{showboxInfo.boxHeight}}px</view>
     </view>
     <view class="doSomething">
+        <view class="showInfo">
+            <icon 
+                type="info" 
+                class="icon" 
+                bindtap="clickIcon" 
+                size="18" 
+                data-imgdescription="{{imgDataArr[0].description}}" 
+                color="#33CCFF"
+            />
+            <text style="font-size:10px;vertical-align:top;">{{cutTime.days}}-{{cutTime.hours}}-{{cutTime.minutes}}-{{cutTime.seconds}}</text>
+        </view>
         <view class="btn">
             <button type="primary" bindtap="submitWork" data-imgId="{{imgDataArr[0].id}}">通过</button>
         </view>
@@ -30,6 +45,5 @@
         <view class="btn">
             <button style="background: #FFCC00;" type="warn" bindtap="cancelReview" data-imgId="{{imgDataArr[0].id}}">放弃</button>
         </view>
-        <icon type="warn" class="icon" bindtap="clickIcon" size="20" data-imgdescription="{{imgDataArr[0].description}}" color="#33CCFF"/>
     </view>
 </view>
