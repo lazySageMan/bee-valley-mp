@@ -19,9 +19,25 @@ Page({
       yMax: 0
     },
     rectInitialized: false,
-    imgDataArr: []
+    imgDataArr: [],
+    showboxInfo: {
+      boxWidth: 0,
+      boxHeight: 0,
+      top: 0,
+      left: 0,
+      width: 0,
+      height: 0
+    },
+    cutTime: {
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0
+    },
+    timer: null
   },
-  clickIcon(e){
+
+  clickIcon(e) {
     // e.target.dataset.imgdescription
     wx.showModal({
       title: "提示",
@@ -30,6 +46,34 @@ Page({
       confirmText: "知道了"
     })
   },
+
+  getCutTime(time) {
+    var that = this;
+    this.data.timer = setInterval(function () {
+      var date = new Date(time).getTime() - new Date().getTime();
+      var days = Math.floor(date / (24 * 3600 * 1000));
+
+      var leave1 = date % (24 * 3600 * 1000);
+      var hours = Math.floor(leave1 / (3600 * 1000));
+
+      var leave2 = leave1 % (3600 * 1000);
+      var minutes = Math.floor(leave2 / (60 * 1000));
+
+      var leave3 = leave2 % (60 * 1000);
+      var seconds = Math.round(leave3 / 1000);
+
+      that.setData({
+        cutTime: {
+          days: days,
+          hours: hours,
+          minutes: minutes,
+          seconds: seconds
+        }
+      })
+    }, 1000)
+    // clearInterval(timer)
+  },
+
   submitWork: function (e) {
     if (this.data.rectInitialized) {
       let imgId = e.currentTarget.dataset.imgid
@@ -80,6 +124,7 @@ Page({
   deleteImg: function (imgId) { //根据id删除对应的点 图片
     this.data.imgDataArr.forEach((item) => {
       if (item.id === imgId) {
+
         let arr = this.data.works.filter((item) => item.id !== imgId);
         // let pointP = this.data.pointsPosition.filter((item) => item.id !== imgId);
         let imgA = this.data.imgDataArr.filter((item) => item.id !== imgId);
@@ -95,7 +140,15 @@ Page({
           works: arr,
           // pointsPosition: pointP,
           imgDataArr: imgA,
-          rectInitialized: false
+          rectInitialized: false,
+          showboxInfo: {
+            boxWidth: 0,
+            boxHeight: 0,
+            top: 0,
+            left: 0,
+            width: 0,
+            height: 0
+          },
         })
         if (arr.length === 0 && imgA.length === 0) {
           this.fetchWorks();
@@ -108,7 +161,7 @@ Page({
 
   imageLoad: function (e) {
     var imgW = this.data.imageAreaWidth,
-        imgH = imgW * e.detail.height / e.detail.width;
+      imgH = imgW * e.detail.height / e.detail.width;
 
     this.setData({
       imgHeight: imgH,
@@ -136,28 +189,54 @@ Page({
 
   createRect: function (id) {
     this.data.imgDataArr.forEach((item) => {
-        if (item.id === id && !this.rect) {
-          var rect = new Shape('rect', {
-            x: ((item.PreviousWork.xMax / this.data.imgRatio) + (item.PreviousWork.xMin / this.data.imgRatio))/2,
-            y: ((item.PreviousWork.yMin / this.data.imgRatio) + (item.PreviousWork.yMax / this.data.imgRatio))/2,
-            w: (item.PreviousWork.xMax / this.data.imgRatio) - (item.PreviousWork.xMin / this.data.imgRatio),
-            h: (item.PreviousWork.yMax / this.data.imgRatio) - (item.PreviousWork.yMin / this.data.imgRatio),
-            lineWidth: 2,
-            lineCap: 'round',
-            strokeStyle: "#339933",
-          }, 'stroke', false);
-          this.wxCanvas.add(rect);
-          this.rect = rect;
-          this.data.rectPosition.xMax = (item.PreviousWork.xMax / this.data.imgRatio);
-          this.data.rectPosition.xMin = (item.PreviousWork.xMin / this.data.imgRatio);
-          this.data.rectPosition.yMax = (item.PreviousWork.yMax / this.data.imgRatio);
-          this.data.rectPosition.yMin = (item.PreviousWork.yMin / this.data.imgRatio);
-          if(this.data.rectPosition.xMax !== 0 && this.data.rectPosition.xMin !==0 && this.data.rectPosition.yMax !== 0 && this.data.rectPosition.yMin !== 0){
-            this.data.rectInitialized = true //如果有驳回的方框，就开始编辑
-          }
+      if (item.id === id && !this.rect) {
+        var rect = new Shape('rect', {
+          x: ((item.PreviousWork.xMax / this.data.imgRatio) + (item.PreviousWork.xMin / this.data.imgRatio)) / 2,
+          y: ((item.PreviousWork.yMin / this.data.imgRatio) + (item.PreviousWork.yMax / this.data.imgRatio)) / 2,
+          w: (item.PreviousWork.xMax / this.data.imgRatio) - (item.PreviousWork.xMin / this.data.imgRatio),
+          h: (item.PreviousWork.yMax / this.data.imgRatio) - (item.PreviousWork.yMin / this.data.imgRatio),
+          lineWidth: 2,
+          lineCap: 'round',
+          strokeStyle: "#339933",
+        }, 'stroke', false);
+        this.wxCanvas.add(rect);
+        this.rect = rect;
+        this.data.rectPosition.xMax = (item.PreviousWork.xMax / this.data.imgRatio);
+        this.data.rectPosition.xMin = (item.PreviousWork.xMin / this.data.imgRatio);
+        this.data.rectPosition.yMax = (item.PreviousWork.yMax / this.data.imgRatio);
+        this.data.rectPosition.yMin = (item.PreviousWork.yMin / this.data.imgRatio);
+        clearInterval(this.data.timer);
+        this.getCutTime(item.cutOutTime);
+        if (this.data.rectPosition.xMax !== 0 && this.data.rectPosition.xMin !== 0 && this.data.rectPosition.yMax !== 0 && this.data.rectPosition.yMin !== 0) {
+          this.data.rectInitialized = true //如果有驳回的方框，就开始编辑
+          this.changeBox();
         }
+      }
     })
-    
+
+  },
+
+  changeBox() { //随方框的大小改变显示的位置
+    var top = 0;
+    if ((this.data.rectPosition.yMin - 5 - 33) < 0) {
+      if ((this.data.rectPosition.yMax + 5 + 33) > this.data.imageAreaHeight) {
+        top = this.data.rectPosition.yMin + 20
+      } else {
+        top = this.data.rectPosition.yMax + 5;
+      }
+    } else {
+      top = this.data.rectPosition.yMin - 10 - 33;
+    }
+    this.setData({
+      showboxInfo: {
+        boxWidth: this.data.rectPosition.xMax - this.data.rectPosition.xMin,
+        boxHeight: this.data.rectPosition.yMax - this.data.rectPosition.yMin,
+        top: top,
+        left: this.data.rectPosition.xMin,
+        width: 65,
+        height: 33
+      }
+    })
   },
 
   initializeRectPosition: function (x, y) {
@@ -203,24 +282,20 @@ Page({
       w: this.data.rectPosition.xMax - this.data.rectPosition.xMin,
       h: this.data.rectPosition.yMax - this.data.rectPosition.yMin
     });
-
+    this.changeBox()
   },
 
   //画框从此开始
   bindtouchstart: function (e) {
-    // 检测手指点击开始事件
     this.wxCanvas.touchstartDetect(e);
-
     if (e.touches[0].x < 0 || e.touches[0].y < 0 || e.touches[0].x > this.data.imgWidth || e.touches[0].y > this.data.imgHeight) {
       return;
     }
-
     if (!this.data.rectInitialized) {
-      // this.createRect();
-      this.data.rectPosition.xMin = e.touches[0].x;
-      this.data.rectPosition.yMin = e.touches[0].y;
+      this.data.rectPosition.xMin = Math.floor(e.touches[0].x);
+      this.data.rectPosition.yMin = Math.floor(e.touches[0].y);
     } else {
-      this.adjustRectPosition(e.touches[0].x, e.touches[0].y);
+      this.adjustRectPosition(Math.floor(e.touches[0].x, Math.floor(e.touches[0].y)));
       this.renderRect();
     }
   },
@@ -233,9 +308,9 @@ Page({
     }
 
     if (!this.data.rectInitialized) {
-      this.initializeRectPosition(e.touches[0].x, e.touches[0].y);
+      this.initializeRectPosition(Math.floor(e.touches[0].x), Math.floor(e.touches[0].y));
     } else {
-      this.adjustRectPosition(e.touches[0].x, e.touches[0].y);
+      this.adjustRectPosition(Math.floor(e.touches[0].x), Math.floor(e.touches[0].y));
     }
     this.renderRect();
   },
@@ -287,7 +362,7 @@ Page({
     this.wxCanvas.clear();
     beevalley.cancelWork(this.data.apitoken, this.data.works.map(w => w.id), function (res) { })
   },
-  
+
   fetchWorks: function () {
     let that = this;
     wx.showToast({ //调用这个可以不用传显示时间，请求链结束后，调用关闭的api就好了
@@ -334,7 +409,7 @@ Page({
         beevalley.downloadWorkFile(this.data.apitoken, item.id, options, function (res) {
           that.handleError(res);
           imgArr.push({
-            description:item.description,
+            description: item.description,
             src: 'data:image/png;base64,' + wx.arrayBufferToBase64(res.data),
             id: item.id,
             xOffset: options.x,
@@ -342,11 +417,12 @@ Page({
             x: anchorX - options.x,
             y: anchorY - options.y,
             PreviousWork: {
-              xMin: PreviousRect ? PreviousRect.xMin  : 0,
-              xMax: PreviousRect ? PreviousRect.xMax  : 0,
-              yMin: PreviousRect ? PreviousRect.yMin  : 0,
-              yMax: PreviousRect ? PreviousRect.yMax  : 0
-            }
+              xMin: PreviousRect ? PreviousRect.xMin : 0,
+              xMax: PreviousRect ? PreviousRect.xMax : 0,
+              yMin: PreviousRect ? PreviousRect.yMin : 0,
+              yMax: PreviousRect ? PreviousRect.yMax : 0
+            },
+            cutOutTime: item.expiredAt
           })
           that.setData({
             imgDataArr: imgArr
@@ -356,9 +432,10 @@ Page({
       })
     }
   },
-  getPreviousRect: function(PreviousWork){
+
+  getPreviousRect: function (PreviousWork) {
     // console.log(PreviousWork)
-    if(PreviousWork && PreviousWork.result.length === 1){
+    if (PreviousWork && PreviousWork.result.length === 1) {
       var result = PreviousWork.result[0];
       return {
         xMin: result[0].x,
@@ -370,6 +447,7 @@ Page({
       return false
     }
   },
+
   calculateWorkarea: function (imageWidth, imageHeight, anchorX, anchorY, windowWidth, windowHeight) {
     var x;
     if (anchorX < windowWidth / 2) {
