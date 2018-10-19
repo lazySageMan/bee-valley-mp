@@ -191,20 +191,20 @@ Page({
     this.data.imgDataArr.forEach((item) => {
       if (item.id === id && !this.rect) {
         var rect = new Shape('rect', {
-          x: ((item.PreviousWork.xMax / this.data.imgRatio) + (item.PreviousWork.xMin / this.data.imgRatio)) / 2,
-          y: ((item.PreviousWork.yMin / this.data.imgRatio) + (item.PreviousWork.yMax / this.data.imgRatio)) / 2,
-          w: (item.PreviousWork.xMax / this.data.imgRatio) - (item.PreviousWork.xMin / this.data.imgRatio),
-          h: (item.PreviousWork.yMax / this.data.imgRatio) - (item.PreviousWork.yMin / this.data.imgRatio),
+          x: (item.PreviousWork.xMax + item.PreviousWork.xMin) / 2 - item.xOffset,
+          y: (item.PreviousWork.yMin + item.PreviousWork.yMax) / 2 - item.yOffset,
+          w: item.PreviousWork.xMax- item.PreviousWork.xMin,
+          h: item.PreviousWork.yMax - item.PreviousWork.yMin,
           lineWidth: 2,
           lineCap: 'round',
           strokeStyle: "#339933",
         }, 'stroke', false);
         this.wxCanvas.add(rect);
         this.rect = rect;
-        this.data.rectPosition.xMax = (item.PreviousWork.xMax / this.data.imgRatio);
-        this.data.rectPosition.xMin = (item.PreviousWork.xMin / this.data.imgRatio);
-        this.data.rectPosition.yMax = (item.PreviousWork.yMax / this.data.imgRatio);
-        this.data.rectPosition.yMin = (item.PreviousWork.yMin / this.data.imgRatio);
+        this.data.rectPosition.xMax = item.PreviousWork.xMax - item.xOffset;
+        this.data.rectPosition.xMin = item.PreviousWork.xMin - item.xOffset;
+        this.data.rectPosition.yMax = item.PreviousWork.yMax - item.yOffset;
+        this.data.rectPosition.yMin = item.PreviousWork.yMin - item.yOffset;
         clearInterval(this.data.timer);
         this.getCutTime(item.cutOutTime);
         if (this.data.rectPosition.xMax !== 0 && this.data.rectPosition.xMin !== 0 && this.data.rectPosition.yMax !== 0 && this.data.rectPosition.yMin !== 0) {
