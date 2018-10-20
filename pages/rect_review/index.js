@@ -20,8 +20,6 @@ Page({
       height: 0
     },
     cutTime: {
-      days: 0,
-      hours: 0,
       minutes: 0,
       seconds: 0
     },
@@ -78,8 +76,6 @@ Page({
 
       that.setData({
         cutTime: {
-          days: days,
-          hours: hours,
           minutes: minutes,
           seconds: seconds
         }
