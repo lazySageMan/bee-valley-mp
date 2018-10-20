@@ -39,7 +39,7 @@
           data-imgdescription="{{imgDataArr[0].description}}" 
           color="#33CCFF"
         />
-        <text style="font-size:10px;vertical-align:top;">{{cutTime.days}}-{{cutTime.hours}}-{{cutTime.minutes}}-{{cutTime.seconds}}</text>
+        <text style="font-size:10px;vertical-align:top;">{{cutTime.minutes}}分-{{cutTime.seconds}}秒</text>
     </view>
     <view class="btn">
         <button  type="primary" bindtap="submitWork" data-imgId="{{imgDataArr[0].id}}">提交</button>
