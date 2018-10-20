@@ -8,31 +8,13 @@ let beevalley = require("../../utils/beevalley.js");
 Page({
 
   data: {
-    errorMessage: null,
+    currentWork: null,
     works: [],
-    imgHeight: '',
-    imgWidth: '',
-    rectPosition: {
-      xMin: 0,
-      xMax: 0,
-      yMin: 0,
-      yMax: 0
-    },
+    imgHeight: 0,
+    imgWidth: 0,
+    rectPosition: {},
     rectInitialized: false,
-    imgDataArr: [],
-    showboxInfo: {
-      boxWidth: 0,
-      boxHeight: 0,
-      top: 0,
-      left: 0,
-      width: 0,
-      height: 0
-    },
-    cutTime: {
-      minutes: 0,
-      seconds: 0
-    },
-    timer: null
+    showboxInfo: {}
   },
 
   clickIcon(e) {
@@ -45,194 +27,252 @@ Page({
     })
   },
 
-  getCutTime(time) {
-    var that = this;
-    this.data.timer = setInterval(function () {
-      var date = new Date(time).getTime() - new Date().getTime();
-      var days = Math.floor(date / (24 * 3600 * 1000));
-
-      var leave1 = date % (24 * 3600 * 1000);
-      var hours = Math.floor(leave1 / (3600 * 1000));
-
-      var leave2 = leave1 % (3600 * 1000);
-      var minutes = Math.floor(leave2 / (60 * 1000));
-
-      var leave3 = leave2 % (60 * 1000);
-      var seconds = Math.round(leave3 / 1000);
-
-      that.setData({
-        cutTime: {
-          minutes: minutes,
-          seconds: seconds
-        }
-      })
-    }, 1000)
-    // clearInterval(timer)
-  },
-
   submitWork: function (e) {
     if (this.data.rectInitialized) {
-      let imgId = e.currentTarget.dataset.imgid
       let that = this;
-      this.data.imgDataArr.forEach((item) => {
-        if (item.id === imgId) {
-          var relativeAnchorX = item.x / this.data.imgRatio;
-          var relativeAnchorY = item.y / this.data.imgRatio;
-          if (relativeAnchorX > this.data.rectPosition.xMin && relativeAnchorX < this.data.rectPosition.xMax && relativeAnchorY > this.data.rectPosition.yMin && relativeAnchorY < this.data.rectPosition.yMax) {
-            beevalley.submitWork(
-              this.data.apitoken,
-              item.id, [
-                [{
-                  x: item.xOffset + Math.floor(this.data.rectPosition.xMin * this.data.imgRatio),
-                  y: item.yOffset + Math.floor(this.data.rectPosition.yMin * this.data.imgRatio)
-                },
-                {
-                  x: item.xOffset + Math.floor(this.data.rectPosition.xMax * this.data.imgRatio),
-                  y: item.yOffset + Math.floor(this.data.rectPosition.yMax * this.data.imgRatio)
-                }
-                ]
-              ],
-              function (res) {
-                that.handleError(res);
-                that.deleteImg(imgId);
-              });
-          }
-        }
-      })
+      let item = this.data.currentWork;
+      var relativeAnchorX = item.anchorX - item.xOffset;
+      var relativeAnchorY = item.anchorY - item.yOffset;
+      if (relativeAnchorX > this.data.rectPosition.xMin && relativeAnchorX < this.data.rectPosition.xMax && relativeAnchorY > this.data.rectPosition.yMin && relativeAnchorY < this.data.rectPosition.yMax) {
+        this.showLoading();
+
+        beevalley.submitWork(
+          this.apitoken,
+          item.id, [
+            [{
+              x: item.xOffset + Math.floor(this.data.rectPosition.xMin * this.data.imgRatio),
+              y: item.yOffset + Math.floor(this.data.rectPosition.yMin * this.data.imgRatio)
+            },
+            {
+              x: item.xOffset + Math.floor(this.data.rectPosition.xMax * this.data.imgRatio),
+              y: item.yOffset + Math.floor(this.data.rectPosition.yMax * this.data.imgRatio)
+            }
+            ]
+          ],
+          function (res) {
+            that.handleError(res);
+            that.nextWork();
+          });
+      }
     }
   },
 
   cancelWork: function (e) {
-    if (this.data.imgDataArr.length > 0) {
+    if (this.data.currentWork) {
+      this.showLoading();
       let that = this;
-      let imgId = e.currentTarget.dataset.imgid;
-      this.data.imgDataArr.forEach((item) => {
-        if (e.currentTarget.dataset.imgid === item.id) {
-          beevalley.cancelWork(that.data.apitoken, [item.id], function (res) {
-            // TODO handle error
-            that.deleteImg(imgId);
-          })
-        }
+      let deletedWorkId = this.data.currentWork.id;
+      beevalley.cancelWork(that.apitoken, [deletedWorkId], function (res) {
+        // TODO handle error
+        that.nextWork();
       })
     }
   },
 
-  deleteImg: function (imgId) { //根据id删除对应的点 图片
-    this.data.imgDataArr.forEach((item) => {
-      if (item.id === imgId) {
+  showLoading: function () {
+    wx.showLoading({
+      title: "加载中",
+      mask: true,
+    })
+  },
 
-        let arr = this.data.works.filter((item) => item.id !== imgId);
-        // let pointP = this.data.pointsPosition.filter((item) => item.id !== imgId);
-        let imgA = this.data.imgDataArr.filter((item) => item.id !== imgId);
-        if (this.rect) {
-          this.rect.destroy();
-          this.rect = null;
-        }
-        if (this.circle) {
-          this.circle.destroy();
-          this.circle = null;
-        }
-        this.setData({
-          works: arr,
-          // pointsPosition: pointP,
-          imgDataArr: imgA,
-          rectInitialized: false,
-          showboxInfo: {
-            boxWidth: 0,
-            boxHeight: 0,
-            top: 0,
-            left: 0,
-            width: 0,
-            height: 0
-          },
+  nextWork: function () {
+
+    if (this.rect) {
+      this.rect.destroy();
+      this.rect = null;
+    }
+    if (this.circle) {
+      this.circle.destroy();
+      this.circle = null;
+    }
+    let data = {};
+    data['rectInitialized'] = false;
+    data['rectPosition'] = {};
+    data['showboxInfo'] = {};
+    data['currentWork'] = null;
+
+    if (this.data.works.length > 0) {
+      let candidate = this.data.works.pop();
+
+      if (candidate.previousWork) {
+        data['rectPosition'] = {
+          xMin: candidate.previousWork.result[0][0].x - candidate.xOffset,
+          yMin: candidate.previousWork.result[0][0].y - candidate.yOffset,
+          xMax: candidate.previousWork.result[0][1].x - candidate.xOffset,
+          yMax: candidate.previousWork.result[0][1].y - candidate.yOffset
+        };
+        data['rectInitialized'] = true;
+      }
+      data['currentWork'] = candidate;
+    } else {
+      this.fetchWorks();
+    }
+    this.setData(data);
+
+  },
+
+  preprocessWork: function (work) {
+
+    let anchorX = Math.floor(work.prerequisites[0].result[work.meta.index].x);
+    let anchorY = Math.floor(work.prerequisites[0].result[work.meta.index].y);
+
+    let options = this.calculateWorkarea(work.meta.imageWidth, work.meta.imageHeight, anchorX, anchorY, this.data.imageAreaWidth, this.data.imageAreaHeight);
+    options['format'] = 'png';
+
+    work['xOffset'] = options.x;
+    work['yOffset'] = options.y;
+    work['anchorX'] = anchorX;
+    work['anchorY'] = anchorY;
+    work['downloadOptions'] = options;
+
+    return work;
+  },
+
+  fetchWorks: function () {
+    let that = this;
+
+    beevalley.fetchWorks(this.apitoken, 'rect', 3, function (res) {
+      that.handleError(res);
+      let works = res.data;
+      that.setData({
+        works: works.map(w => that.preprocessWork(w))
+      });
+      if (works.length > 0) {
+        works.reverse().forEach(w => that.downloadWorkFile(w));
+        that.nextWork();
+      } else {
+        wx.hideLoading();
+        wx.showToast({
+          title: '暂时没有任务',
         })
-        if (arr.length === 0 && imgA.length === 0) {
-          this.fetchWorks();
-        } else {//这边判断请求来的图片，没有就将对应图片的point创建出来
-          this.createAnchor(this.data.imgDataArr[0].id)//一直让imgDataArr的第一个作为显示的图片
+      }
+    });
+
+  },
+
+  downloadWorkFile: function (work) {
+    let that = this;
+
+    beevalley.downloadWorkFile(this.apitoken, work.id, work.downloadOptions, function (res) {
+      that.handleError(res);
+      let imageSrc = 'data:image/png;base64,' + wx.arrayBufferToBase64(res.data);
+
+      if (that.data.currentWork.id === work.id) {
+        that.setData({
+          'currentWork.src': imageSrc
+        });
+      } else {
+        let foundIndex = that.data.works.findIndex(w => w.id === work.id);
+        if (foundIndex >= 0) {
+          let imageData = {};
+          imageData['works[' + foundIndex + '].src'] = imageSrc;
+          that.setData(imageData);
         }
       }
+
     })
+
   },
 
   imageLoad: function (e) {
-    var imgW = this.data.imageAreaWidth,
-      imgH = imgW * e.detail.height / e.detail.width;
+    // var imgW = this.data.imageAreaWidth,
+    //   imgH = imgW * e.detail.height / e.detail.width;
 
+    // TODO use default imgRatio
     this.setData({
-      imgHeight: imgH,
-      imgWidth: imgW,
-      imgRatio: e.detail.width / imgW
-    })
+      imgHeight: e.detail.height,
+      imgWidth: e.detail.width,
+      imgRatio: 1
+    });
+
     this.createAnchor(e.currentTarget.dataset.imgid);
     this.createRect(e.currentTarget.dataset.imgid);
+    this.renderRect();
+    this.renderInfoBox();
+    this.startTimer();
+    wx.hideLoading();
+
   },
 
   createAnchor: function (id) {
-    this.data.imgDataArr.forEach((item) => {
-      if (item.id === id && !this.circle) {
-        var circle = new Shape('circle', {
-          x: item.x / this.data.imgRatio,
-          y: item.y / this.data.imgRatio,
-          r: 5,
-          fillStyle: "#E6324B"
-        });
-        this.wxCanvas.add(circle);
-        this.circle = circle;
-      }
-    })
+    if (this.data.currentWork.id === id && !this.circle) {
+      var circle = new Shape('circle', {
+        x: this.data.currentWork.anchorX - this.data.currentWork.xOffset,
+        y: this.data.currentWork.anchorY - this.data.currentWork.yOffset,
+        r: 5,
+        fillStyle: "#E6324B"
+      });
+      this.wxCanvas.add(circle);
+      this.circle = circle;
+    }
+  },
+
+  startTimer: function () {
+    clearInterval(this.timer);
+    var that = this;
+    let expiredTime = new Date(this.data.currentWork.expiredAt).getTime();
+    this.timer = setInterval(function () {
+      that.setData({
+        displayTimer: beevalley.formatCountDown(expiredTime)
+      })
+    }, 1000);
+  },
+
+  startBoxInfoRefresher: function () {
+    let that = this;
+    clearInterval(this.boxRefresher);
+    this.boxRefresher = setInterval(function () {
+      that.renderInfoBox();
+    }, 250);
+  },
+
+  stopBoxInfoRefresher: function () {
+    clearInterval(this.boxRefresher);
   },
 
   createRect: function (id) {
-    this.data.imgDataArr.forEach((item) => {
-      if (item.id === id && !this.rect) {
-        var rect = new Shape('rect', {
-          x: (item.PreviousWork.xMax + item.PreviousWork.xMin) / 2 - item.xOffset,
-          y: (item.PreviousWork.yMin + item.PreviousWork.yMax) / 2 - item.yOffset,
-          w: item.PreviousWork.xMax- item.PreviousWork.xMin,
-          h: item.PreviousWork.yMax - item.PreviousWork.yMin,
-          lineWidth: 2,
-          lineCap: 'round',
-          strokeStyle: "#339933",
-        }, 'stroke', false);
-        this.wxCanvas.add(rect);
-        this.rect = rect;
-        this.data.rectPosition.xMax = item.PreviousWork.xMax - item.xOffset;
-        this.data.rectPosition.xMin = item.PreviousWork.xMin - item.xOffset;
-        this.data.rectPosition.yMax = item.PreviousWork.yMax - item.yOffset;
-        this.data.rectPosition.yMin = item.PreviousWork.yMin - item.yOffset;
-        clearInterval(this.data.timer);
-        this.getCutTime(item.cutOutTime);
-        if (this.data.rectPosition.xMax !== 0 && this.data.rectPosition.xMin !== 0 && this.data.rectPosition.yMax !== 0 && this.data.rectPosition.yMin !== 0) {
-          this.data.rectInitialized = true //如果有驳回的方框，就开始编辑
-          this.changeBox();
-        }
-      }
-    })
-
+    if (!this.rect) {
+      var rect = new Shape('rect', {
+        x: 0,
+        y: 0,
+        w: 0,
+        h: 0,
+        lineWidth: 2,
+        lineCap: 'round',
+        strokeStyle: "#339933",
+      }, 'stroke', false);
+      this.wxCanvas.add(rect);
+      this.rect = rect;
+    }
   },
 
-  changeBox() { //随方框的大小改变显示的位置
-    var top = 0;
-    if ((this.data.rectPosition.yMin - 5 - 33) < 0) {
-      if ((this.data.rectPosition.yMax + 5 + 33) > this.data.imageAreaHeight) {
-        top = this.data.rectPosition.yMin + 20
+  renderInfoBox() { //随方框的大小改变显示的位置
+    if (this.data.rectPosition) {
+      var top = 0;
+      if ((this.data.rectPosition.yMin - 5 - 33) < 0) {
+        if ((this.data.rectPosition.yMax + 5 + 33) > this.data.imageAreaHeight) {
+          top = this.data.rectPosition.yMin + 20
+        } else {
+          top = this.data.rectPosition.yMax + 5;
+        }
       } else {
-        top = this.data.rectPosition.yMax + 5;
+        top = this.data.rectPosition.yMin - 10 - 33;
       }
-    } else {
-      top = this.data.rectPosition.yMin - 10 - 33;
+      let boxWidth = this.data.rectPosition.xMax - this.data.rectPosition.xMin;
+      let boxHeight = this.data.rectPosition.yMax - this.data.rectPosition.yMin;
+
+      this.setData({
+        showboxInfo: {
+          boxWidth: boxWidth,
+          boxHeight: boxHeight,
+          top: top,
+          left: this.data.rectPosition.xMin,
+          width: 65,
+          height: 33
+        }
+      })
     }
-    this.setData({
-      showboxInfo: {
-        boxWidth: this.data.rectPosition.xMax - this.data.rectPosition.xMin,
-        boxHeight: this.data.rectPosition.yMax - this.data.rectPosition.yMin,
-        top: top,
-        left: this.data.rectPosition.xMin,
-        width: 65,
-        height: 33
-      }
-    })
   },
 
   initializeRectPosition: function (x, y) {
@@ -272,13 +312,15 @@ Page({
 
   renderRect: function () {
 
-    this.rect.updateOption({
-      x: (this.data.rectPosition.xMin + this.data.rectPosition.xMax) / 2,
-      y: (this.data.rectPosition.yMin + this.data.rectPosition.yMax) / 2,
-      w: this.data.rectPosition.xMax - this.data.rectPosition.xMin,
-      h: this.data.rectPosition.yMax - this.data.rectPosition.yMin
-    });
-    this.changeBox()
+    if (this.data.rectPosition) {
+      this.rect.updateOption({
+        x: (this.data.rectPosition.xMin + this.data.rectPosition.xMax) / 2,
+        y: (this.data.rectPosition.yMin + this.data.rectPosition.yMax) / 2,
+        w: this.data.rectPosition.xMax - this.data.rectPosition.xMin,
+        h: this.data.rectPosition.yMax - this.data.rectPosition.yMin
+      });
+    }
+
   },
 
   //画框从此开始
@@ -290,10 +332,8 @@ Page({
     if (!this.data.rectInitialized) {
       this.data.rectPosition.xMin = Math.floor(e.touches[0].x);
       this.data.rectPosition.yMin = Math.floor(e.touches[0].y);
-    } else {
-      this.adjustRectPosition(Math.floor(e.touches[0].x, Math.floor(e.touches[0].y)));
-      this.renderRect();
     }
+    this.startBoxInfoRefresher();
   },
 
   bindtouchmove: function (e) {
@@ -321,6 +361,7 @@ Page({
         });
       }
     }
+    this.stopBoxInfoRefresher();
   },
 
   bindtap: function (e) {
@@ -334,9 +375,8 @@ Page({
   },
 
   onLoad: function () {
-    this.setData({
-      apitoken: wx.getStorageSync('apitoken')
-    });
+    this.showLoading()
+    this.apitoken = wx.getStorageSync('apitoken');
     let context = wx.createCanvasContext('rectTask');
     this.wxCanvas = new wxDraw(context, 0, 0, 400, 500);
     let that = this;
@@ -349,99 +389,19 @@ Page({
         imageAreaHeight: Math.floor(res[0].height)
       });
       // console.log(res[0].height, res[0].width);
-      that.fetchWorks();
+      that.nextWork();
     })
 
   },
 
   onUnload: function () {
     this.wxCanvas.clear();
-    beevalley.cancelWork(this.data.apitoken, this.data.works.map(w => w.id), function (res) { })
-  },
-
-  fetchWorks: function () {
-    let that = this;
-    wx.showLoading({ //调用这个可以不用传显示时间，请求链结束后，调用关闭的api就好了
-      title: "加载中",
-      mask: true,
-    })
-    beevalley.fetchWorks(this.data.apitoken, 'rect', 2, function (res) {//传不同的数字，请求不同数量的图片
-      that.handleError(res);
-      let works = res.data;
-      that.setData({
-        works: works
-      });
-      that.processFirstWork();
-    });
-
-  },
-
-  processFirstWork: function () {
-    // TODO preload next work when user working current work
-    if (this.data.works.length > 0) {
-      this.downloadWorkFile()
-    } else {
-      wx.hideLoading()
-      wx.showToast({
-        title: '暂时没有任务，请稍后再试。',
-        mask: true,
-        icon: "loading"
-      });
+    var worksToCancel = this.data.works.map(w => w.id);
+    if (this.data.currentWork) {
+      worksToCancel.push(this.data.currentWork.id);
     }
-  },
-
-  downloadWorkFile: function () {
-    let that = this;
-    if (this.data.works.length !== 0) {
-      var imgArr = [];
-      // console.log(this.data.pointsPosition)
-      this.data.works.forEach((item) => {
-        let anchorX = Math.floor(item.prerequisites[0].result[item.meta.index].x);
-        let anchorY = Math.floor(item.prerequisites[0].result[item.meta.index].y);
-        let PreviousRect = that.getPreviousRect(item.previousWork);
-        // console.log(PreviousRect)
-        // TODO remove default image width height 
-        let options = that.calculateWorkarea(item.meta.imageWidth ? item.meta.imageWidth : 1536, item.meta.imageHeight ? item.meta.imageHeight : 1900, anchorX, anchorY, that.data.imageAreaWidth, that.data.imageAreaHeight);
-        options['format'] = 'png';
-        beevalley.downloadWorkFile(this.data.apitoken, item.id, options, function (res) {
-          that.handleError(res);
-          imgArr.push({
-            description: item.description,
-            src: 'data:image/png;base64,' + wx.arrayBufferToBase64(res.data),
-            id: item.id,
-            xOffset: options.x,
-            yOffset: options.y,
-            x: anchorX - options.x,
-            y: anchorY - options.y,
-            PreviousWork: {
-              xMin: PreviousRect ? PreviousRect.xMin : 0,
-              xMax: PreviousRect ? PreviousRect.xMax : 0,
-              yMin: PreviousRect ? PreviousRect.yMin : 0,
-              yMax: PreviousRect ? PreviousRect.yMax : 0
-            },
-            cutOutTime: item.expiredAt
-          })
-          that.setData({
-            imgDataArr: imgArr
-          })
-          wx.hideLoading()
-        })
-      })
-    }
-  },
-
-  getPreviousRect: function (PreviousWork) {
-    // console.log(PreviousWork)
-    if (PreviousWork && PreviousWork.result.length === 1) {
-      var result = PreviousWork.result[0];
-      return {
-        xMin: result[0].x,
-        yMin: result[0].y,
-        xMax: result[1].x,
-        yMax: result[1].y
-      }
-    } else {
-      return false
+    if (worksToCancel.length > 0) {
+      beevalley.cancelWork(this.apitoken, worksToCancel, function (res) { })
     }
   },
 

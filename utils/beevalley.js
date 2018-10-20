@@ -177,7 +177,7 @@ function submitReview(token, workId, result, callback) {
 //   });
 // }
 
-function listAuthorizedReviewsType(token, callback){
+function listAuthorizedReviewsType(token, callback) {
   wx.request({
     url: TODVIEW_API_BASE_URL + 'reviews/authorized_types',
     method: 'GET',
@@ -188,6 +188,20 @@ function listAuthorizedReviewsType(token, callback){
   });
 }
 
+function formatCountDown(expiredTime) {
+  let now = new Date().getTime();
+  var displayCountDown;
+  if (expiredTime > now) {
+    let millisToGo = expiredTime - now;
+    let secondsToGo = Math.floor(millisToGo / 1000);
+    let seconds = secondsToGo % 60;
+    let minutes = parseInt(secondsToGo / 60);
+    displayCountDown = minutes + ':' + (seconds > 10 ? seconds : '0' + seconds);
+  } else {
+    displayCountDown = '超时';
+  }
+  return displayCountDown;
+}
 
 module.exports.fetchWorks = fetchWorks
 exports.downloadWorkFile = downloadWorkFile
@@ -201,3 +215,4 @@ exports.downloadAuditWorkFile = downloadAuditWorkFile
 exports.submitReview = submitReview
 exports.cancelReview = cancelReview
 exports.listAuthorizedReviewsType = listAuthorizedReviewsType
+exports.formatCountDown = formatCountDown
