@@ -168,6 +168,7 @@ Page({
     
         this.createRect(e.currentTarget.dataset.imgid);
         this.renderRect();
+        this.createAnchor();
         this.renderInfoBox();
         this.startTimer();
         wx.hideLoading();
@@ -211,6 +212,20 @@ Page({
             this.wxCanvas.add(rect);
             this.rect = rect;
         }
+    },
+
+    createAnchor: function(){
+        if(this.data.rectPosition && this.data.rectPosition.xMin > 0){
+            var circle = new Shape('circle', {
+                x: (this.data.rectPosition.xMin + this.data.rectPosition.xMax) / 2,
+                y: (this.data.rectPosition.yMin + this.data.rectPosition.yMax) / 2,
+                r: 5,
+                fillStyle: "#E6324B"
+            });
+            this.wxCanvas.add(circle);
+            this.circle = circle;
+        }
+        
     },
 
     renderInfoBox() { //随方框的大小改变显示的位置
