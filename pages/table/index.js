@@ -60,6 +60,10 @@ Page({
     var token = wx.getStorageSync('apitoken');
     var apiType = ["rejected", "pending", "approved"];
     var that = this;
+    wx.showLoading({
+        title: "加载中",
+        mask: true,
+    })
     apiType.forEach((item) => {
       beevalley.getWorkHistory(token, nowTime, item, function (res) {
         if (item === "rejected") {
@@ -69,6 +73,7 @@ Page({
         } else if (item === "approved") {
           that.setApprovedData(res.data)
         }
+        wx.hideLoading();
       })
     })
   }

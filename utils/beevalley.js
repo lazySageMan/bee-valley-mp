@@ -138,9 +138,9 @@ function fetchAuditWorks(token, type, num, callback) {
   });
 }
 
-function downloadAuditWorkFile(token, workId, callback) {
+function downloadAuditWorkFile(token, workId, options, callback) {
   wx.request({
-    url: TODVIEW_API_BASE_URL + 'reviews/' + workId + '/file',
+    url: options ? `${TODVIEW_API_BASE_URL}reviews/${workId}/file?format=${options.format}&x=${options.x}&y=${options.y}&width=${options.width}&height=${options.height}` : `${TODVIEW_API_BASE_URL}reviews/${workId}/file`,
     method: 'GET',
     header: {
       'Authorization': 'Bearer ' + token
