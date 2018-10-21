@@ -26,7 +26,7 @@
     </image>
     <view 
       wx:if="{{showboxInfo && showboxInfo.boxWidth > 0}}"
-      style="width: {{showboxInfo.width}}px;height:{{showboxInfo.height}}px;background:black;font-size: 12px;color: #fff;padding: 2px;position: absolute;top:{{showboxInfo.top}}px;left: {{showboxInfo.left}}px;vertical-align:top;"
+      style="width: {{showboxInfo.width}}px;height:{{showboxInfo.height}}px;background:black;font-size: 12px;color: #fff;padding: 2px;position: absolute;top:{{showboxInfo.top}}px;left: {{showboxInfo.left}}px;vertical-align:top;line-height:16.5px;padding:0;"
     >宽：{{showboxInfo.boxWidth}}px 高：{{showboxInfo.boxHeight}}px</view>
   </view>
   <view class="doSomething">

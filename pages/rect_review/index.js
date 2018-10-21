@@ -3,280 +3,315 @@ let wxDraw = require("../../utils/wxdraw.min.js").wxDraw;
 let Shape = require("../../utils/wxdraw.min.js").Shape;
 
 Page({
-
-  data: {
-    apiToken: null,
-    pointsPosition: [],
-    rectsPosition: [],
-    imgDataArr: [],
-    imgHeight: 0,
-    imgWidth: 0,
-    showboxInfo: {
-      boxWidth: 0,
-      boxHeight: 0,
-      top: 0,
-      left: 0,
-      width: 0,
-      height: 0
+    data: {
+        currentWork: null,
+        works: [],
+        imgHeight: 0,
+        imgWidth: 0,
+        rectPosition: {},
+        rectInitialized: false,
+        showboxInfo: {}
     },
-    cutTime: {
-      minutes: 0,
-      seconds: 0
-    },
-    timer: null
-  },
 
-  onLoad: function () {
-    var query = wx.createSelectorQuery();
-    query.select('.rectAudit').boundingClientRect()
-    query.exec(function (res) {
-      //console.log(res);  
-      console.log(res[0].height, res[0].width);
-    })
-    console.log("audit pages");
-    this.setData({
-      apiToken: wx.getStorageSync('apitoken')
-    });
-    let context = wx.createCanvasContext('rectAudit');
-    this.wxCanvas = new wxDraw(context, 0, 0, 400, 500);
-    var that = this;
-    wx.getSystemInfo({
-      success: function (res) {
-        that.setData({
-          pixelRatio: res.pixelRatio,
-          windowWidth: res.windowWidth
+    clickIcon(e) {
+        // e.target.dataset.imgdescription
+        wx.showModal({
+            title: "提示",
+            content: e.target.dataset.imgdescription,
+            showCancel: false,
+            confirmText: "知道了"
+        })
+        console.log(e)
+    },
+
+    showLoading: function () {
+        wx.showLoading({
+            title: "加载中",
+            mask: true,
+        })
+    },
+
+    submitWork: function(){
+        this.showLoading();
+        let that = this;
+        beevalley.submitReview(this.apitoken, this.data.currentWork.id, true, function(res){
+            that.handleError(res);
+            that.nextWork();
+        })
+    },
+
+    rejectWork: function(){
+        this.showLoading();
+        let that = this;
+        beevalley.submitReview(this.apitoken, this.data.currentWork.id, false, function(res){
+            that.handleError(res);
+            that.nextWork();
+        })
+    },
+
+    cancelReview: function(){
+        this.showLoading();
+        let that = this;
+        let deletedWorkId = this.data.currentWork.id;
+        beevalley.cancelWork(that.apitoken, [deletedWorkId], function (res) {
+        // TODO handle error
+            that.nextWork();
+        })
+    },
+
+    nextWork: function () {
+
+        if (this.rect) {
+            this.rect.destroy();
+            this.rect = null;
+        }
+        if (this.circle) {
+            this.circle.destroy();
+            this.circle = null;
+        }
+        let data = {};
+        data['rectInitialized'] = false;
+        data['rectPosition'] = {};
+        data['showboxInfo'] = {};
+        data['currentWork'] = null;
+    
+        if (this.data.works.length > 0) {
+            let candidate = this.data.works.pop();
+    
+            if (candidate.work) {
+                data['rectPosition'] = {
+                    xMin: candidate.work.result[0][0].x - candidate.xOffset,
+                    yMin: candidate.work.result[0][0].y - candidate.yOffset,
+                    xMax: candidate.work.result[0][1].x - candidate.xOffset,
+                    yMax: candidate.work.result[0][1].y - candidate.yOffset
+                };
+                data['rectInitialized'] = true;
+            }
+            data['currentWork'] = candidate;
+            console.log(data.currentWork)
+        } else {
+            this.fetchWorks();
+        }
+        this.setData(data);
+    
+    },
+
+    preprocessWork: function (work) {
+        // console.log(work); 取方框的中心点作为剪切的依据
+        let anchorX = Math.floor((work.work.result[0][1].x + work.work.result[0][0].x)/2);
+        let anchorY = Math.floor((work.work.result[0][1].y - work.work.result[0][0].y)/2);
+        console.log(work.work.result[0][1].x - work.work.result[0][0].x)
+        let options = this.calculateWorkarea(work.meta.imageWidth, work.meta.imageHeight, anchorX, anchorY, this.data.imageAreaWidth, this.data.imageAreaHeight);
+        options['format'] = 'png';
+    
+        work['xOffset'] = options.x;
+        work['yOffset'] = options.y;
+        work['anchorX'] = anchorX;
+        work['anchorY'] = anchorY;
+        work['downloadOptions'] = options;
+    
+        return work;
+    },
+
+    fetchWorks: function () {
+        let that = this;
+    
+        beevalley.fetchAuditWorks(this.apitoken, 'rect', 3, function (res) {
+            that.handleError(res);
+            let works = res.data;
+            that.setData({
+                works: works.map(w => that.preprocessWork(w))
+            });
+            if (works.length > 0) {
+                works.reverse().forEach(w => that.downloadWorkFile(w));
+                that.nextWork();
+            } else {
+                wx.hideLoading();
+                wx.showToast({
+                    title: '暂时没有任务',
+                })
+            }
         });
+    
+    },
+
+    downloadWorkFile: function (work) {
+        let that = this;
+        // console.log(work.downloadOptions)
+        beevalley.downloadAuditWorkFile(this.apitoken, work.id, work.downloadOptions, function (res) {
+            that.handleError(res);
+            console.log(res)
+            let imageSrc = 'data:image/png;base64,' + wx.arrayBufferToBase64(res.data);
+    
+            if (that.data.currentWork.id === work.id) {
+                that.setData({
+                    'currentWork.src': imageSrc
+                });
+            } else {
+                let foundIndex = that.data.works.findIndex(w => w.id === work.id);
+                if (foundIndex >= 0) {
+                    let imageData = {};
+                    imageData['works[' + foundIndex + '].src'] = imageSrc;
+                    that.setData(imageData);
+                }
+            }
+        })
+    
+    },
+
+    imageLoad: function (e) {
+        this.setData({
+            imgHeight: e.detail.height,
+            imgWidth: e.detail.width,
+            imgRatio: 1
+        });
+    
+        this.createRect(e.currentTarget.dataset.imgid);
+        this.renderRect();
+        this.renderInfoBox();
+        this.startTimer();
+        wx.hideLoading();
+    
+    },
+
+    startTimer: function () {
+        clearInterval(this.timer);
+        var that = this;
+        let expiredTime = new Date(this.data.currentWork.expiredAt).getTime();
+        this.timer = setInterval(function () {
+            that.setData({
+                displayTimer: beevalley.formatCountDown(expiredTime)
+            })
+        }, 1000);
+    },
+
+    startBoxInfoRefresher: function () {
+        let that = this;
+        clearInterval(this.boxRefresher);
+        this.boxRefresher = setInterval(function () {
+            that.renderInfoBox();
+        }, 250);
+      },
+    
+    stopBoxInfoRefresher: function () {
+        clearInterval(this.boxRefresher);
+    },
+
+    createRect: function () {
+        if (!this.rect) {
+            var rect = new Shape('rect', {
+                x: 0,
+                y: 0,
+                w: 0,
+                h: 0,
+                lineWidth: 2,
+                lineCap: 'round',
+                strokeStyle: "#339933",
+            }, 'stroke', false);
+            this.wxCanvas.add(rect);
+            this.rect = rect;
+        }
+    },
+
+    renderInfoBox() { //随方框的大小改变显示的位置
+        if (this.data.rectPosition) {
+            var top = 0;
+            if ((this.data.rectPosition.yMin - 5 - 33) < 0) {
+                if ((this.data.rectPosition.yMax + 5 + 33) > this.data.imageAreaHeight) {
+                    top = this.data.rectPosition.yMin + 20
+                } else {
+                    top = this.data.rectPosition.yMax + 5;
+                }
+            } else {
+                top = this.data.rectPosition.yMin - 10 - 33;
+            }
+            let boxWidth = this.data.rectPosition.xMax - this.data.rectPosition.xMin;
+            let boxHeight = this.data.rectPosition.yMax - this.data.rectPosition.yMin;
+    
+            this.setData({
+                showboxInfo: {
+                    boxWidth: boxWidth,
+                    boxHeight: boxHeight,
+                    top: top,
+                    left: this.data.rectPosition.xMin,
+                    width: 65,
+                    height: 33
+                }
+            })
+        }
+    },
+
+    renderRect: function () {
+        // console.log(this.data.rectPosition)
+        if (this.data.rectPosition) {
+            this.rect.updateOption({
+                x: (this.data.rectPosition.xMin + this.data.rectPosition.xMax) / 2,
+                y: (this.data.rectPosition.yMin + this.data.rectPosition.yMax) / 2,
+                w: this.data.rectPosition.xMax - this.data.rectPosition.xMin,
+                h: this.data.rectPosition.yMax - this.data.rectPosition.yMin
+            });
+            console.log(this.rect)
+        }
+    
+    },
+
+    onLoad: function(){
+        this.showLoading();
+        this.apitoken = wx.getStorageSync('apitoken');
+        let context = wx.createCanvasContext('rectAudit');
+        this.wxCanvas = new wxDraw(context, 0, 0, 400, 500);
+
+        let that = this;
         var query = wx.createSelectorQuery();
         query.select('.rectAudit').boundingClientRect()
         query.exec(function (res) {
-          that.setData({
-            imageAreaWidth: Math.floor(res[0].width),
-            imageAreaHeight: Math.floor(res[0].height)
-          });
-          that.fetchWorks("rect");
+            // console.log(res[0].width)
+            that.setData({
+                imageAreaWidth: Math.floor(res[0].width),
+                imageAreaHeight: Math.floor(res[0].height)
+            });
+            that.nextWork();
         })
-      }
-    });
-  },
+    },
 
-  getCutTime(time) {
-    var that = this;
-    this.data.timer = setInterval(function () {
-      var date = new Date(time).getTime() - new Date().getTime();
-      var days = Math.floor(date / (24 * 3600 * 1000));
-
-      var leave1 = date % (24 * 3600 * 1000);
-      var hours = Math.floor(leave1 / (3600 * 1000));
-
-      var leave2 = leave1 % (3600 * 1000);
-      var minutes = Math.floor(leave2 / (60 * 1000));
-
-      var leave3 = leave2 % (60 * 1000);
-      var seconds = Math.round(leave3 / 1000);
-
-      that.setData({
-        cutTime: {
-          minutes: minutes,
-          seconds: seconds
+    onUnload: function () {
+        this.wxCanvas.clear();
+        var worksToCancel = this.data.works.map(w => w.id);
+        if (this.data.currentWork) {
+            worksToCancel.push(this.data.currentWork.id);
         }
-      })
-    }, 1000)
-  },
-
-  onUnload: function () {
-    this.wxCanvas.clear();
-    beevalley.cancelReview(this.data.apiToken, this.data.imgDataArr.map(w => w.id), function (res) { })
-  },
-
-  clickIcon(e) {
-    wx.showModal({
-      title: "提示",
-      content: e.target.dataset.imgdescription,
-      showCancel: false,
-      confirmText: "知道了"
-    })
-  },
-
-  imageLoad: function (e) {
-    var imgW = this.data.windowWidth,
-      imgH = imgW * e.detail.height / e.detail.width;
-    this.setData({
-      imgHeight: imgH,
-      imgWidth: imgW,
-      imgRatio: e.detail.width / imgW
-    })
-    console.log(this.data.imgDataArr)
-    this.createRect(e.currentTarget.dataset.imgid)
-  },
-
-  deleteImg: function (imgId) {
-    let imgA = this.data.imgDataArr.filter((item) => item.id !== imgId);
-    if (this.rect) {
-      this.rect.destroy();
-      this.rect = null;
-    }
-    this.setData({
-      imgDataArr: imgA,
-      showboxInfo: {
-        boxWidth: 0,
-        boxHeight: 0,
-        top: 0,
-        left: 0,
-        width: 0,
-        height: 0
-      },
-    })
-    if (imgA.length === 0) {
-      this.fetchWorks("rect")
-    } else {
-      this.createAnchor(this.data.imgDataArr[0].id);
-      this.createRect(this.data.imgDataArr[0].id);
-    }
-  },
-
-  submitWork: function (e) {
-    var imgId = e.currentTarget.dataset.imgid;
-    var that = this;
-    beevalley.submitReview(this.data.apiToken, imgId, true, function (res) {
-      if (res.statusCode === 200) {
-        that.deleteImg(imgId);
-      }
-    })
-  },
-
-  rejectWork: function (e) {
-    var imgId = e.currentTarget.dataset.imgid;
-    var that = this;
-    beevalley.submitReview(this.data.apiToken, imgId, false, function (res) {
-      if (res.statusCode === 200) {
-        that.deleteImg(imgId);
-      }
-    })
-  },
-
-  cancelReview: function (e) {
-    var imgId = e.currentTarget.dataset.imgid;
-    var that = this;
-    beevalley.cancelReview(this.data.apiToken, [imgId], function (res) {
-      if (res.statusCode === 200) {
-        that.deleteImg(imgId);
-      }
-    })
-  },
-
-  fetchWorks: function (type) {
-    var that = this;
-    beevalley.fetchAuditWorks(that.data.apiToken, type, 2, function (res) { //这边接受一个query确定是什么类型的请求
-      if (res.data.length > 0) {
-        wx.showLoading({
-          title: "加载中",
-          mask: true,
-        })
-        that.changePosition(res.data, type)
-      } else {
-        wx.showToast({
-          title: "没有任务，请联系客服",
-          icon: "loading",
-          mask: true,
-          duration: 2000,
-          success: function () {
-            wx.navigateTo({
-              url: "../index/index"
-            })
-          }
-        })
-      }
-    })
-  },
-
-  changePosition: function (data, type) {
-    if (type === 'rect' && data.length > 0) {//根据类型分别处理数据
-
-      this.getImgFiles(data);
-    } else if (type === 'count' && data.length > 0) {
-      //这里吧对应的点放入
-    }
-  },
-
-  getImgFiles(work) {
-    if (work.length > 0) {
-      var imgArr = [];
-      var that = this;
-      work.forEach((item) => {
-        beevalley.downloadAuditWorkFile(this.data.apiToken, item.id, function (res) {
-          imgArr.push({
-            src: 'data:image/jpeg;base64,' + wx.arrayBufferToBase64(res.data),
-            id: item.id,
-            minX: item.work.result[0][0].x,
-            minY: item.work.result[0][0].y,
-            maxX: item.work.result[0][1].x,
-            maxY: item.work.result[0][1].y,
-            description: item.work.description,
-            cutOutTime: item.expiredAt
-          })
-          that.setData({
-            imgDataArr: imgArr
-          })
-          wx.hideLoading();
-        })
-
-      })
-    }
-  },
-
-  createAnchor: function (id) {
-
-  },
-
-  createRect: function (id) {
-    if (!this.rect) {
-      console.log(this.data.imgDataArr)
-      this.data.imgDataArr.forEach((item) => {
-        if (item.id === id) {
-          var rect = new Shape('rect', {
-            x: ((item.maxX / this.data.imgRatio) + (item.minX / this.data.imgRatio)) / 2,
-            y: ((item.maxY / this.data.imgRatio) + (item.minY / this.data.imgRatio)) / 2,
-            w: (item.maxX / this.data.imgRatio) - (item.minX / this.data.imgRatio),
-            h: (item.maxY / this.data.imgRatio) - (item.minY / this.data.imgRatio),
-            lineWidth: 2,
-            lineCap: 'round',
-            strokeStyle: "#339933",
-          }, 'stroke', false);
-          this.wxCanvas.add(rect);
-          this.rect = rect;
-          clearInterval(this.data.timer);
-          this.getCutTime(item.cutOutTime);
-          this.changeBox(id);
+        if (worksToCancel.length > 0) {
+            beevalley.cancelWork(this.apitoken, worksToCancel, function (res) { })
         }
-      })
-    }
-  },
-
-  changeBox(id) { //随方框的大小改变显示的位置
-    this.data.imgDataArr.forEach((item) => {
-      if (id === item.id) {
-        var top = 0;
-        if ((item.minY / this.data.imgRatio - 5 - 33) < 0) {
-          if ((item.maxY / this.data.imgRatio + 5 + 33) > this.data.imageAreaHeight) {
-            top = item.minY / this.data.imgRatio + 20
-          } else {
-            top = item.maxY / this.data.imgRatio + 5;
-          }
+    },
+    
+    calculateWorkarea: function (imageWidth, imageHeight, anchorX, anchorY, windowWidth, windowHeight) {
+        var x;
+        if (anchorX < windowWidth / 2) {
+            x = 0;
+        } else if (anchorX > imageWidth - windowWidth / 2) {
+            x = imageWidth - windowWidth;
         } else {
-          top = item.minY / this.data.imgRatio - 10 - 33;
+            x = anchorX - windowWidth / 2
         }
-        this.setData({
-          showboxInfo: {
-            boxWidth: Math.floor(item.maxX / this.data.imgRatio - item.minX / this.data.imgRatio),
-            boxHeight: Math.floor(item.maxY / this.data.imgRatio - item.minY / this.data.imgRatio),
-            top: top,
-            left: item.minX / this.data.imgRatio,
-            width: 65,
-            height: 33
-          }
-        })
-      }
-    })
-  },
+        var y;
+        if (anchorY < windowHeight / 2) {
+            y = 0;
+        } else if (anchorY > imageHeight - windowHeight / 2) {
+            y = imageHeight - windowHeight;
+        } else {
+            y = anchorY - windowHeight / 2
+        }
+        return { x: Math.floor(x), y: Math.floor(y), width: windowWidth, height: windowHeight };
+    },
+    
+    handleError: function (res) {
+        if (res.statusCode === 403) {
+        // TODO handle conflict case
+            wx.navigateBack({
+                delta: 1
+            })
+        }
+    }
 
 })

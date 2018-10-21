@@ -1,7 +1,7 @@
 <view class="container">
     <view class="rectAudit">
         <canvas
-            wx:if="{{imgDataArr.length > 0}}"
+            wx:if="{{imgWidth > 0 && imgHeight > 0}}" 
             style="width:{{imgWidth}}px;height:{{imgHeight}}px;position:absolute;top:0;left:0;"
             canvas-id="rectAudit"
             disable-scroll=true
@@ -12,16 +12,16 @@
             bindlongpress="bindlongpress"
         ></canvas>
         <image
-            wx:if="{{imgDataArr.length > 0}}"
+            wx:if="{{currentWork.src}}"
             style="width:{{imgWidth}}px;height:{{imgHeight}}px"
             class="rectAuditImg"
-            src="{{imgDataArr[0].src}}" 
+            src="{{currentWork.src}}"
             bindload="imageLoad"
-            data-imgId="{{imgDataArr[0].id}}"
+            data-imgId="{{currentWork.id}}"
         ></image>
         <view 
-            wx:if="{{showboxInfo.width !== 0}}"
-            style="width: {{showboxInfo.width}}px;height:{{showboxInfo.height}}px;background:black;font-size: 12px;color: #fff;padding: 2px;position: absolute;top:{{showboxInfo.top}}px;left: {{showboxInfo.left}}px;vertical-align:top;"
+            wx:if="{{showboxInfo && showboxInfo.boxWidth > 0}}"
+            style="width: {{showboxInfo.width}}px;height:{{showboxInfo.height}}px;background:black;font-size: 12px;color: #fff;padding: 2px;position: absolute;top:{{showboxInfo.top}}px;left: {{showboxInfo.left}}px;vertical-align:top;line-height:16.5px;padding:0"
         >宽：{{showboxInfo.boxWidth}}px 高：{{showboxInfo.boxHeight}}px</view>
     </view>
     <view class="doSomething">
@@ -31,10 +31,10 @@
                 class="icon" 
                 bindtap="clickIcon" 
                 size="18" 
-                data-imgdescription="{{imgDataArr[0].description}}" 
+                data-imgdescription="{{currentWork.work.description}}"  
                 color="#33CCFF"
             />
-            <text style="font-size:10px;vertical-align:top;">{{cutTime.minutes}}分-{{cutTime.seconds}}秒</text>
+            <text style="font-size:10px;vertical-align:top;">{{displayTimer}}</text>
         </view>
         <view class="btn">
             <button type="primary" bindtap="submitWork" data-imgId="{{imgDataArr[0].id}}">通过</button>
