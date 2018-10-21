@@ -99,7 +99,7 @@ Page({
         let anchorX = Math.floor((work.work.result[0][1].x + work.work.result[0][0].x) / 2);
         let anchorY = Math.floor((work.work.result[0][1].y - work.work.result[0][0].y) / 2);
 
-        let options = this.calculateWorkarea(work.meta.imageWidth, work.meta.imageHeight, anchorX, anchorY, this.data.imageAreaWidth, this.data.imageAreaHeight);
+        let options = beevalley.calculateWorkarea(work.meta.imageWidth, work.meta.imageHeight, anchorX, anchorY, this.data.imageAreaWidth, this.data.imageAreaHeight);
         options['format'] = 'png';
 
         work['xOffset'] = options.x;
@@ -294,26 +294,6 @@ Page({
         if (worksToCancel.length > 0) {
             beevalley.cancelWork(this.apitoken, worksToCancel, function (res) { })
         }
-    },
-
-    calculateWorkarea: function (imageWidth, imageHeight, anchorX, anchorY, windowWidth, windowHeight) {
-        var x;
-        if (anchorX < windowWidth / 2) {
-            x = 0;
-        } else if (anchorX > imageWidth - windowWidth / 2) {
-            x = imageWidth - windowWidth;
-        } else {
-            x = anchorX - windowWidth / 2
-        }
-        var y;
-        if (anchorY < windowHeight / 2) {
-            y = 0;
-        } else if (anchorY > imageHeight - windowHeight / 2) {
-            y = imageHeight - windowHeight;
-        } else {
-            y = anchorY - windowHeight / 2
-        }
-        return { x: Math.floor(x), y: Math.floor(y), width: windowWidth, height: windowHeight };
     },
 
     handleError: function (res) {

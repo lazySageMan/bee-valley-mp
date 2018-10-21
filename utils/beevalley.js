@@ -166,17 +166,6 @@ function submitReview(token, workId, result, callback) {
   });
 }
 
-// function cancelAuditWork(token, workId, callback) {
-//   wx.request({
-//     url: TODVIEW_API_BASE_URL + 'reviews/' + workId + '/cancel',
-//     method: 'DELETE',
-//     header: {
-//       'Authorization': 'Bearer ' + token
-//     },
-//     success: wrap(callback)
-//   });
-// }
-
 function listAuthorizedReviewsType(token, callback) {
   wx.request({
     url: TODVIEW_API_BASE_URL + 'reviews/authorized_types',
@@ -203,6 +192,26 @@ function formatCountDown(expiredTime) {
   return displayCountDown;
 }
 
+function calculateWorkarea(imageWidth, imageHeight, anchorX, anchorY, windowWidth, windowHeight) {
+  var x;
+  if (anchorX < windowWidth / 2) {
+      x = 0;
+  } else if (anchorX > imageWidth - windowWidth / 2) {
+      x = imageWidth - windowWidth;
+  } else {
+      x = anchorX - windowWidth / 2
+  }
+  var y;
+  if (anchorY < windowHeight / 2) {
+      y = 0;
+  } else if (anchorY > imageHeight - windowHeight / 2) {
+      y = imageHeight - windowHeight;
+  } else {
+      y = anchorY - windowHeight / 2
+  }
+  return { x: Math.floor(x), y: Math.floor(y), width: windowWidth, height: windowHeight };
+}
+
 module.exports.fetchWorks = fetchWorks
 exports.downloadWorkFile = downloadWorkFile
 exports.submitWork = submitWork
@@ -216,3 +225,4 @@ exports.submitReview = submitReview
 exports.cancelReview = cancelReview
 exports.listAuthorizedReviewsType = listAuthorizedReviewsType
 exports.formatCountDown = formatCountDown
+exports.calculateWorkarea = calculateWorkarea
