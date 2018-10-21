@@ -1,14 +1,17 @@
-<view class="message" wx:if="{{!authenticated}}">
+<!-- <view class="message" wx:if="{{!authenticated}}">
   <text>登录中</text>
+</view> -->
+<view wx:if="{{requiredAuth}}" class="btn1">
+  <button type="primary" size="default" open-type="getUserInfo" bindgetuserinfo="bindGetUserInfoButton">授权登录</button>
 </view>
-<view wx:if="{{authenticated}}">
-    <view class="btn1">
-        <button type="primary" size="default" bindtap="intoChoose">任务</button>
-    </view>
-    <view class="btn">
-        <button type="primary" size="default" bindtap="intoAuditChoose">审核</button>
-    </view>
-    <view class="btn">
-        <button type="primary" size="default" bindtap="intoList">工作记录</button>
-    </view>
+<view wx:if="{{!requiredAuth}}">
+  <view class="btn1">
+    <button type="primary" size="default" bindtap="intoChoose">任务</button>
+  </view>
+  <view class="btn">
+    <button type="primary" size="default" bindtap="intoAuditChoose">审核</button>
+  </view>
+  <view class="btn">
+    <button type="primary" size="default" bindtap="intoList">工作记录</button>
+  </view>
 </view>
