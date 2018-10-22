@@ -1,6 +1,6 @@
 {
-    "navigationBarBackgroundColor": "#000000",
-    "navigationBarTextStyle": "#fff",
-    "navigationBarTitleText": "方框审核",
-    "backgroundColor": "#eeeeee"
-  }
+  "navigationBarBackgroundColor": "#000000",
+  "navigationBarTextStyle": "#fff",
+  "navigationBarTitleText": "审核-方框标注",
+  "backgroundColor": "#eeeeee"
+}

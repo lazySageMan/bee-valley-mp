@@ -10,10 +10,10 @@
         <view class="td">{{rect.Pending + rect.Rejected + rect.Approved}}/{{rect.Approved}}/{{rect.Rejected}}</view>
         <view class="td">{{rect.Money}}</view>
       </view>
-      <view class="tr bg-g" style="border-top:2px solid black;border-bottom:2px solid black;">
+      <!-- <view class="tr bg-g" style="border-top:2px solid black;border-bottom:2px solid black;">
         <view class="td">数点</view>
         <view class="td">{{count.Pending + count.Rejected + count.Approved}}/{{count.Approved}}/{{count.Rejected}}</view>
         <view class="td">{{count.Money}}</view>
-      </view>
+      </view> -->
     </block>
   </view>

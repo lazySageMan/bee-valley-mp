@@ -29,7 +29,11 @@ Page({
     let that = this;
     beevalley.listAuthorizedReviewsType(this.data.apitoken, function (res) {
       console.log(res)
-      that.setData({ taskTypes: res.data });
+      if (res.statusCode === 200) {
+        that.setData({ taskTypes: res.data });
+      } else {
+        that.setData({ taskTypes: [] });
+      }      
       wx.stopPullDownRefresh();
     });
   },

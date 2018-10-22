@@ -180,6 +180,8 @@ Page({
     //   imgH = imgW * e.detail.height / e.detail.width;
 
     // TODO use default imgRatio
+    let that = this;
+
     this.setData({
       imgHeight: e.detail.height,
       imgWidth: e.detail.width,
@@ -188,9 +190,14 @@ Page({
 
     this.createAnchor(e.currentTarget.dataset.imgid);
     this.createRect();
-    beevalley.renderRect(this);
-    beevalley.renderInfoBox(this);
-    beevalley.startTimer(this);
+    beevalley.renderRect(this.rect, this.data.rectPosition);
+    beevalley.renderInfoBox(function (data) {
+      that.setData(data);
+    }, this.data.rectPosition, this.data.imageAreaHeight);
+    clearInterval(this.timer);
+    this.timer = beevalley.startTimer(function (data) {
+      that.setData(data);
+    }, this.data.currentWork.expiredAt);
     wx.hideLoading();
 
   },
@@ -212,7 +219,9 @@ Page({
     let that = this;
     clearInterval(this.boxRefresher);
     this.boxRefresher = setInterval(function () {
-      beevalley.renderInfoBox(that);
+      beevalley.renderInfoBox(function (data) {
+        that.setData(data);
+      }, that.data.rectPosition, that.data.imageAreaHeight);
     }, 250);
   },
 
@@ -296,7 +305,7 @@ Page({
     } else {
       this.adjustRectPosition(Math.floor(e.touches[0].x), Math.floor(e.touches[0].y));
     }
-    beevalley.renderRect(this);
+    beevalley.renderRect(this.rect, this.data.rectPosition);
   },
 
   bindtouchend: function (e) {

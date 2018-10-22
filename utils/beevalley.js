@@ -1,4 +1,6 @@
 // common.js
+// const dayjs = require('./dayjs.min.js');
+const moment = require('./moment.min.js');
 
 const TODVIEW_API_BASE_URL = 'https://api.todview.com/v1/';
 
@@ -179,6 +181,7 @@ function listAuthorizedReviewsType(token, callback) {
 
 function formatCountDown(expiredTime) {
   let now = new Date().getTime();
+  // console.log('now: %s expiredTime: %s', now, expiredTime);
   var displayCountDown;
   if (expiredTime > now) {
     let millisToGo = expiredTime - now;
@@ -197,73 +200,71 @@ function formatCountDown(expiredTime) {
 function calculateWorkarea(imageWidth, imageHeight, anchorX, anchorY, windowWidth, windowHeight) {
   var x;
   if (anchorX < windowWidth / 2) {
-      x = 0;
+    x = 0;
   } else if (anchorX > imageWidth - windowWidth / 2) {
-      x = imageWidth - windowWidth;
+    x = imageWidth - windowWidth;
   } else {
-      x = anchorX - windowWidth / 2
+    x = anchorX - windowWidth / 2
   }
   var y;
   if (anchorY < windowHeight / 2) {
-      y = 0;
+    y = 0;
   } else if (anchorY > imageHeight - windowHeight / 2) {
-      y = imageHeight - windowHeight;
+    y = imageHeight - windowHeight;
   } else {
-      y = anchorY - windowHeight / 2
+    y = anchorY - windowHeight / 2
   }
   return { x: Math.floor(x), y: Math.floor(y), width: windowWidth, height: windowHeight };
 }
 
-function renderInfoBox(that) { //随方框的大小改变显示的位置
-  if (that.data.rectPosition) {
-      var top = 0;
-      if ((that.data.rectPosition.yMin - 5 - 33) < 0) {
-          if ((that.data.rectPosition.yMax + 5 + 33) > that.data.imageAreaHeight) {
-              top = that.data.rectPosition.yMin + 20
-          } else {
-              top = that.data.rectPosition.yMax + 5;
-          }
+function renderInfoBox(setData, rectPosition, imageAreaHeight) { //随方框的大小改变显示的位置
+  if (rectPosition) {
+    var top = 0;
+    if ((rectPosition.yMin - 5 - 33) < 0) {
+      if ((rectPosition.yMax + 5 + 33) > imageAreaHeight) {
+        top = rectPosition.yMin + 20
       } else {
-          top = that.data.rectPosition.yMin - 10 - 33;
+        top = rectPosition.yMax + 5;
       }
-      let boxWidth = that.data.rectPosition.xMax - that.data.rectPosition.xMin;
-      let boxHeight = that.data.rectPosition.yMax - that.data.rectPosition.yMin;
+    } else {
+      top = rectPosition.yMin - 10 - 33;
+    }
+    let boxWidth = rectPosition.xMax - rectPosition.xMin;
+    let boxHeight = rectPosition.yMax - rectPosition.yMin;
 
-      that.setData({
-          showboxInfo: {
-              boxWidth: boxWidth,
-              boxHeight: boxHeight,
-              top: top,
-              left: that.data.rectPosition.xMin,
-              width: 65,
-              height: 33
-          }
-      })
+    setData({
+      showboxInfo: {
+        boxWidth: boxWidth,
+        boxHeight: boxHeight,
+        top: top,
+        left: rectPosition.xMin,
+        width: 65,
+        height: 33
+      }
+    })
   }
 }
 
-function startTimer(that) {
-  clearInterval(that.timer);
-  // var that = that;
-  let expiredTime = new Date(that.data.currentWork.expiredAt).getTime();
-  that.timer = setInterval(function () {
-      that.setData({
-          displayTimer: formatCountDown(expiredTime)
-      })
+function startTimer(setData, expiredAt) {
+  // console.log('expiredAt: %s', expiredAt);
+  let expiredTime = moment(expiredAt, moment.ISO_8601).valueOf();
+  return setInterval(function () {
+    setData({
+      displayTimer: formatCountDown(expiredTime)
+    })
   }, 1000);
 }
 
-function renderRect(that) {
+function renderRect(rect, rectPosition) {
   // console.log(this.data.rectPosition)
-  if (that.data.rectPosition) {
-    that.rect.updateOption({
-          x: (that.data.rectPosition.xMin + that.data.rectPosition.xMax) / 2,
-          y: (that.data.rectPosition.yMin + that.data.rectPosition.yMax) / 2,
-          w: that.data.rectPosition.xMax - that.data.rectPosition.xMin,
-          h: that.data.rectPosition.yMax - that.data.rectPosition.yMin
-      });
+  if (rectPosition) {
+    rect.updateOption({
+      x: (rectPosition.xMin + rectPosition.xMax) / 2,
+      y: (rectPosition.yMin + rectPosition.yMax) / 2,
+      w: rectPosition.xMax - rectPosition.xMin,
+      h: rectPosition.yMax - rectPosition.yMin
+    });
   }
-
 }
 
 module.exports.fetchWorks = fetchWorks
@@ -278,7 +279,6 @@ exports.downloadAuditWorkFile = downloadAuditWorkFile
 exports.submitReview = submitReview
 exports.cancelReview = cancelReview
 exports.listAuthorizedReviewsType = listAuthorizedReviewsType
-exports.formatCountDown = formatCountDown
 exports.calculateWorkarea = calculateWorkarea
 exports.renderInfoBox = renderInfoBox
 exports.startTimer = startTimer
