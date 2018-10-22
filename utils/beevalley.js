@@ -266,23 +266,6 @@ function renderRect(that) {
 
 }
 
-function createRect(that) {
-  if (!that.rect) {
-      var rect = new Shape('rect', {
-          x: 0,
-          y: 0,
-          w: 0,
-          h: 0,
-          lineWidth: 2,
-          lineCap: 'round',
-          strokeStyle: "#339933",
-      }, 'stroke', false);
-      that.wxCanvas.add(rect);
-      that.rect = rect;
-  }
-}
-
-
 module.exports.fetchWorks = fetchWorks
 exports.downloadWorkFile = downloadWorkFile
 exports.submitWork = submitWork
@@ -300,4 +283,3 @@ exports.calculateWorkarea = calculateWorkarea
 exports.renderInfoBox = renderInfoBox
 exports.startTimer = startTimer
 exports.renderRect = renderRect
-exports.createRect = createRect
