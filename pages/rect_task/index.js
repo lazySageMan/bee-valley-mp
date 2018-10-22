@@ -117,7 +117,7 @@ Page({
     let anchorX = Math.floor(work.prerequisites[0].result[work.meta.index].x);
     let anchorY = Math.floor(work.prerequisites[0].result[work.meta.index].y);
 
-    let options = this.calculateWorkarea(work.meta.imageWidth, work.meta.imageHeight, anchorX, anchorY, this.data.imageAreaWidth, this.data.imageAreaHeight);
+    let options = beevalley.calculateWorkarea(work.meta.imageWidth, work.meta.imageHeight, anchorX, anchorY, this.data.imageAreaWidth, this.data.imageAreaHeight);
     options['format'] = 'png';
 
     work['xOffset'] = options.x;
@@ -187,10 +187,10 @@ Page({
     });
 
     this.createAnchor(e.currentTarget.dataset.imgid);
-    this.createRect(e.currentTarget.dataset.imgid);
-    this.renderRect();
-    this.renderInfoBox();
-    this.startTimer();
+    this.createRect();
+    beevalley.renderRect(this);
+    beevalley.renderInfoBox(this);
+    beevalley.startTimer(this);
     wx.hideLoading();
 
   },
@@ -208,22 +208,11 @@ Page({
     }
   },
 
-  startTimer: function () {
-    clearInterval(this.timer);
-    var that = this;
-    let expiredTime = new Date(this.data.currentWork.expiredAt).getTime();
-    this.timer = setInterval(function () {
-      that.setData({
-        displayTimer: beevalley.formatCountDown(expiredTime)
-      })
-    }, 1000);
-  },
-
   startBoxInfoRefresher: function () {
     let that = this;
     clearInterval(this.boxRefresher);
     this.boxRefresher = setInterval(function () {
-      that.renderInfoBox();
+      beevalley.renderInfoBox(that);
     }, 250);
   },
 
@@ -231,7 +220,7 @@ Page({
     clearInterval(this.boxRefresher);
   },
 
-  createRect: function (id) {
+  createRect: function () {
     if (!this.rect) {
       var rect = new Shape('rect', {
         x: 0,
@@ -244,34 +233,6 @@ Page({
       }, 'stroke', false);
       this.wxCanvas.add(rect);
       this.rect = rect;
-    }
-  },
-
-  renderInfoBox() { //随方框的大小改变显示的位置
-    if (this.data.rectPosition) {
-      var top = 0;
-      if ((this.data.rectPosition.yMin - 5 - 33) < 0) {
-        if ((this.data.rectPosition.yMax + 5 + 33) > this.data.imageAreaHeight) {
-          top = this.data.rectPosition.yMin + 20
-        } else {
-          top = this.data.rectPosition.yMax + 5;
-        }
-      } else {
-        top = this.data.rectPosition.yMin - 10 - 33;
-      }
-      let boxWidth = this.data.rectPosition.xMax - this.data.rectPosition.xMin;
-      let boxHeight = this.data.rectPosition.yMax - this.data.rectPosition.yMin;
-
-      this.setData({
-        showboxInfo: {
-          boxWidth: boxWidth,
-          boxHeight: boxHeight,
-          top: top,
-          left: this.data.rectPosition.xMin,
-          width: 65,
-          height: 33
-        }
-      })
     }
   },
 
@@ -310,19 +271,6 @@ Page({
     }
   },
 
-  renderRect: function () {
-
-    if (this.data.rectPosition) {
-      this.rect.updateOption({
-        x: (this.data.rectPosition.xMin + this.data.rectPosition.xMax) / 2,
-        y: (this.data.rectPosition.yMin + this.data.rectPosition.yMax) / 2,
-        w: this.data.rectPosition.xMax - this.data.rectPosition.xMin,
-        h: this.data.rectPosition.yMax - this.data.rectPosition.yMin
-      });
-    }
-
-  },
-
   //画框从此开始
   bindtouchstart: function (e) {
     this.wxCanvas.touchstartDetect(e);
@@ -348,7 +296,7 @@ Page({
     } else {
       this.adjustRectPosition(Math.floor(e.touches[0].x), Math.floor(e.touches[0].y));
     }
-    this.renderRect();
+    beevalley.renderRect(this);
   },
 
   bindtouchend: function (e) {
@@ -403,26 +351,6 @@ Page({
     if (worksToCancel.length > 0) {
       beevalley.cancelWork(this.apitoken, worksToCancel, function (res) { })
     }
-  },
-
-  calculateWorkarea: function (imageWidth, imageHeight, anchorX, anchorY, windowWidth, windowHeight) {
-    var x;
-    if (anchorX < windowWidth / 2) {
-      x = 0;
-    } else if (anchorX > imageWidth - windowWidth / 2) {
-      x = imageWidth - windowWidth;
-    } else {
-      x = anchorX - windowWidth / 2
-    }
-    var y;
-    if (anchorY < windowHeight / 2) {
-      y = 0;
-    } else if (anchorY > imageHeight - windowHeight / 2) {
-      y = imageHeight - windowHeight;
-    } else {
-      y = anchorY - windowHeight / 2
-    }
-    return { x: Math.floor(x), y: Math.floor(y), width: windowWidth, height: windowHeight };
   },
 
   handleError: function (res) {
