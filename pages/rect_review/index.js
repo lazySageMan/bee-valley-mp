@@ -164,35 +164,12 @@ Page({
         });
 
         this.createAnchor();
-        this.createRect(e.currentTarget.dataset.imgid);
-        this.renderRect();
-        this.renderInfoBox();
-        this.startTimer();
+        this.createRect();
+        beevalley.renderRect(this);
+        beevalley.renderInfoBox(this);
+        beevalley.startTimer(this);
         wx.hideLoading();
 
-    },
-
-    startTimer: function () {
-        clearInterval(this.timer);
-        var that = this;
-        let expiredTime = new Date(this.data.currentWork.expiredAt).getTime();
-        this.timer = setInterval(function () {
-            that.setData({
-                displayTimer: beevalley.formatCountDown(expiredTime)
-            })
-        }, 1000);
-    },
-
-    startBoxInfoRefresher: function () {
-        let that = this;
-        clearInterval(this.boxRefresher);
-        this.boxRefresher = setInterval(function () {
-            that.renderInfoBox();
-        }, 250);
-    },
-
-    stopBoxInfoRefresher: function () {
-        clearInterval(this.boxRefresher);
     },
 
     createRect: function () {
@@ -221,47 +198,6 @@ Page({
             });
             this.wxCanvas.add(circle);
             this.circle = circle;
-        }
-
-    },
-
-    renderInfoBox() { //随方框的大小改变显示的位置
-        if (this.data.rectPosition) {
-            var top = 0;
-            if ((this.data.rectPosition.yMin - 5 - 33) < 0) {
-                if ((this.data.rectPosition.yMax + 5 + 33) > this.data.imageAreaHeight) {
-                    top = this.data.rectPosition.yMin + 20
-                } else {
-                    top = this.data.rectPosition.yMax + 5;
-                }
-            } else {
-                top = this.data.rectPosition.yMin - 10 - 33;
-            }
-            let boxWidth = this.data.rectPosition.xMax - this.data.rectPosition.xMin;
-            let boxHeight = this.data.rectPosition.yMax - this.data.rectPosition.yMin;
-
-            this.setData({
-                showboxInfo: {
-                    boxWidth: boxWidth,
-                    boxHeight: boxHeight,
-                    top: top,
-                    left: this.data.rectPosition.xMin,
-                    width: 65,
-                    height: 33
-                }
-            })
-        }
-    },
-
-    renderRect: function () {
-        // console.log(this.data.rectPosition)
-        if (this.data.rectPosition) {
-            this.rect.updateOption({
-                x: (this.data.rectPosition.xMin + this.data.rectPosition.xMax) / 2,
-                y: (this.data.rectPosition.yMin + this.data.rectPosition.yMax) / 2,
-                w: this.data.rectPosition.xMax - this.data.rectPosition.xMin,
-                h: this.data.rectPosition.yMax - this.data.rectPosition.yMin
-            });
         }
 
     },
