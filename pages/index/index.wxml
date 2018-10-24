@@ -11,7 +11,4 @@
   <view class="btn">
     <button type="primary" size="default" bindtap="intoAuditChoose">审核</button>
   </view>
-  <view class="btn">
-    <button type="primary" size="default" bindtap="intoList">工作记录</button>
-  </view>
 </view>

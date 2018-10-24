@@ -7,7 +7,7 @@
   </view>
 
   <view class="message" wx:if="{{taskTypes && taskTypes.length === 0}}">
-    <text>暂无任务。请加公众号“淘然视界”联系客服获取更多任务。</text>
+    <text>暂无任务。请联系客服获取更多任务。</text>
   </view>
 
 </view>
