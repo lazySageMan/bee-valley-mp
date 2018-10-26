@@ -31,31 +31,37 @@ Page({
   },
 
   submitWork: function () {
-    this.showLoading();
-    let that = this;
-    beevalley.submitReview(this.apitoken, this.data.currentWork.id, true, function (res) {
-      that.handleError(res);
-      that.nextWork();
-    })
+    if (this.data.currentWork) {
+      this.showLoading();
+      let that = this;
+      beevalley.submitReview(this.apitoken, this.data.currentWork.id, true, function (res) {
+        that.handleError(res);
+        that.nextWork();
+      })
+    }
   },
 
   rejectWork: function () {
-    this.showLoading();
-    let that = this;
-    beevalley.submitReview(this.apitoken, this.data.currentWork.id, false, function (res) {
-      that.handleError(res);
-      that.nextWork();
-    })
+    if (this.data.currentWork) {
+      this.showLoading();
+      let that = this;
+      beevalley.submitReview(this.apitoken, this.data.currentWork.id, false, function (res) {
+        that.handleError(res);
+        that.nextWork();
+      })
+    }
   },
 
   cancelReview: function () {
-    this.showLoading();
-    let that = this;
-    let deletedWorkId = this.data.currentWork.id;
-    beevalley.cancelWork(that.apitoken, [deletedWorkId], function (res) {
-      // TODO handle error
-      that.nextWork();
-    })
+    if (this.data.currentWork) {
+      this.showLoading();
+      let that = this;
+      let deletedWorkId = this.data.currentWork.id;
+      beevalley.cancelWork(that.apitoken, [deletedWorkId], function (res) {
+        // TODO handle error
+        that.nextWork();
+      })
+    }
   },
 
   nextWork: function () {
@@ -97,7 +103,7 @@ Page({
   preprocessWork: function (work) {
     // console.log(work); 取方框的中心点作为剪切的依据
     let anchorX = Math.floor((work.work.result[0][1].x + work.work.result[0][0].x) / 2);
-    let anchorY = Math.floor((work.work.result[0][1].y - work.work.result[0][0].y) / 2);
+    let anchorY = Math.floor((work.work.result[0][1].y + work.work.result[0][0].y) / 2);
 
     let options = beevalley.calculateWorkarea(work.meta.imageWidth, work.meta.imageHeight, anchorX, anchorY, this.data.imageAreaWidth, this.data.imageAreaHeight);
     options['format'] = 'png';
@@ -126,7 +132,7 @@ Page({
       } else {
         wx.hideLoading();
         wx.showToast({
-          title: '暂时没有任务',
+          title: '暂时没有任务'
         })
       }
     });
