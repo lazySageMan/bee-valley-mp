@@ -18,24 +18,29 @@ Page({
   },
 
   clickIcon(e) {
-    // e.target.dataset.imgdescription
+    var info = ''
+
+    this.data.currentWork.details.forEach(item => {
+      info += `• ${item}\r\n`
+    })
+    
     wx.showModal({
-      title: "提示",
-      content: e.target.dataset.imgdescription,
+      title: this.data.currentWork.description,
+      content: info, 
       showCancel: false,
       confirmText: "知道了"
     })
   },
 
   submitWork: function (e) {
-    if (this.data.rectInitialized) {
+    if (this.data.rectInitialized && this.data.currentWork) {
       let that = this;
       let item = this.data.currentWork;
       var relativeAnchorX = item.anchorX - item.xOffset;
       var relativeAnchorY = item.anchorY - item.yOffset;
       if (relativeAnchorX > this.data.rectPosition.xMin && relativeAnchorX < this.data.rectPosition.xMax && relativeAnchorY > this.data.rectPosition.yMin && relativeAnchorY < this.data.rectPosition.yMax) {
         this.showLoading();
-
+        // adjust for stroke width
         beevalley.submitWork(
           this.apitoken,
           item.id, [
@@ -46,8 +51,7 @@ Page({
             {
               x: item.xOffset + Math.floor(this.data.rectPosition.xMax * this.data.imgRatio),
               y: item.yOffset + Math.floor(this.data.rectPosition.yMax * this.data.imgRatio)
-            }
-            ]
+            }]
           ],
           function (res) {
             that.handleError(res);
