@@ -4,7 +4,6 @@ let beevalley = require("../../utils/beevalley.js");
 Page({
 
   data: {
-    authenticated: false
   },
 
   onLoad: function () {
@@ -26,12 +25,24 @@ Page({
   },
 
   fetchTaskTypes: function () {
+
+    wx.showLoading({
+      title: "加载中",
+      mask: true,
+    })
+
     let that = this;
     beevalley.listAuthorizedWorkType(this.data.apitoken, function (res) {
       console.log(res)//等待后端改数据类型
-      that.setData({ taskTypes: res.data });
+      if (res.statusCode === 200) {
+        that.setData({ taskTypes: res.data });
+      } else {
+        that.setData({ taskTypes: [] });
+      }
       wx.stopPullDownRefresh();
+      wx.hideLoading();
     });
+
   },
 
   navToTask: function (e) {

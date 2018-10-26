@@ -4,7 +4,6 @@ let beevalley = require("../../utils/beevalley.js");
 Page({
 
   data: {
-    authenticated: false
   },
 
   onLoad: function () {
@@ -26,6 +25,12 @@ Page({
   },
 
   fetchTaskTypes: function () {
+    
+    wx.showLoading({
+      title: "加载中",
+      mask: true,
+    })
+    
     let that = this;
     beevalley.listAuthorizedReviewsType(this.data.apitoken, function (res) {
       console.log(res)
@@ -35,6 +40,7 @@ Page({
         that.setData({ taskTypes: [] });
       }      
       wx.stopPullDownRefresh();
+      wx.hideLoading();
     });
   },
 
