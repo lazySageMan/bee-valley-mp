@@ -14,10 +14,15 @@ Page({
   },
 
   clickIcon(e) {
-    // e.target.dataset.imgdescription
+    var info = ''
+
+    this.data.currentWork.work.details.forEach(item => {
+      info += `• ${item}\r\n`
+    })
+    
     wx.showModal({
-      title: "提示",
-      content: e.target.dataset.imgdescription,
+      title: this.data.currentWork.work.description,
+      content: info,
       showCancel: false,
       confirmText: "知道了"
     })
