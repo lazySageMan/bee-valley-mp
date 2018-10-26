@@ -31,7 +31,6 @@
                 class="icon" 
                 bindtap="clickIcon" 
                 size="18" 
-                data-imgdescription="{{currentWork.work.description}}"  
                 color="#33CCFF"
             />
             <text style="font-size:10px;vertical-align:top;">{{displayTimer}}</text>
