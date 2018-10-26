@@ -18,18 +18,22 @@ Page({
   },
 
   clickIcon(e) {
-    var info = ''
 
-    this.data.currentWork.details.forEach(item => {
-      info += `• ${item}\r\n`
-    })
-    
-    wx.showModal({
-      title: this.data.currentWork.description,
-      content: info, 
-      showCancel: false,
-      confirmText: "知道了"
-    })
+    if (this.data.currentWork) {
+      var info = ''
+
+      this.data.currentWork.details.forEach(item => {
+        info += `• ${item}\r\n`
+      })
+
+      wx.showModal({
+        title: this.data.currentWork.description,
+        content: info,
+        showCancel: false,
+        confirmText: "知道了"
+      })
+    }
+
   },
 
   submitWork: function (e) {
@@ -95,6 +99,8 @@ Page({
     data['rectPosition'] = {};
     data['showboxInfo'] = {};
     data['currentWork'] = null;
+    
+    clearInterval(this.timer);
 
     if (this.data.works.length > 0) {
       let candidate = this.data.works.pop();
@@ -198,7 +204,7 @@ Page({
     beevalley.renderInfoBox(function (data) {
       that.setData(data);
     }, this.data.rectPosition, this.data.imageAreaHeight);
-    clearInterval(this.timer);
+    
     this.timer = beevalley.startTimer(function (data) {
       that.setData(data);
     }, this.data.currentWork.expiredAt);
