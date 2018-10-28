@@ -8,10 +8,11 @@
 .showMessage {
   width: 100%;
   height: 5vh;
-  line-height: 5vh;
-  text-align: center;
-  color: red;
   font-weight: bold;
+  display: flex;
+  color: red;
+  align-items: center;
+  justify-content: center;
 }
 
 .doSomething {

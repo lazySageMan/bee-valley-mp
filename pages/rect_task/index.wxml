@@ -33,9 +33,7 @@
       <icon 
         type="info" 
         class="icon" 
-        style="height:18px;width:18px;margin:0 5px;"
         bindtap="clickIcon" 
-        size="18" 
         color="#33CCFF"
       />
       {{currentWork.description}}
