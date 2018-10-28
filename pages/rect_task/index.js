@@ -23,14 +23,14 @@ Page({
       var info = ''
 
       this.data.currentWork.details.forEach(item => {
-        info += `• ${item}\r\n`
+        info += `�${item}\r\n`
       })
 
       wx.showModal({
-        title: this.data.currentWork.description,
+        title: '提示',
         content: info,
         showCancel: false,
-        confirmText: "知道了"
+        confirmText: "知道�
       })
     }
 
@@ -79,7 +79,7 @@ Page({
 
   showLoading: function () {
     wx.showLoading({
-      title: "加载中",
+      title: "加载�,
       mask: true,
     })
   },
@@ -297,7 +297,7 @@ Page({
     this.touchStartPosition.y = y;
   },
 
-  //画框从此开始
+  //画框从此开�
   bindtouchstart: function (e) {
     this.wxCanvas.touchstartDetect(e);
     if (e.touches[0].x < 0 || e.touches[0].y < 0 || e.touches[0].x > this.data.imgWidth || e.touches[0].y > this.data.imgHeight) {
@@ -327,7 +327,7 @@ Page({
   },
 
   bindtouchend: function (e) {
-    //检测手指点�移出事件
+    //检测手指点�移出事�
     this.wxCanvas.touchendDetect();
     if (!this.data.rectInitialized) {
       if (this.data.rectPosition.xMin < this.data.rectPosition.xMax && this.data.rectPosition.yMin < this.data.rectPosition.yMax) {
