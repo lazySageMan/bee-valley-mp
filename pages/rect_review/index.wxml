@@ -37,7 +37,7 @@
     </view>
     <view class="doSomething">
         
-        <text style="position: absolute;top:3.5vh;right:3vw;font-size: 3vh;">{{displayTimer}}</text>
+        <text class='timer'>{{displayTimer}}</text>
         
         <view class="btn">
             <button type="primary" bindtap="submitWork" data-imgId="{{imgDataArr[0].id}}">通过</button>

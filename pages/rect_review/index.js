@@ -19,14 +19,14 @@ Page({
       var info = ''
 
       this.data.currentWork.work.details.forEach(item => {
-        info += `�${item}\r\n`
+        info += `• ${item}\r\n`
       })
 
       wx.showModal({
         title: '提示',
         content: info,
         showCancel: false,
-        confirmText: "知道�
+        confirmText: "知道了"
       })
     }
 
@@ -34,7 +34,7 @@ Page({
 
   showLoading: function () {
     wx.showLoading({
-      title: "加载�,
+      title: "加载中",
       mask: true,
     })
   },

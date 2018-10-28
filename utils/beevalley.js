@@ -188,7 +188,7 @@ function formatCountDown(expiredTime) {
     let secondsToGo = Math.floor(millisToGo / 1000);
     let seconds = secondsToGo % 60;
     let minutes = parseInt(secondsToGo / 60);
-    displayCountDown = minutes + ':' + (seconds > 10 ? seconds : '0' + seconds);
+    displayCountDown = minutes + ':' + (seconds >= 10 ? seconds : '0' + seconds);
   } else {
     displayCountDown = '超时';
   }

@@ -41,12 +41,12 @@
       {{currentWork.description}}
   </view>
   <view class="doSomething">
-    <text style="position: absolute;top:3.5vh;right:3vw;font-size: 3vh;">{{displayTimer}}</text>
+    <text class="timer">{{displayTimer}}</text>
     <view class="btn">
         <button  type="primary" bindtap="submitWork">提交</button>
     </view>
     <view class="btn">
-        <button type="warn" bindtap="cancelWork">放弃</button>
+        <button type="warn" style="background: #FFCC00;" bindtap="cancelWork">放弃</button>
     </view>
   </view>
 </view>
