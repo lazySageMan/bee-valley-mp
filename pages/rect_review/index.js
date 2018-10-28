@@ -21,7 +21,7 @@ Page({
     })
     
     wx.showModal({
-      title: this.data.currentWork.work.description,
+      title: '提示',
       content: info,
       showCancel: false,
       confirmText: "知道了"
