@@ -12,48 +12,82 @@ Page({
       Rejected: 0,
       Approved: 0,
       Money: 0
-    }
+    },
+
+    showArr:[]
   },
-  setPendingData: function (data) {
-    if (data.length !== 0) {
-      var rect = data.filter((item) => item.type === "rect");
-      var point = data.filter((item) => item.type === "point");
-      this.setData({
-        ["rect.Pending"]: rect.length,
-        ["count.Pending"]: point.length
-      })
-    }
-  },
-  setRejectedData: function (data) {
-    if (data.length !== 0) {
-      var rect = data.filter((item) => item.type === "rect");
-      var point = data.filter((item) => item.type === "point");
-      this.setData({
-        ["rect.Rejected"]: rect.length,
-        ["count.Rejected"]: point.length
-      })
-    }
-  },
-  setApprovedData: function (data) {
-    // console.log(data)
-    if (data.length !== 0) {
-      var rect = data.filter((item) => item.type === "rect");
-      var point = data.filter((item) => item.type === "point");
-      var rectMoney = 0;
-      var pointMoney = 0;
-      rect.forEach((item) => {
-        rectMoney += item.price;
-      })
-      point.forEach((item) => {
-        pointMoney += item.price;
-      })
-      this.setData({
-        ["rect.Money"]: rectMoney.toFixed(2),
-        ["count.Money"]: pointMoney.toFixed(2),
-        ["rect.Approved"]: rect.length,
-        ["count.Approved"]: point.length
-      })
-    }
+  setApprovedData: function (responData) {
+    // console.log(responData)
+    let dataArr = [];
+    responData.forEach((item) => {
+      
+      if(dataArr.length > 0){
+
+        dataArr.forEach(items => {
+          if(items.pack === item.pack){
+            if(item.reviewResult === false){
+              items.rejected++;
+            }
+            if(item.reviewResult === true){
+              items.approved++;
+              item.money+=item.price;
+            }
+            if(item.reviewResult === null){
+              items.pending++
+            }
+
+          }else{
+            let node = {};
+            node.title = '任务1'
+            node.pack = item.pack;
+            node.rejected = 0;
+            node.pending = 0;
+            node.approved = 0
+            node.money = 0;
+            if(item.reviewResult === false){
+              node.rejected++;
+            }
+            if(item.reviewResult === true){
+              node.approved++;
+              node.money = item.price;
+            }
+            if(item.reviewResult === null){
+              node.pending++
+            }
+            dataArr.push(node)
+
+          }
+
+        })
+      }else{
+        // console.log(1)
+        let node = {};
+        node.title = '任务1'
+        node.pack = item.pack;
+        node.rejected = 0;
+        node.pending = 0;
+        node.approved = 0;
+        node.money = 0;
+        if(item.reviewResult === false){
+          node.rejected++;
+        }
+        if(item.reviewResult === true){
+          node.approved++;
+          node.money = item.price;
+        }
+        if(item.reviewResult === null){
+          node.pending++
+        }
+        dataArr.push(node)
+      }
+
+    })
+    
+    this.setData({
+      showArr: dataArr
+    })
+
+    wx.hideLoading();
   },
   onLoad: function () {
     var nowTime = new Date().getTime();
@@ -64,17 +98,10 @@ Page({
         title: "加载中",
         mask: true,
     })
-    apiType.forEach((item) => {
-      beevalley.getWorkHistory(token, nowTime, item, function (res) {
-        if (item === "rejected") {
-          that.setRejectedData(res.data)
-        } else if (item === "pending") {
-          that.setPendingData(res.data)
-        } else if (item === "approved") {
-          that.setApprovedData(res.data)
-        }
-        wx.hideLoading();
-      })
+
+    beevalley.getWorkHistory(token, nowTime,  (res) => {
+      this.setApprovedData(res.data);
     })
+    
   }
 })

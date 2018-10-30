@@ -5,10 +5,10 @@
       <view class="th ">赏金</view>
     </view>
     <block>
-      <view class="tr bg-g">
-        <view class="td">方框</view>
-        <view class="td">{{rect.Pending + rect.Rejected + rect.Approved}}/{{rect.Approved}}/{{rect.Rejected}}</view>
-        <view class="td">{{rect.Money}}</view>
+      <view class="tr bg-g" wx:for="{{showArr}}" wx:key="{{index}}">
+        <view class="td">{{item.title}}</view>
+        <view class="td">{{item.pending + item.rejected + item.approved}}/{{item.approved}}/{{item.rejected}}</view>
+        <view class="td">{{item.money}}</view>
       </view>
       <!-- <view class="tr bg-g" style="border-top:2px solid black;border-bottom:2px solid black;">
         <view class="td">数点</view>
