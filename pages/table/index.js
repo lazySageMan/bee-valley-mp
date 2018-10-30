@@ -30,7 +30,7 @@ Page({
             }
             if(item.reviewResult === true){
               items.approved++;
-              item.money+=item.price;
+              item.money+=item.price.toFixed(2);
             }
             if(item.reviewResult === null){
               items.pending++
@@ -49,7 +49,7 @@ Page({
             }
             if(item.reviewResult === true){
               node.approved++;
-              node.money = item.price;
+              node.money = item.price.toFixed(2);
             }
             if(item.reviewResult === null){
               node.pending++
@@ -73,7 +73,7 @@ Page({
         }
         if(item.reviewResult === true){
           node.approved++;
-          node.money = item.price;
+          node.money = item.price.toFixed(2);
         }
         if(item.reviewResult === null){
           node.pending++
@@ -92,8 +92,6 @@ Page({
   onLoad: function () {
     var nowTime = new Date().getTime();
     var token = wx.getStorageSync('apitoken');
-    var apiType = ["rejected", "pending", "approved"];
-    var that = this;
     wx.showLoading({
         title: "加载中",
         mask: true,
