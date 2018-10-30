@@ -1,10 +1,18 @@
 const app = getApp()
-let beevalley = require("../../utils/beevalley.js");
+const beevalley = require("../../utils/beevalley.js");
+const moment = require('../../utils/moment.min.js');
+const jwtDecode = require('jwt-decode');
 
 Page({
 
   data: {
 
+  },
+
+  isJwtExpired: function (jwtToken) {
+    let decoded = jwtDecode(jwtToken);
+    let exp = moment.unix(decoded.exp);
+    return moment().isAfter(exp);
   },
 
   onLoad: function () {
@@ -15,8 +23,7 @@ Page({
     console.log("index");
     let that = this;
     let apitoken = wx.getStorageSync('apitoken');
-    console.log(apitoken)
-    if (!apitoken) {
+    if (!apitoken || this.isJwtExpired(apitoken)) {
       wx.login({
         success: function (res) {
           if (res.code) {

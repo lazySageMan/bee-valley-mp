@@ -1,19 +1,14 @@
 <view class="table">
-    <view class="tr bg-w" style="border-bottom:2px solid black;">
-      <view class="th">类型</view>
-      <view class="th">已提交/通过/驳回</view>
-      <view class="th ">赏金</view>
-    </view>
-    <block>
-      <view class="tr bg-g" wx:for="{{showArr}}" wx:key="{{index}}">
-        <view class="td">{{item.title}}</view>
-        <view class="td">{{item.pending + item.rejected + item.approved}}/{{item.approved}}/{{item.rejected}}</view>
-        <view class="td">{{item.money}}</view>
-      </view>
-      <!-- <view class="tr bg-g" style="border-top:2px solid black;border-bottom:2px solid black;">
-        <view class="td">数点</view>
-        <view class="td">{{count.Pending + count.Rejected + count.Approved}}/{{count.Approved}}/{{count.Rejected}}</view>
-        <view class="td">{{count.Money}}</view>
-      </view> -->
-    </block>
+  <view class="tr bg-w" style="border-bottom:2px solid black;">
+    <view class="th">任务</view>
+    <view class="th">已提交/通过/驳回</view>
+    <view class="th ">赏金</view>
   </view>
+  <block>
+    <view class="tr bg-g" wx:for="{{records}}" wx:key="{{index}}">
+      <view class="td">{{item.title}}</view>
+      <view class="td">{{item.total}}/{{item.approved}}/{{item.rejected}}</view>
+      <view class="td">{{item.reward}}</view>
+    </view>
+  </block>
+</view>

@@ -1,105 +1,71 @@
 let beevalley = require("../../utils/beevalley.js");
 Page({
   data: {
-    rect:{
-      Pending: 0,
-      Rejected: 0,
-      Approved: 0,
-      Money: 0
-    },
-    count:{
-      Pending: 0,
-      Rejected: 0,
-      Approved: 0,
-      Money: 0
-    },
-
-    showArr:[]
   },
-  setApprovedData: function (responData) {
-    // console.log(responData)
-    let dataArr = [];
-    responData.forEach((item) => {
-      
-      if(dataArr.length > 0){
 
-        dataArr.forEach(items => {
-          if(items.pack === item.pack){
-            if(item.reviewResult === false){
-              items.rejected++;
-            }
-            if(item.reviewResult === true){
-              items.approved++;
-              item.money+=item.price.toFixed(2);
-            }
-            if(item.reviewResult === null){
-              items.pending++
-            }
+  groupBy: function (xs, key) {
+    return xs.reduce(function (rv, x) {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+    }, {});
+  },
 
-          }else{
-            let node = {};
-            node.title = '任务1'
-            node.pack = item.pack;
-            node.rejected = 0;
-            node.pending = 0;
-            node.approved = 0
-            node.money = 0;
-            if(item.reviewResult === false){
-              node.rejected++;
-            }
-            if(item.reviewResult === true){
-              node.approved++;
-              node.money = item.price.toFixed(2);
-            }
-            if(item.reviewResult === null){
-              node.pending++
-            }
-            dataArr.push(node)
+  getTypeDisplay: function (taskType) {
+    if (taskType === 'rect') {
+      return '方框';
+    }
+  },
 
-          }
+  setWorkHistoryData: function (responData) {
 
-        })
-      }else{
-        // console.log(1)
-        let node = {};
-        node.title = '任务1'
-        node.pack = item.pack;
-        node.rejected = 0;
-        node.pending = 0;
-        node.approved = 0;
-        node.money = 0;
-        if(item.reviewResult === false){
-          node.rejected++;
+    let records = [],
+      count = 1,
+      groups = this.groupBy(responData, 'pack'),
+      sortedKeys = Object.keys(groups).sort();
+
+    for (var idx in sortedKeys) {
+      if (groups.hasOwnProperty(sortedKeys[idx])) {
+        let group = groups[sortedKeys[idx]],
+          approved = group.filter(r => r.reviewResult === true),
+          rejected = group.filter(r => r.reviewResult === false),
+          taskType = group[0].type;
+        if (taskType === 'rect') {
+          records.push({
+            title: '任务' + count + '(' + this.getTypeDisplay(taskType) + ')',
+            total: group.length,
+            approved: approved.length,
+            rejected: rejected.length,
+            reward: approved.reduce((sum, record) => sum + record.price, 0).toFixed(2)
+          })
+          count++;
+        } else {
+          // TODO Show only rect type task for now
         }
-        if(item.reviewResult === true){
-          node.approved++;
-          node.money = item.price.toFixed(2);
-        }
-        if(item.reviewResult === null){
-          node.pending++
-        }
-        dataArr.push(node)
       }
+    }
 
-    })
-    
     this.setData({
-      showArr: dataArr
+      records: records
     })
 
     wx.hideLoading();
   },
+
   onLoad: function () {
-    var nowTime = new Date().getTime();
-    var token = wx.getStorageSync('apitoken');
+
     wx.showLoading({
-        title: "加载中",
-        mask: true,
+      title: "加载中",
+      mask: true,
     })
 
-    beevalley.getWorkHistory(token, nowTime,  (res) => {
-      this.setApprovedData(res.data);
+    var nowTime = new Date().getTime();
+    var token = wx.getStorageSync('apitoken');
+    var that = this;
+
+    beevalley.getWorkHistory(token, nowTime, (res) => {
+      that.setWorkHistoryData(res.data);
     })
-    
+
   }
+
 })
