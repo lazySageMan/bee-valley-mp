@@ -89,9 +89,9 @@ function listAuthorizedWorkType(token, callback) {
   });
 }
 
-function getWorkHistory(token, nowTime, apiType, callback) {
+function getWorkHistory(token, nowTime, callback) {
   wx.request({
-    url: `${TODVIEW_API_BASE_URL}works/history/type/${apiType}/before/${nowTime}/limit/100`,
+    url: `${TODVIEW_API_BASE_URL}works/history/type/all/before/${nowTime}/limit/100`,
     header: {
       'content-type': 'application/json',
       'Authorization': 'Bearer ' + token
