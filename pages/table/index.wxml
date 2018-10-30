@@ -1,0 +1,19 @@
+<view class="table">
+    <view class="tr bg-w" style="border-bottom:2px solid black;">
+      <view class="th">类型</view>
+      <view class="th">已提交/通过/驳回</view>
+      <view class="th ">赏金</view>
+    </view>
+    <block>
+      <view class="tr bg-g">
+        <view class="td">方框</view>
+        <view class="td">{{rect.Pending + rect.Rejected + rect.Approved}}/{{rect.Approved}}/{{rect.Rejected}}</view>
+        <view class="td">{{rect.Money}}</view>
+      </view>
+      <!-- <view class="tr bg-g" style="border-top:2px solid black;border-bottom:2px solid black;">
+        <view class="td">数点</view>
+        <view class="td">{{count.Pending + count.Rejected + count.Approved}}/{{count.Approved}}/{{count.Rejected}}</view>
+        <view class="td">{{count.Money}}</view>
+      </view> -->
+    </block>
+  </view>

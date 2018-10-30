@@ -4,7 +4,8 @@
     "pages/rect_review/index",
     "pages/task_list/index",
     "pages/rect_task/index",
-    "pages/review_list/index"
+    "pages/review_list/index",
+    "pages/table/index"
   ],
   "window": {
     "backgroundTextStyle": "light",

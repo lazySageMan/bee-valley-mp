@@ -8,4 +8,7 @@
   <view class="btn1">
     <button type="primary" size="default" bindtap="intoChoose">任务</button>
   </view>
+  <view class="btn">
+    <button type="primary" size="default" bindtap="intoList">工作记录</button>
+  </view>
 </view>
