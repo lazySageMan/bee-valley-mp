@@ -34,7 +34,7 @@
         {{currentWork.work.description}}
     </view>
     <view class="doSomething">
-        
+        <text class="price">￥{{currentWork.price}}</text>       
         <text class='timer'>{{displayTimer}}</text>
         
         <view class="btn">

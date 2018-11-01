@@ -39,7 +39,8 @@
       {{currentWork.description}}
   </view>
   <view class="doSomething">
-    <text class="timer">{{displayTimer}}</text>
+   <text class="price">￥{{currentWork.price}}</text>
+   <text class="timer">{{displayTimer}}</text>
     <view class="btn">
         <button  type="primary" bindtap="submitWork">提交</button>
     </view>
