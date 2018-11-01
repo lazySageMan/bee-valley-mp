@@ -89,9 +89,9 @@ function listAuthorizedWorkType(token, callback) {
   });
 }
 
-function getWorkHistory(token, nowTime, apiType, callback) {
+function getWorkHistory(token, nowTime, limit, callback) {
   wx.request({
-    url: `${TODVIEW_API_BASE_URL}works/history/type/${apiType}/before/${nowTime}/limit/100`,
+    url: `${TODVIEW_API_BASE_URL}works/history/type/all/before/${nowTime}/limit/${limit}`,
     header: {
       'content-type': 'application/json',
       'Authorization': 'Bearer ' + token
@@ -188,7 +188,7 @@ function formatCountDown(expiredTime) {
     let secondsToGo = Math.floor(millisToGo / 1000);
     let seconds = secondsToGo % 60;
     let minutes = parseInt(secondsToGo / 60);
-    displayCountDown = minutes + ':' + (seconds > 10 ? seconds : '0' + seconds);
+    displayCountDown = minutes + ':' + (seconds >= 10 ? seconds : '0' + seconds);
   } else {
     displayCountDown = '超时';
   }

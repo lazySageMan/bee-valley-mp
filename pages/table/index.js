@@ -1,80 +1,71 @@
 let beevalley = require("../../utils/beevalley.js");
 Page({
   data: {
-    rect:{
-      Pending: 0,
-      Rejected: 0,
-      Approved: 0,
-      Money: 0
-    },
-    count:{
-      Pending: 0,
-      Rejected: 0,
-      Approved: 0,
-      Money: 0
+  },
+
+  groupBy: function (xs, key) {
+    return xs.reduce(function (rv, x) {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+    }, {});
+  },
+
+  getTypeDisplay: function (taskType) {
+    if (taskType === 'rect') {
+      return '方框';
     }
   },
-  setPendingData: function (data) {
-    if (data.length !== 0) {
-      var rect = data.filter((item) => item.type === "rect");
-      var point = data.filter((item) => item.type === "point");
-      this.setData({
-        ["rect.Pending"]: rect.length,
-        ["count.Pending"]: point.length
-      })
+
+  setWorkHistoryData: function (responData) {
+
+    let records = [],
+      count = 1,
+      groups = this.groupBy(responData, 'pack'),
+      sortedKeys = Object.keys(groups).sort();
+
+    for (var idx in sortedKeys) {
+      if (groups.hasOwnProperty(sortedKeys[idx])) {
+        let group = groups[sortedKeys[idx]],
+          approved = group.filter(r => r.reviewResult === true),
+          rejected = group.filter(r => r.reviewResult === false),
+          taskType = group[0].type;
+        if (taskType === 'rect') {
+          records.push({
+            title: '任务' + count + '(' + this.getTypeDisplay(taskType) + ')',
+            total: group.length,
+            approved: approved.length,
+            rejected: rejected.length,
+            reward: approved.reduce((sum, record) => sum + record.price, 0).toFixed(2)
+          })
+          count++;
+        } else {
+          // TODO Show only rect type task for now
+        }
+      }
     }
+
+    this.setData({
+      records: records
+    })
+
+    wx.hideLoading();
   },
-  setRejectedData: function (data) {
-    if (data.length !== 0) {
-      var rect = data.filter((item) => item.type === "rect");
-      var point = data.filter((item) => item.type === "point");
-      this.setData({
-        ["rect.Rejected"]: rect.length,
-        ["count.Rejected"]: point.length
-      })
-    }
-  },
-  setApprovedData: function (data) {
-    // console.log(data)
-    if (data.length !== 0) {
-      var rect = data.filter((item) => item.type === "rect");
-      var point = data.filter((item) => item.type === "point");
-      var rectMoney = 0;
-      var pointMoney = 0;
-      rect.forEach((item) => {
-        rectMoney += item.price;
-      })
-      point.forEach((item) => {
-        pointMoney += item.price;
-      })
-      this.setData({
-        ["rect.Money"]: rectMoney.toFixed(2),
-        ["count.Money"]: pointMoney.toFixed(2),
-        ["rect.Approved"]: rect.length,
-        ["count.Approved"]: point.length
-      })
-    }
-  },
+
   onLoad: function () {
+
+    wx.showLoading({
+      title: "加载中",
+      mask: true,
+    })
+
     var nowTime = new Date().getTime();
     var token = wx.getStorageSync('apitoken');
-    var apiType = ["rejected", "pending", "approved"];
     var that = this;
-    wx.showLoading({
-        title: "加载中",
-        mask: true,
+
+    beevalley.getWorkHistory(token, nowTime, 1000, (res) => {
+      that.setWorkHistoryData(res.data);
     })
-    apiType.forEach((item) => {
-      beevalley.getWorkHistory(token, nowTime, item, function (res) {
-        if (item === "rejected") {
-          that.setRejectedData(res.data)
-        } else if (item === "pending") {
-          that.setPendingData(res.data)
-        } else if (item === "approved") {
-          that.setApprovedData(res.data)
-        }
-        wx.hideLoading();
-      })
-    })
+
   }
+
 })

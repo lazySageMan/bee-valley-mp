@@ -18,18 +18,22 @@ Page({
   },
 
   clickIcon(e) {
-    var info = ''
 
-    this.data.currentWork.details.forEach(item => {
-      info += `• ${item}\r\n`
-    })
-    
-    wx.showModal({
-      title: this.data.currentWork.description,
-      content: info, 
-      showCancel: false,
-      confirmText: "知道了"
-    })
+    if (this.data.currentWork) {
+      var info = ''
+
+      this.data.currentWork.details.forEach(item => {
+        info += `• ${item}\r\n`
+      })
+
+      wx.showModal({
+        title: '提示',
+        content: info,
+        showCancel: false,
+        confirmText: "知道了"
+      })
+    }
+
   },
 
   submitWork: function (e) {
@@ -95,6 +99,8 @@ Page({
     data['rectPosition'] = {};
     data['showboxInfo'] = {};
     data['currentWork'] = null;
+
+    clearInterval(this.timer);
 
     if (this.data.works.length > 0) {
       let candidate = this.data.works.pop();
@@ -198,7 +204,7 @@ Page({
     beevalley.renderInfoBox(function (data) {
       that.setData(data);
     }, this.data.rectPosition, this.data.imageAreaHeight);
-    clearInterval(this.timer);
+
     this.timer = beevalley.startTimer(function (data) {
       that.setData(data);
     }, this.data.currentWork.expiredAt);
@@ -269,22 +275,28 @@ Page({
     let deltaXmax = Math.abs(x - this.data.rectPosition.xMax);
     let deltaYmin = Math.abs(y - this.data.rectPosition.yMin);
     let deltaYmax = Math.abs(y - this.data.rectPosition.yMax);
-    let minimum = Math.min(deltaXmin, deltaXmax, deltaYmin, deltaYmax);
-    if (minimum > 100) {
-      return;
+    // let minimum = Math.min(deltaXmin, deltaXmax, deltaYmin, deltaYmax);
+    // if (minimum > 100) {
+    //   return;
+    // }
+    if (this.data.rectPosition.yMin < y && this.data.rectPosition.yMax > y) {
+      if (deltaXmax < deltaXmin) {
+        this.data.rectPosition.xMax += (x - this.touchStartPosition.x);
+      } else {
+        this.data.rectPosition.xMin += (x - this.touchStartPosition.x);
+      }
     }
-    if (deltaXmax === minimum && this.data.rectPosition.yMin < y && this.data.rectPosition.yMax > y) {
-      this.data.rectPosition.xMax = x;
-    } else if (deltaXmin === minimum && this.data.rectPosition.yMin < y && this.data.rectPosition.yMax > y) {
-      this.data.rectPosition.xMin = x;
-    } else if (deltaYmax === minimum && this.data.rectPosition.xMin < x && this.data.rectPosition.xMax > x) {
-      this.data.rectPosition.yMax = y;
-    } else if (deltaYmin === minimum && this.data.rectPosition.xMin < x && this.data.rectPosition.xMax > x) {
-      this.data.rectPosition.yMin = y;
+    if (this.data.rectPosition.xMin < x && this.data.rectPosition.xMax > x) {
+      if (deltaYmax < deltaYmin) {
+        this.data.rectPosition.yMax += (y - this.touchStartPosition.y);
+      } else {
+        this.data.rectPosition.yMin += (y - this.touchStartPosition.y);
+      }
     }
+    this.touchStartPosition.x = x;
+    this.touchStartPosition.y = y;
   },
 
-  //画框从此开始
   bindtouchstart: function (e) {
     this.wxCanvas.touchstartDetect(e);
     if (e.touches[0].x < 0 || e.touches[0].y < 0 || e.touches[0].x > this.data.imgWidth || e.touches[0].y > this.data.imgHeight) {
@@ -295,6 +307,7 @@ Page({
       this.data.rectPosition.yMin = Math.floor(e.touches[0].y);
     }
     this.startBoxInfoRefresher();
+    this.touchStartPosition = { x: Math.floor(e.touches[0].x), y: Math.floor(e.touches[0].y) };
   },
 
   bindtouchmove: function (e) {
@@ -313,7 +326,6 @@ Page({
   },
 
   bindtouchend: function (e) {
-    //检测手指点�移出事件
     this.wxCanvas.touchendDetect();
     if (!this.data.rectInitialized) {
       if (this.data.rectPosition.xMin < this.data.rectPosition.xMax && this.data.rectPosition.yMin < this.data.rectPosition.yMax) {
@@ -323,15 +335,14 @@ Page({
       }
     }
     this.stopBoxInfoRefresher();
+    this.touchStartPosition = null;
   },
 
   bindtap: function (e) {
-    // 检测tap事件
     this.wxCanvas.tapDetect(e);
   },
 
   bindlongpress: function (e) {
-    // 检测longpress事件
     this.wxCanvas.longpressDetect(e);
   },
 
