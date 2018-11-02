@@ -4,13 +4,14 @@ const moment = require('./moment.min.js');
 
 const TODVIEW_API_BASE_URL = 'https://api.todview.com/v1/';
 
-function fetchWorks(token, type, num, callback) {
+function fetchWorks(token, type, num, packageId, callback) {
   wx.request({
     url: TODVIEW_API_BASE_URL + 'works/fetch',
     method: 'POST',
     data: {
       'type': type,
-      'num': num
+      'num': num,
+      'packages': [packageId]
     },
     header: {
       'content-type': 'application/json',

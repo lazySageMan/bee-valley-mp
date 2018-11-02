@@ -142,7 +142,7 @@ Page({
   fetchWorks: function () {
     let that = this;
 
-    beevalley.fetchWorks(this.apitoken, 'rect', 3, function (res) {
+    beevalley.fetchWorks(this.apitoken, 'rect', 3, this.packageId, function (res) {
       that.handleError(res);
       let works = res.data;
       that.setData({
@@ -346,7 +346,7 @@ Page({
     this.wxCanvas.longpressDetect(e);
   },
 
-  onLoad: function () {
+  onLoad: function (options) {
     this.showLoading()
     this.apitoken = wx.getStorageSync('apitoken');
     let context = wx.createCanvasContext('rectTask');
@@ -363,6 +363,7 @@ Page({
       // console.log(res[0].height, res[0].width);
       that.nextWork();
     })
+    this.packageId = options.packageId;
 
   },
 

@@ -47,9 +47,9 @@ Page({
 
   navToTask: function (e) {
     let taskType = e.currentTarget.dataset.tasktype,
-        packageId = e.currentTarget.dataset.packageId;
+      packageId = e.currentTarget.dataset.packageid;
     wx.navigateTo({
-      url: "../" + taskType + "_task/index"
+      url: "../" + taskType + "_task/index?packageId=" + packageId
     })
   }
 
