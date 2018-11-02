@@ -2,8 +2,10 @@
 
   <view wx:for="{{taskTypes}}" wx:key="type">
     <view class='{{index === 0 ? "btn1" : "btn" }}'>
-      <button type="primary" size="default" bindtap="navToTask" data-tasktype="{{item.type}}">{{item.displayName}}</button>
+      {{item.priceRange}}
+      <button type="primary" size="default" bindtap="navToTask" data-packageId="{{item.packageId}}" data-tasktype="{{item.typeCode}}">{{item.packageName}}:{{item.typeName}}</button>
     </view>
+    
   </view>
 
   <view class="message" wx:if="{{taskTypes && taskTypes.length === 0}}">
