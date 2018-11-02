@@ -23,7 +23,7 @@ Page({
     // TODO Show only rect type task for now
     let records = [],
       displayTypes = ['rect'],
-      count = 1,
+      // count = 1,
       groups = this.groupBy(responData, 'pack'),
       sortedKeys = Object.keys(groups).sort();
 
@@ -37,13 +37,13 @@ Page({
 
           if (group.length > 0) {
             records.push({
-              title: '任务' + count + '(' + this.getTypeDisplay(taskType) + ')',
+              title: group[0].packageName + '(' + this.getTypeDisplay(taskType) + ')',
               total: group.length,
               approved: approved.length,
               rejected: rejected.length,
               reward: approved.reduce((sum, record) => sum + record.price, 0).toFixed(2)
             })
-            count++;
+            // count++;
           }
         }
 
