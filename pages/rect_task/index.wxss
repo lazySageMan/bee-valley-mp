@@ -39,3 +39,10 @@
   right: 5vw;
   font-size: 3vh;
 }
+
+.doSomething .price {
+  position: absolute;
+  top: 3vh;
+  left: 5vw;
+  font-size: 3vh;
+}

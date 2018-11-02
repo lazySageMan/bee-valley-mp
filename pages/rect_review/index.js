@@ -236,7 +236,8 @@ Page({
     query.select('.rectAudit').boundingClientRect()
     query.exec(function (res) {
       // console.log(res[0].width)
-      that.setData({
+      // console.log(res);
+      that.setData({        
         imageAreaWidth: Math.floor(res[0].width),
         imageAreaHeight: Math.floor(res[0].height)
       });

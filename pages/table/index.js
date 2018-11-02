@@ -13,34 +13,40 @@ Page({
   getTypeDisplay: function (taskType) {
     if (taskType === 'rect') {
       return '方框';
+    } else {
+      return '未知';
     }
   },
 
   setWorkHistoryData: function (responData) {
 
+    // TODO Show only rect type task for now
     let records = [],
-      count = 1,
+      displayTypes = ['rect'],
+      // count = 1,
       groups = this.groupBy(responData, 'pack'),
       sortedKeys = Object.keys(groups).sort();
 
     for (var idx in sortedKeys) {
       if (groups.hasOwnProperty(sortedKeys[idx])) {
-        let group = groups[sortedKeys[idx]],
-          approved = group.filter(r => r.reviewResult === true),
-          rejected = group.filter(r => r.reviewResult === false),
-          taskType = group[0].type;
-        if (taskType === 'rect') {
-          records.push({
-            title: '任务' + count + '(' + this.getTypeDisplay(taskType) + ')',
-            total: group.length,
-            approved: approved.length,
-            rejected: rejected.length,
-            reward: approved.reduce((sum, record) => sum + record.price, 0).toFixed(2)
-          })
-          count++;
-        } else {
-          // TODO Show only rect type task for now
+        for (var i in displayTypes) {
+          let taskType = displayTypes[i],
+            group = groups[sortedKeys[idx]].filter(r => r.type === taskType),
+            approved = group.filter(r => r.reviewResult === true),
+            rejected = group.filter(r => r.reviewResult === false);
+
+          if (group.length > 0) {
+            records.push({
+              title: group[0].packageName + '(' + this.getTypeDisplay(taskType) + ')',
+              total: group.length,
+              approved: approved.length,
+              rejected: rejected.length,
+              reward: approved.reduce((sum, record) => sum + record.price, 0).toFixed(2)
+            })
+            // count++;
+          }
         }
+
       }
     }
 
