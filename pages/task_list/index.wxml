@@ -2,11 +2,10 @@
 
   <view wx:for="{{taskTypes}}" wx:key="type">
     <view class='{{index === 0 ? "btn1" : "btn" }}'>
-      <view class="showPrice">
-        ￥ 0.05 - 0.1
-      </view>
-      <button type="primary" size="default" bindtap="navToTask" data-tasktype="{{item.type}}">{{item.displayName}}</button>
+      <view class="showPrice">{{item.priceRange}}</view>
+      <button type="primary" size="default" bindtap="navToTask" data-packageId="{{item.packageId}}" data-tasktype="{{item.typeCode}}">{{item.packageName}}:{{item.typeName}}</button>
     </view>
+    
   </view>
 
   <view class="message" wx:if="{{taskTypes && taskTypes.length === 0}}">

@@ -80,7 +80,7 @@ function login(code, callback, encryptedData, iv) {
 
 function listAuthorizedWorkType(token, callback) {
   wx.request({
-    url: TODVIEW_API_BASE_URL + 'works/authorized_types',
+    url: TODVIEW_API_BASE_URL + 'works/authorizations',
     method: 'GET',
     header: {
       'Authorization': 'Bearer ' + token
