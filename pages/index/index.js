@@ -23,6 +23,7 @@ Page({
     console.log("index");
     let that = this;
     let apitoken = wx.getStorageSync('apitoken');
+    console.log(apitoken)
     if (!apitoken || this.isJwtExpired(apitoken)) {
       wx.login({
         success: function (res) {
