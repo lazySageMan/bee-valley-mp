@@ -91,8 +91,14 @@ Page({
 
     clearInterval(this.timer);
 
-    if (this.data.works.length > 0) {
-      let candidate = this.data.works.pop();
+    let currentWorks = this.data.works;
+
+    if (currentWorks.length > 0) {
+      let candidate = currentWorks.pop();
+
+      if (currentWorks.length > 0) {
+        this.downloadWorkFile(currentWorks[currentWorks.length - 1]);
+      }
 
       if (candidate.work) {
         data['rectPosition'] = {
@@ -117,7 +123,7 @@ Page({
     let anchorY = Math.floor((work.work.result[0][1].y + work.work.result[0][0].y) / 2);
 
     let options = beevalley.calculateWorkarea(work.meta.imageWidth, work.meta.imageHeight, anchorX, anchorY, this.data.imageAreaWidth, this.data.imageAreaHeight);
-    options['format'] = 'png';
+    options['format'] = 'jpeg';
 
     work['xOffset'] = options.x;
     work['yOffset'] = options.y;
@@ -138,7 +144,8 @@ Page({
         works: works.map(w => that.preprocessWork(w))
       });
       if (works.length > 0) {
-        works.reverse().forEach(w => that.downloadWorkFile(w));
+        // works.reverse().forEach(w => that.downloadWorkFile(w));
+        that.downloadWorkFile(works[works.length - 1]);
         that.nextWork();
       } else {
         wx.hideLoading();
@@ -155,7 +162,7 @@ Page({
     // console.log(work.downloadOptions)
     beevalley.downloadAuditWorkFile(this.apitoken, work.id, work.downloadOptions, function (res) {
       that.handleError(res);
-      let imageSrc = 'data:image/png;base64,' + wx.arrayBufferToBase64(res.data);
+      let imageSrc = 'data:image/jpeg;base64,' + wx.arrayBufferToBase64(res.data);
 
       if (that.data.currentWork.id === work.id) {
         that.setData({
@@ -237,7 +244,7 @@ Page({
     query.exec(function (res) {
       // console.log(res[0].width)
       // console.log(res);
-      that.setData({        
+      that.setData({
         imageAreaWidth: Math.floor(res[0].width),
         imageAreaHeight: Math.floor(res[0].height)
       });
