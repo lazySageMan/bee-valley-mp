@@ -271,30 +271,32 @@ Page({
   },
 
   adjustRectPosition: function (x, y) {
-    let deltaXmin = Math.abs(x - this.data.rectPosition.xMin);
-    let deltaXmax = Math.abs(x - this.data.rectPosition.xMax);
-    let deltaYmin = Math.abs(y - this.data.rectPosition.yMin);
-    let deltaYmax = Math.abs(y - this.data.rectPosition.yMax);
-    // let minimum = Math.min(deltaXmin, deltaXmax, deltaYmin, deltaYmax);
-    // if (minimum > 100) {
-    //   return;
-    // }
-    if (this.data.rectPosition.yMin < y && this.data.rectPosition.yMax > y) {
-      if (deltaXmax < deltaXmin) {
-        this.data.rectPosition.xMax += (x - this.touchStartPosition.x);
-      } else {
-        this.data.rectPosition.xMin += (x - this.touchStartPosition.x);
+    if (this.touchStartPosition) {
+      let deltaXmin = Math.abs(x - this.data.rectPosition.xMin);
+      let deltaXmax = Math.abs(x - this.data.rectPosition.xMax);
+      let deltaYmin = Math.abs(y - this.data.rectPosition.yMin);
+      let deltaYmax = Math.abs(y - this.data.rectPosition.yMax);
+      // let minimum = Math.min(deltaXmin, deltaXmax, deltaYmin, deltaYmax);
+      // if (minimum > 100) {
+      //   return;
+      // }
+      if (this.data.rectPosition.yMin < y && this.data.rectPosition.yMax > y) {
+        if (deltaXmax < deltaXmin) {
+          this.data.rectPosition.xMax += (x - this.touchStartPosition.x);
+        } else {
+          this.data.rectPosition.xMin += (x - this.touchStartPosition.x);
+        }
       }
-    }
-    if (this.data.rectPosition.xMin < x && this.data.rectPosition.xMax > x) {
-      if (deltaYmax < deltaYmin) {
-        this.data.rectPosition.yMax += (y - this.touchStartPosition.y);
-      } else {
-        this.data.rectPosition.yMin += (y - this.touchStartPosition.y);
+      if (this.data.rectPosition.xMin < x && this.data.rectPosition.xMax > x) {
+        if (deltaYmax < deltaYmin) {
+          this.data.rectPosition.yMax += (y - this.touchStartPosition.y);
+        } else {
+          this.data.rectPosition.yMin += (y - this.touchStartPosition.y);
+        }
       }
+      this.touchStartPosition.x = x;
+      this.touchStartPosition.y = y;
     }
-    this.touchStartPosition.x = x;
-    this.touchStartPosition.y = y;
   },
 
   bindtouchstart: function (e) {
