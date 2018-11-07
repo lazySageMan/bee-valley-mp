@@ -48,8 +48,17 @@ Page({
   navToTask: function (e) {
     let taskType = e.currentTarget.dataset.tasktype,
       packageId = e.currentTarget.dataset.packageid;
-    wx.navigateTo({
-      url: "../" + taskType + "_task/index?packageId=" + packageId
+
+    wx.showModal({
+      title: '提示信息',
+      content: '注意事项',
+      success: function(res){
+        if(res.confirm){
+          wx.navigateTo({
+            url: "../" + taskType + "_task/index?packageId=" + packageId
+          })
+        }
+      }
     })
   }
 

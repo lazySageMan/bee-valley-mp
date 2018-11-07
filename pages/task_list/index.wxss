@@ -1,27 +1,20 @@
-.btn1{
-    width: 75%;
+.wrap_item{
+    width: 90%;
     height: 100rpx;
-    margin: 200rpx auto 0;
     display: flex;
-    justify-content: center;
+    margin: auto;
+    justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid #f1f1f1;
 }
-.btn1 button{
-    margin:0;
-    margin-left: 10rpx;
+.wrap_item .showPrice{
+    font-size: 35rpx;
+    color: #00CC88;
+    font-family: 'PingFangSC';
+    font-weight: bold;
 }
-.btn{
-    width: 75%;
-    height: 100rpx;
-    margin: 100rpx auto 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.btn button{
-    margin:0;
-    margin-left: 10rpx;
-}
-.showPrice{
-    font-size: 25rpx;
+.wrap_item .showText{
+    color: #3C3C3C;
+    font-size: 35rpx;
+    font-family: 'PingFangSC';
 }
