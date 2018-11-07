@@ -6,7 +6,6 @@ const base64 = require('../../utils/base64.min.js');
 Page({
 
   data: {
-
   },
 
   jwtDecode: function (token) {
@@ -52,9 +51,20 @@ Page({
         }
       });
     } else {
+      this.getNicknameAndAvatar();
       this.setData({ requiredAuth: false });
       wx.hideLoading();
     }
+  },
+
+  getNicknameAndAvatar() {
+    let that = this;
+    wx.getUserInfo({
+      success: function (e) {
+        // console.log(e);
+        that.setData({ nickname: e.userInfo.nickName, avatarUrl: e.userInfo.avatarUrl });
+      }
+    });
   },
 
   bindGetUserInfoButton(e) {
@@ -87,6 +97,7 @@ Page({
     let that = this;
     wx.setStorage({
       key: 'apitoken', data: token, success: function () {
+        that.getNicknameAndAvatar();
         that.setData({ requiredAuth: false });
         wx.hideLoading();
       }

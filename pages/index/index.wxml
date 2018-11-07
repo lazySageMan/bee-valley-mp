@@ -1,6 +1,10 @@
 <!-- <view class="message" wx:if="{{!authenticated}}">
   <text>登录中</text>
 </view> -->
+<view >
+  {{nickname}}
+  <image src="{{avatarUrl}}" />
+</view>
 <view wx:if="{{requiredAuth}}" class="btn1">
   <button type="primary" size="default" open-type="getUserInfo" bindgetuserinfo="bindGetUserInfoButton">授权登录</button>
 </view>
