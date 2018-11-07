@@ -26,45 +26,16 @@ Page({
     })
     console.log("index");
     let that = this;
-    let apitoken = wx.getStorageSync('apitoken');
-    console.log(apitoken)
-    if (!apitoken || this.isJwtExpired(apitoken)) {
-      wx.login({
-        success: function (res) {
-          if (res.code) {
-            beevalley.login(res.code, function (res) {
-              if (res.statusCode === 200) {
-                let token = res.data;
-                that.handleSuccessLogin(token);
-              } else if (res.statusCode === 403) {
-                wx.getUserInfo({
-                  withCredentials: true,
-                  success: that.bindGetUserInfo,
-                  fail: function () {
-                    that.setData({ requiredAuth: true });
-                    wx.hideLoading();
-                  }
-                });
-              }
-            });
-          }
-        }
-      });
-    } else {
-      this.getNicknameAndAvatar();
-      this.setData({ requiredAuth: false });
-      wx.hideLoading();
-    }
-  },
 
-  getNicknameAndAvatar() {
-    let that = this;
     wx.getUserInfo({
-      success: function (e) {
-        // console.log(e);
-        that.setData({ nickname: e.userInfo.nickName, avatarUrl: e.userInfo.avatarUrl });
+      withCredentials: true,
+      success: that.bindGetUserInfo,
+      fail: function () {
+        that.setData({ requiredAuth: true });
+        wx.hideLoading();
       }
     });
+
   },
 
   bindGetUserInfoButton(e) {
@@ -75,21 +46,31 @@ Page({
 
     // console.log(e.detail.userInfo)
     let that = this;
-    wx.login({
-      success: function (res) {
-        if (res.code) {
-          // console.log(res.code);
-          beevalley.login(res.code, function (res) {
-            if (res.statusCode === 200) {
-              let token = res.data;
-              that.handleSuccessLogin(token);
-            } else if (res.statusCode === 403) {
-              that.setData({ requiredAuth: true });
-            }
-          }, e.encryptedData, e.iv);
+    let apitoken = wx.getStorageSync('apitoken');
+    // console.log(apitoken)
+    if (!apitoken || this.isJwtExpired(apitoken)) {
+      wx.login({
+        success: function (res) {
+          if (res.code) {
+            // console.log(res.code);
+            beevalley.login(res.code, function (res) {
+              if (res.statusCode === 200) {
+                let token = res.data;
+                that.handleSuccessLogin(token);
+                that.setData({ requiredAuth: false, nickname: e.userInfo.nickName, avatarUrl: e.userInfo.avatarUrl });
+                wx.hideLoading();
+              } else if (res.statusCode === 403) {
+                that.setData({ requiredAuth: true });
+                wx.hideLoading();
+              }
+            }, e.encryptedData, e.iv);
+          }
         }
-      }
-    });
+      });
+    } else {
+      this.setData({ requiredAuth: false, nickname: e.userInfo.nickName, avatarUrl: e.userInfo.avatarUrl });
+      wx.hideLoading();
+    }
 
   },
 
@@ -97,9 +78,8 @@ Page({
     let that = this;
     wx.setStorage({
       key: 'apitoken', data: token, success: function () {
-        that.getNicknameAndAvatar();
-        that.setData({ requiredAuth: false });
-        wx.hideLoading();
+        // that.getNicknameAndAvatar();
+        // wx.hideLoading();
       }
     });
   },
