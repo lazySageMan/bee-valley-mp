@@ -1,7 +1,7 @@
 const app = getApp()
 const beevalley = require("../../utils/beevalley.js");
 const moment = require('../../utils/moment.min.js');
-const jwtDecode = require('jwt-decode');
+const base64 = require('../../utils/base64.min.js');
 
 Page({
 
@@ -9,8 +9,13 @@ Page({
 
   },
 
+  jwtDecode: function (token) {
+    let str = token.split('.')[1];
+    return JSON.parse(base64.decode(str));
+  },
+
   isJwtExpired: function (jwtToken) {
-    let decoded = jwtDecode(jwtToken);
+    let decoded = this.jwtDecode(jwtToken);
     let exp = moment.unix(decoded.exp);
     return moment().isAfter(exp);
   },

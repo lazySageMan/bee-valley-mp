@@ -68,7 +68,7 @@ Page({
     var token = wx.getStorageSync('apitoken');
     var that = this;
 
-    beevalley.getWorkHistory(token, nowTime, 1000, (res) => {
+    beevalley.getWorkHistory(token, nowTime, 10000, (res) => {
       that.setWorkHistoryData(res.data);
     })
 
