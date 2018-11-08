@@ -61,9 +61,13 @@ Page({
     this.taskType = e.currentTarget.dataset.tasktype;
     this.packageId = e.currentTarget.dataset.packageid;
 
-    this.setData({
-      is_modal_Hidden: !this.data.is_modal_Hidden
-    })
+    // Display only rect type for QTS
+    if (this.taskType === 'rect') {
+      this.setData({
+        is_modal_Hidden: !this.data.is_modal_Hidden
+      })
+    }
+
   }
 
 })

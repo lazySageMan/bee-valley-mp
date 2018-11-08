@@ -3,7 +3,7 @@
   <view wx:for="{{taskTypes}}" wx:key="type">
     <view class='wrap_item' bindtap="navToTask" data-packageId="{{item.packageId}}" data-tasktype="{{item.typeCode}}">
       <view class="showText">{{item.packageName}}:{{item.typeName}}</view>
-      <view class="showPrice">{{item.priceRange}}</view>
+      <view class="showPrice">{{item.priceRange}}元/张</view>
     </view>
     
   </view>
