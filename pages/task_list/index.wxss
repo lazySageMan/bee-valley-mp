@@ -19,7 +19,7 @@
     font-family: 'PingFangSC';
 }
 .modalPosition{
-    position: absolute;
+    position: fixed;
     top: 25vw;
     width: 100vw;
 }

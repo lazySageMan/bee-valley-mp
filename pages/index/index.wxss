@@ -9,6 +9,8 @@
 .wrap_index .showBtn{
     width: 50%;
     height: 110rpx;
+    margin: auto;
+    padding-top: 500rpx;
 }
 
 .wrap_index .showBtn button{
