@@ -18,3 +18,8 @@
     font-size: 35rpx;
     font-family: 'PingFangSC';
 }
+.modalPosition{
+    position: absolute;
+    top: 25vw;
+    width: 100vw;
+}
