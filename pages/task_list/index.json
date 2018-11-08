@@ -4,5 +4,9 @@
     "navigationBarTitleText": "青团任务列表",
     "backgroundColor": "#eeeeee",
     "enablePullDownRefresh": true,
-    "backgroundTextStyle": "light"
+    "backgroundTextStyle": "light",
+    "usingComponents": {
+      "modal": "../modal/index"
+    }
+    
   }
