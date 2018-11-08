@@ -11,6 +11,8 @@
   <view class="message" wx:if="{{taskTypes && taskTypes.length === 0}}">
     <text>暂无任务。请联系客服获取更多任务。</text>
   </view>
-  <!-- 调用modal组件 -->
-  <modal modal-hidden="{{is_modal_Hidden}}" modal-msg="{{is_modal_Msg}}" bind:getmodaldata="getmodaldata"/>  
+  <view class="modalPosition">
+    <!-- 调用modal组件 -->
+    <modal modal-hidden="{{is_modal_Hidden}}" modal-msg="{{is_modal_Msg}}" bind:getmodaldata="getmodaldata"/>  
+  </view>
 </view>
