@@ -272,11 +272,11 @@ Page({
   },
 
   handleError: function (res) {
-    if (res.statusCode !== 200) {
+    if (res.statusCode === 403) {
       // TODO handle error
       wx.showModal({
-        title: '错误',
-        content: '系统错误，请稍后重试',
+        title: '任务超时',
+        content: '请稍后重试',
         showCancel: false,
         confirmText: "知道了",
         success: function() {

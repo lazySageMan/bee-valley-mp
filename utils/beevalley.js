@@ -111,15 +111,30 @@ function wrap(callback) {
 
 function handleError(res) {
   if (res.statusCode === 401) {
-    wx.removeStorageSync('apitoken');
-    wx.reLaunch({
-      url: "../index/index"
-    });
-  } else if (res.statusCode === 403) {
-    // TODO handle conflict case
-    // wx.navigateTo({
-    //   url: "../index/index"
-    // });
+    wx.removeStorageSync('apitoken');    
+    wx.showModal({
+      title: '重新登录',
+      content: '登录过期，需要重新登录',
+      showCancel: false,
+      confirmText: "知道了",
+      success: function () {
+        wx.reLaunch({
+          url: "../index/index"
+        });
+      }
+    })
+  } else if (res.statusCode === 500) {
+    wx.showModal({
+      title: '错误',
+      content: '系统错误，请稍后重试',
+      showCancel: false,
+      confirmText: "知道了",
+      success: function () {
+        wx.reLaunch({
+          url: "../index/index"
+        });
+      }
+    })
   }
 }
 
