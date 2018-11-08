@@ -14,7 +14,7 @@
     text-align: center;
 }
 .bg-w{
-    background: snow;
+  border-bottom:1px solid #f1f1f1;
 }
 .bg-g{
     width: 90%;

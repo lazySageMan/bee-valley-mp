@@ -1,5 +1,5 @@
 <view class="table">
-  <view class="tr bg-w" style="border-bottom:1px solid #f1f1f1;">
+  <view class="tr bg-w">
     <view class="th">任务名称</view>
     <view class="th">已提交/通过数/驳回数</view>
     <view class="th">佣金</view>
