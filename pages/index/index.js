@@ -53,6 +53,7 @@ Page({
         success: function (res) {
           if (res.code) {
             // console.log(res.code);
+            var appInstance = getApp()
             beevalley.login(res.code, function (res) {
               if (res.statusCode === 200) {
                 let token = res.data;
@@ -63,7 +64,7 @@ Page({
                 that.setData({ requiredAuth: true });
                 wx.hideLoading();
               }
-            }, e.encryptedData, e.iv);
+            }, e.encryptedData, e.iv, appInstance.globalData.uid);
           }
         }
       });

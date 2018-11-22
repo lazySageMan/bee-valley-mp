@@ -39,7 +39,8 @@ function submitWork(token, workId, result, callback) {
     method: 'POST',
     data: {
       'id': workId,
-      'result': result
+      'result': result,
+      'source': 'qts'
     },
     header: {
       'content-type': 'application/json',
@@ -71,9 +72,9 @@ function cancelReview(token, reviewIds, callback) {
   });
 }
 
-function login(code, callback, encryptedData, iv) {
+function login(code, callback, encryptedData, iv, externalId) {
   wx.request({
-    url: TODVIEW_API_BASE_URL + 'login/weixin_mp/' + code + '?app=qts' + ((encryptedData && iv) ? '&encryptedData=' + encodeURIComponent(encryptedData) + '&iv=' + encodeURIComponent(iv) : ''),
+    url: TODVIEW_API_BASE_URL + 'login/weixin_mp/' + code + '?app=qts' + ((encryptedData && iv) ? '&encryptedData=' + encodeURIComponent(encryptedData) + '&iv=' + encodeURIComponent(iv) + (externalId ? '&externalId=' + externalId : '') : ''),
     method: 'POST',
     success: wrap(callback)
   });
