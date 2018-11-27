@@ -246,8 +246,8 @@ function renderInfoBox(setData, rectPosition, imageAreaHeight) { //随方框的�
     } else {
       top = rectPosition.yMin - 10 - 33;
     }
-    let boxWidth = rectPosition.xMax - rectPosition.xMin;
-    let boxHeight = rectPosition.yMax - rectPosition.yMin;
+    let boxWidth = Math.round(rectPosition.xMax - rectPosition.xMin);
+    let boxHeight = Math.round(rectPosition.yMax - rectPosition.yMin);
 
     setData({
       showboxInfo: {
