@@ -72,9 +72,9 @@ function cancelReview(token, reviewIds, callback) {
   });
 }
 
-function login(code, callback, encryptedData, iv, externalId) {
+function login(code, callback, encryptedData, iv) {
   wx.request({
-    url: TODVIEW_API_BASE_URL + 'login/weixin_mp/' + code + '?app=qts' + ((encryptedData && iv) ? '&encryptedData=' + encodeURIComponent(encryptedData) + '&iv=' + encodeURIComponent(iv) + (externalId ? '&externalId=' + externalId : '') : ''),
+    url: TODVIEW_API_BASE_URL + 'login/weixin_mp/' + code + '?' + ((encryptedData && iv) ? 'encryptedData=' + encodeURIComponent(encryptedData) + '&iv=' + encodeURIComponent(iv) : ''),
     method: 'POST',
     success: wrap(callback)
   });
