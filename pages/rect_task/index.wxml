@@ -5,7 +5,7 @@
   >
     <canvas
       wx:if="{{imgWidth > 0 && imgHeight > 0}}" 
-      style="width:{{imgWidth}}px;height:{{imgHeight}}px;position:absolute;top:0;left:0;"
+      
       canvas-id="rectTask"
       disable-scroll=true
       bindtouchstart="bindtouchstart"
@@ -18,7 +18,7 @@
     <image 
       wx:if="{{currentWork.src}}" 
       class="imglab-imgage" 
-      style="width:{{imgWidth}}px;height:{{imgHeight}}px" 
+      
       src="{{currentWork.src}}" 
       bindload="imageLoad"
       data-imgId="{{currentWork.id}}"
@@ -30,13 +30,20 @@
     >宽：{{showboxInfo.boxWidth}}px 高：{{showboxInfo.boxHeight}}px</view>
   </view>
   <view class="showMessage">
+    <view class="showInfo">
       <icon 
-        type="info" 
-        class="icon" 
-        bindtap="clickIcon" 
-        color="#33CCFF"
+          type="info" 
+          class="icon" 
+          bindtap="clickIcon" 
+          color="#33CCFF"
       />
       {{currentWork.description}}
+    </view>
+    <view class="showBtn">
+      <button  type="default" bindtap="lessRatio">－</button>
+      <button  type="default" bindtap="addRatio">＋</button>
+    </view>
+      
   </view>
   <view class="doSomething">
    <text class="price">￥{{currentWork.price}}</text>

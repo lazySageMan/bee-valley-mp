@@ -1,15 +1,18 @@
-<view>
+<view style="border-top: 1px solid #f1f1f1;">
 
   <view wx:for="{{taskTypes}}" wx:key="type">
-    <view class='{{index === 0 ? "btn1" : "btn" }}'>
-      <view class="showPrice">{{item.priceRange}}</view>
-      <button type="primary" size="default" bindtap="navToTask" data-packageId="{{item.packageId}}" data-tasktype="{{item.typeCode}}">{{item.packageName}}:{{item.typeName}}</button>
+    <view class='wrap_item' bindtap="navToTask" data-packageId="{{item.packageId}}" data-tasktype="{{item.typeCode}}">
+      <view class="showText">{{item.packageName}}:{{item.typeName}}</view>
+      <view class="showPrice">{{item.priceRange}}元/张</view>
     </view>
     
   </view>
 
   <view class="message" wx:if="{{taskTypes && taskTypes.length === 0}}">
-    <text>暂无任务。请加公众号“淘然视界”联系客服获取更多任务。</text>
+    <text>暂无任务。请联系客服获取更多任务。</text>
   </view>
-
+  <view class="modalPosition">
+    <!-- 调用modal组件 -->
+    <modal modal-hidden="{{is_modal_Hidden}}" modal-msg="{{is_modal_Msg}}" bind:getmodaldata="getmodaldata"/>  
+  </view>
 </view>

@@ -1,0 +1,17 @@
+<view hidden='{{modalHidden}}'>
+    <view class='mask_layer' />
+    <view class='modal_box'>
+        <view class="header">
+            <text class="title">方框任务说明</text>
+            <text class="close" bindtap='cancel'>×</text>
+        </view>       
+        <view class='content'>
+            <text class='modalMsg'>方框标注任务需要用户把图片中红点标记的目标物体用方框框定出来。</text>
+            <text class="attenMsg">注意：方框要紧贴目标边缘不能有缝隙。</text>
+        </view>
+        <view class='btn'>
+            <view bindtap='cancel' class='cancel button1'>取消</view>
+            <view bindtap='submit' class='submit button1'>我知道了</view>
+        </view>
+    </view>
+</view>

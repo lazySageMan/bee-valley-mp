@@ -3,14 +3,14 @@
     "pages/index/index",
     "pages/rect_review/index",
     "pages/task_list/index",
-    "pages/table/index",
     "pages/rect_task/index",
-    "pages/review_list/index"
+    "pages/review_list/index",
+    "pages/table/index"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#000000",
-    "navigationBarTitleText": "玉蜂谷",
+    "navigationBarTitleText": "青团任务",
     "navigationBarTextStyle": "#fff"
   }
 }

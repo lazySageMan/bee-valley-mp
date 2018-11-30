@@ -36,7 +36,15 @@ Page({
     wx.showLoading({
       title: "加载中",
       mask: true,
-    })
+    });
+    this.clearTimer();
+  },
+
+  clearTimer: function () {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
   },
 
   submitWork: function () {
@@ -88,8 +96,6 @@ Page({
     data['rectPosition'] = {};
     data['showboxInfo'] = {};
     data['currentWork'] = null;
-
-    clearInterval(this.timer);
 
     let currentWorks = this.data.works;
 
@@ -164,7 +170,7 @@ Page({
       that.handleError(res);
       let imageSrc = 'data:image/jpeg;base64,' + wx.arrayBufferToBase64(res.data);
 
-      if (that.data.currentWork.id === work.id) {
+      if (that.data.currentWork && that.data.currentWork.id === work.id) {
         that.setData({
           'currentWork.src': imageSrc
         });
@@ -195,6 +201,7 @@ Page({
       that.setData(data);
     }, this.data.rectPosition, this.data.imageAreaHeight);
 
+    this.clearTimer();
     this.timer = beevalley.startTimer(function (data) {
       that.setData(data);
     }, this.data.currentWork.expiredAt);
@@ -253,6 +260,7 @@ Page({
   },
 
   onUnload: function () {
+    this.clearTimer();
     this.wxCanvas.clear();
     var worksToCancel = this.data.works.map(w => w.id);
     if (this.data.currentWork) {
@@ -265,9 +273,17 @@ Page({
 
   handleError: function (res) {
     if (res.statusCode === 403) {
-      // TODO handle conflict case
-      wx.navigateBack({
-        delta: 1
+      // TODO handle error
+      wx.showModal({
+        title: '任务超时',
+        content: '请稍后重试',
+        showCancel: false,
+        confirmText: "知道了",
+        success: function() {
+          wx.navigateBack({
+            delta: 1
+          })
+        }
       })
     }
   }

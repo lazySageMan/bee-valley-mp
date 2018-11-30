@@ -4,6 +4,16 @@
   background: gray;
   position: relative;
 }
+.imglab image, .imglab canvas{
+  width: 100%;
+  height: 100%;
+}
+
+.imglab canvas{
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 
 .showMessage {
   width: 100%;
@@ -12,7 +22,29 @@
   display: flex;
   color: red;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
+}
+
+.showMessage .showInfo{
+  display: flex;
+  align-items: center;
+}
+
+.showMessage .showBtn{
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.showMessage .showBtn button{
+  width: 60rpx;
+  height: 60rpx;
+  text-align: center;
+  line-height: 60rpx;
+  padding: 0;
+}
+.showMessage .showBtn button:first-child{
+  margin-right: 10rpx;
 }
 
 .doSomething {

@@ -14,35 +14,43 @@
     text-align: center;
 }
 .bg-w{
-    background: snow;
+  border-bottom:1px solid #f1f1f1;
 }
 .bg-g{
-    background: #E6F3F9;
+    width: 90%;
+    border-bottom: 1px solid#f1f1f1;
+    margin:auto;
+    font-size: 35rpx;
 }
 .th:nth-child(1) {
     width: 40%;
-    justify-content: center;
-    background: #009933;
-    color: #fff;
+    justify-content: flex-start;
+    background: #fff;
+    color: #6C6C6C;
     display: flex;
     height: 3rem;
     align-items: center;
+    font-size: 25rpx;
+    margin-left: 5%;
 }
 .th:nth-child(2) {
     width: 55%;
     justify-content: center;
-    background: #009933;
-    color: #fff;
+    background: #fff;
+    color: #6C6C6C;
     display: flex;
     height: 3rem;
     align-items: center;
+    font-size: 25rpx;
 }
 .th:nth-child(3) {
     width: 40%;
-    justify-content: center;
-    background: #009933;
-    color: #fff;
+    justify-content: flex-end;
+    background: #fff;
+    color: #6C6C6C;
     display: flex;
     height: 3rem;
     align-items: center;
+    font-size: 28rpx;
+    margin-right: 5%;
 }

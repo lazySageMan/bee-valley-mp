@@ -1,0 +1,99 @@
+.mask_layer {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 1000;
+    left:0;
+    top:0;
+    background: #000;
+    opacity: 0.5;
+    overflow: hidden;
+}
+
+.modal_box{
+    width: 90vw;
+    height:45vh;
+    margin:0 auto;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1001;
+}
+
+.modal_box .header{
+    width: 100%;
+    height:30%;
+    text-align: center;
+    position: relative
+}
+
+.modal_box .header .title{
+    color: #3C3C3C;
+    font-size: 43rpx;
+    width: auto;
+    height: 150rpx;
+    line-height: 150rpx;
+}
+
+.modal_box .header .close{
+    position: absolute;
+    top: 22rpx;
+    right: 25rpx;
+    font-size: 40rpx;
+    font-weight: bold;
+    width: 35rpx;
+    height: 35rpx;
+    text-align: center;
+    line-height: 35rpx;
+}
+
+.modal_box .content{
+    width: 80%;
+    height: 40%;
+    margin:0 auto;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: scroll;
+}
+
+.modal_box .content .modalMsg{
+    font-size: 33rpx;
+    color: #3C3C3C ;
+    line-height: 45rpx;
+}
+
+.modal_box .content .attenMsg{
+    font-size: 28rpx;
+    color: #6C6C6C;
+    line-height: 30rpx;
+    margin-top: 30rpx;
+}
+
+.modal_box .btn{
+    width: 90%;
+    height: 30%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal_box .btn .button1{
+    width: 45%;
+    height: 105rpx;
+    line-height: 105rpx;
+    border:1px solid #00CC88;
+    text-align: center;
+    margin-top: 30rpx;
+}
+
+.modal_box .btn .cancel{
+    color: #00CC88;
+}
+
+.modal_box .btn .submit{
+    color: #ffffff;
+    background: #00CC88;
+}

@@ -39,7 +39,8 @@ function submitWork(token, workId, result, callback) {
     method: 'POST',
     data: {
       'id': workId,
-      'result': result
+      'result': result,
+      'source': 'qts'
     },
     header: {
       'content-type': 'application/json',
@@ -71,9 +72,9 @@ function cancelReview(token, reviewIds, callback) {
   });
 }
 
-function login(code, callback, encryptedData, iv) {
+function login(code, callback, encryptedData, iv, externalId) {
   wx.request({
-    url: TODVIEW_API_BASE_URL + 'login/weixin_mp/' + code + ((encryptedData && iv) ? '?encryptedData=' + encodeURIComponent(encryptedData) + '&iv=' + encodeURIComponent(iv) : ''),
+    url: TODVIEW_API_BASE_URL + 'login/weixin_mp/' + code + '?app=qts' + ((encryptedData && iv) ? '&encryptedData=' + encodeURIComponent(encryptedData) + '&iv=' + encodeURIComponent(iv) + (externalId ? '&externalId=' + externalId : '') : ''),
     method: 'POST',
     success: wrap(callback)
   });
@@ -111,15 +112,30 @@ function wrap(callback) {
 
 function handleError(res) {
   if (res.statusCode === 401) {
-    wx.removeStorageSync('apitoken');
-    wx.reLaunch({
-      url: "../index/index"
-    });
-  } else if (res.statusCode === 403) {
-    // TODO handle conflict case
-    // wx.navigateTo({
-    //   url: "../index/index"
-    // });
+    wx.removeStorageSync('apitoken');    
+    wx.showModal({
+      title: '重新登录',
+      content: '登录过期，需要重新登录',
+      showCancel: false,
+      confirmText: "知道了",
+      success: function () {
+        wx.reLaunch({
+          url: "../index/index"
+        });
+      }
+    })
+  } else if (res.statusCode === 500) {
+    wx.showModal({
+      title: '错误',
+      content: '系统错误，请稍后重试',
+      showCancel: false,
+      confirmText: "知道了",
+      success: function () {
+        wx.reLaunch({
+          url: "../index/index"
+        });
+      }
+    })
   }
 }
 
@@ -230,8 +246,8 @@ function renderInfoBox(setData, rectPosition, imageAreaHeight) { //随方框的�
     } else {
       top = rectPosition.yMin - 10 - 33;
     }
-    let boxWidth = rectPosition.xMax - rectPosition.xMin;
-    let boxHeight = rectPosition.yMax - rectPosition.yMin;
+    let boxWidth = Math.round(rectPosition.xMax - rectPosition.xMin);
+    let boxHeight = Math.round(rectPosition.yMax - rectPosition.yMin);
 
     setData({
       showboxInfo: {

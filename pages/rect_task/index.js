@@ -14,7 +14,8 @@ Page({
     imgWidth: 0,
     rectPosition: {},
     rectInitialized: false,
-    showboxInfo: {}
+    showboxInfo: {},
+    ratio: 1
   },
 
   clickIcon(e) {
@@ -40,8 +41,9 @@ Page({
     if (this.data.rectInitialized && this.data.currentWork) {
       let that = this;
       let item = this.data.currentWork;
-      var relativeAnchorX = item.anchorX - item.xOffset;
-      var relativeAnchorY = item.anchorY - item.yOffset;
+      let {ratio} = this.data;
+      var relativeAnchorX = (item.anchorX - item.xOffset)/ratio;
+      var relativeAnchorY = (item.anchorY - item.yOffset)/ratio;
       if (relativeAnchorX > this.data.rectPosition.xMin && relativeAnchorX < this.data.rectPosition.xMax && relativeAnchorY > this.data.rectPosition.yMin && relativeAnchorY < this.data.rectPosition.yMax) {
         this.showLoading();
         // adjust for stroke width
@@ -49,12 +51,12 @@ Page({
           this.apitoken,
           item.id, [
             [{
-              x: item.xOffset + Math.floor(this.data.rectPosition.xMin * this.data.imgRatio),
-              y: item.yOffset + Math.floor(this.data.rectPosition.yMin * this.data.imgRatio)
+              x: item.xOffset + Math.floor(this.data.rectPosition.xMin * ratio),
+              y: item.yOffset + Math.floor(this.data.rectPosition.yMin * ratio)
             },
             {
-              x: item.xOffset + Math.floor(this.data.rectPosition.xMax * this.data.imgRatio),
-              y: item.yOffset + Math.floor(this.data.rectPosition.yMax * this.data.imgRatio)
+              x: item.xOffset + Math.floor(this.data.rectPosition.xMax * ratio),
+              y: item.yOffset + Math.floor(this.data.rectPosition.yMax * ratio)
             }]
           ],
           function (res) {
@@ -82,6 +84,14 @@ Page({
       title: "加载中",
       mask: true,
     })
+    this.clearTimer();
+  },
+
+  clearTimer: function () {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
   },
 
   nextWork: function () {
@@ -99,8 +109,7 @@ Page({
     data['rectPosition'] = {};
     data['showboxInfo'] = {};
     data['currentWork'] = null;
-
-    clearInterval(this.timer);
+    data['ratio'] = 1;
 
     let currentWorks = this.data.works;
 
@@ -112,14 +121,16 @@ Page({
       }
 
       if (candidate.previousWork) {
+        let {ratio} = this.data;
         data['rectPosition'] = {
-          xMin: candidate.previousWork.result[0][0].x - candidate.xOffset,
-          yMin: candidate.previousWork.result[0][0].y - candidate.yOffset,
-          xMax: candidate.previousWork.result[0][1].x - candidate.xOffset,
-          yMax: candidate.previousWork.result[0][1].y - candidate.yOffset
+          xMin: (candidate.previousWork.result[0][0].x - candidate.xOffset)/ratio,
+          yMin: (candidate.previousWork.result[0][0].y - candidate.yOffset)/ratio,
+          xMax: (candidate.previousWork.result[0][1].x - candidate.xOffset)/ratio,
+          yMax: (candidate.previousWork.result[0][1].y - candidate.yOffset)/ratio
         };
         data['rectInitialized'] = true;
       }
+
       data['currentWork'] = candidate;
     } else {
       this.fetchWorks();
@@ -132,8 +143,8 @@ Page({
 
     let anchorX = Math.floor(work.prerequisites[0].result[work.meta.index].x);
     let anchorY = Math.floor(work.prerequisites[0].result[work.meta.index].y);
-
-    let options = beevalley.calculateWorkarea(work.meta.imageWidth, work.meta.imageHeight, anchorX, anchorY, this.data.imageAreaWidth, this.data.imageAreaHeight);
+    let {ratio} = this.data;
+    let options = beevalley.calculateWorkarea(work.meta.imageWidth, work.meta.imageHeight, anchorX, anchorY, Math.round(this.data.imageAreaWidth*ratio), Math.round(this.data.imageAreaHeight*ratio));
     options['format'] = 'jpeg';
 
     work['xOffset'] = options.x;
@@ -155,7 +166,6 @@ Page({
         works: works.map(w => that.preprocessWork(w))
       });
       if (works.length > 0) {
-        // works.reverse().forEach(w => that.downloadWorkFile(w));
         that.downloadWorkFile(works[works.length - 1]);
         that.nextWork();
       } else {
@@ -175,7 +185,7 @@ Page({
       that.handleError(res);
       let imageSrc = 'data:image/jpeg;base64,' + wx.arrayBufferToBase64(res.data);
 
-      if (that.data.currentWork.id === work.id) {
+      if (that.data.currentWork && that.data.currentWork.id === work.id) {
         that.setData({
           'currentWork.src': imageSrc
         });
@@ -193,10 +203,6 @@ Page({
   },
 
   imageLoad: function (e) {
-    // var imgW = this.data.imageAreaWidth,
-    //   imgH = imgW * e.detail.height / e.detail.width;
-
-    // TODO use default imgRatio
     let that = this;
 
     this.setData({
@@ -212,6 +218,7 @@ Page({
       that.setData(data);
     }, this.data.rectPosition, this.data.imageAreaHeight);
 
+    this.clearTimer();
     this.timer = beevalley.startTimer(function (data) {
       that.setData(data);
     }, this.data.currentWork.expiredAt);
@@ -221,9 +228,10 @@ Page({
 
   createAnchor: function (id) {
     if (this.data.currentWork.id === id && !this.circle) {
+      let {ratio} = this.data;
       var circle = new Shape('circle', {
-        x: this.data.currentWork.anchorX - this.data.currentWork.xOffset,
-        y: this.data.currentWork.anchorY - this.data.currentWork.yOffset,
+        x: (this.data.currentWork.anchorX - this.data.currentWork.xOffset)/ratio,
+        y: (this.data.currentWork.anchorY - this.data.currentWork.yOffset)/ratio,
         r: 5,
         fillStyle: "#E6324B"
       });
@@ -231,6 +239,8 @@ Page({
       this.circle = circle;
     }
   },
+
+
 
   startBoxInfoRefresher: function () {
     let that = this;
@@ -283,10 +293,6 @@ Page({
       let deltaXmax = Math.abs(x - this.data.rectPosition.xMax);
       let deltaYmin = Math.abs(y - this.data.rectPosition.yMin);
       let deltaYmax = Math.abs(y - this.data.rectPosition.yMax);
-      // let minimum = Math.min(deltaXmin, deltaXmax, deltaYmin, deltaYmax);
-      // if (minimum > 100) {
-      //   return;
-      // }
       if (this.data.rectPosition.yMin < y && this.data.rectPosition.yMax > y) {
         if (deltaXmax < deltaXmin) {
           this.data.rectPosition.xMax += (x - this.touchStartPosition.x);
@@ -363,13 +369,11 @@ Page({
     let that = this;
     var query = wx.createSelectorQuery();
     query.select('.imglab').boundingClientRect()
-    query.exec(function (res) {
-      //console.log(res);  
+    query.exec(function (res) {  
       that.setData({
         imageAreaWidth: Math.floor(res[0].width),
         imageAreaHeight: Math.floor(res[0].height)
       });
-      // console.log(res[0].height, res[0].width);
       that.nextWork();
     })
     this.packageId = options.packageId;
@@ -377,6 +381,7 @@ Page({
   },
 
   onUnload: function () {
+    this.clearTimer();
     this.wxCanvas.clear();
     var worksToCancel = this.data.works.map(w => w.id);
     if (this.data.currentWork) {
@@ -389,11 +394,93 @@ Page({
 
   handleError: function (res) {
     if (res.statusCode === 403) {
-      // TODO handle conflict case
-      wx.navigateBack({
-        delta: 1
+      // TODO handle error
+      wx.showModal({
+        title: '任务超时',
+        content: '请稍后重试',
+        showCancel: false,
+        confirmText: "知道了",
+        success: function () {
+          wx.navigateBack({
+            delta: 1
+          })
+        }
       })
     }
-  }
+  },
 
+  lessRatio: function(){
+    let { currentWork, ratio } = this.data;
+        if (ratio <= 1) {
+            wx.showToast({
+                title: '不能继续缩小'
+            })
+        } else {
+            ratio -= 1;
+            this.setData({
+              ratio: ratio
+          }, () => {
+                this.preprocessWork(currentWork)
+                this.downloadWorkFile(currentWork)
+              
+                this.updateCircle();
+
+                if (currentWork.previousWork) {
+                  let rectData = {
+                    xMin: (currentWork.previousWork.result[0][0].x - currentWork.xOffset)/ratio,
+                    yMin: (currentWork.previousWork.result[0][0].y - currentWork.yOffset)/ratio,
+                    xMax: (currentWork.previousWork.result[0][1].x - currentWork.xOffset)/ratio,
+                    yMax: (currentWork.previousWork.result[0][1].y - currentWork.yOffset)/ratio
+                  };
+                  this.data.rectInitialized = true;
+
+                  this.data.rectPosition = rectData;
+                }
+  
+                beevalley.renderRect(this.rect, this.data.rectPosition);
+          })
+        }
+  },
+
+  addRatio: function(){
+    let { currentWork, ratio, imageAreaWidth, imageAreaHeight } = this.data;
+    if (imageAreaWidth * (ratio + 1) > currentWork.meta.imageWidth || imageAreaHeight * (ratio + 1) > currentWork.meta.imageHeight) {
+        wx.showToast({
+            title: '不能继续放大'
+        })
+    } else {
+        ratio += 1;
+        this.setData({
+            ratio: ratio
+        }, () => {
+            
+              this.preprocessWork(currentWork)
+              this.downloadWorkFile(currentWork)
+            
+              this.updateCircle();
+
+              if (currentWork.previousWork) {
+                let rectData = {
+                  xMin: (currentWork.previousWork.result[0][0].x - currentWork.xOffset)/ratio,
+                  yMin: (currentWork.previousWork.result[0][0].y - currentWork.yOffset)/ratio,
+                  xMax: (currentWork.previousWork.result[0][1].x - currentWork.xOffset)/ratio,
+                  yMax: (currentWork.previousWork.result[0][1].y - currentWork.yOffset)/ratio
+                };
+                this.data.rectInitialized = true;
+
+                this.data.rectPosition = rectData;
+              }
+
+              beevalley.renderRect(this.rect, this.data.rectPosition);
+        })
+    }
+  },
+
+  updateCircle: function(){
+    let {ratio, currentWork} = this.data;
+    this.circle.updateOption({
+      x: (currentWork.anchorX - currentWork.xOffset)/ratio,
+      y: (currentWork.anchorY - currentWork.yOffset)/ratio,
+    })
+  }
 })

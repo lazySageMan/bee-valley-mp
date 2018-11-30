@@ -4,6 +4,10 @@ let beevalley = require("../../utils/beevalley.js");
 Page({
 
   data: {
+        is_modal_Hidden:true,
+        is_modal_Msg:'我是一个自定义组件'
+    
+
   },
 
   onLoad: function () {
@@ -16,8 +20,16 @@ Page({
 
   },
 
-  onShow: function () {
-    // this.fetchTaskTypes();
+  getmodaldata: function(e){
+
+    this.setData({
+      is_modal_Hidden: !this.data.is_modal_Hidden
+    })
+    if(e.detail.isSumbit){
+      wx.navigateTo({
+        url: "../" + this.taskType + "_task/index?packageId=" + this.packageId
+      })
+    }
   },
 
   onPullDownRefresh: function () {
@@ -46,11 +58,16 @@ Page({
   },
 
   navToTask: function (e) {
-    let taskType = e.currentTarget.dataset.tasktype,
-      packageId = e.currentTarget.dataset.packageid;
-    wx.navigateTo({
-      url: "../" + taskType + "_task/index?packageId=" + packageId
-    })
+    this.taskType = e.currentTarget.dataset.tasktype;
+    this.packageId = e.currentTarget.dataset.packageid;
+
+    // Display only rect type for QTS
+    if (this.taskType === 'rect') {
+      this.setData({
+        is_modal_Hidden: !this.data.is_modal_Hidden
+      })
+    }
+
   }
 
 })
