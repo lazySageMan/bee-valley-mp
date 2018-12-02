@@ -187,7 +187,7 @@ function submitReview(token, workId, result, callback) {
 
 function listAuthorizedReviewsType(token, callback) {
   wx.request({
-    url: TODVIEW_API_BASE_URL + 'reviews/authorized_types',
+    url: TODVIEW_API_BASE_URL + 'reviews/authorizations',
     method: 'GET',
     header: {
       'Authorization': 'Bearer ' + token
