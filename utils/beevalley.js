@@ -141,13 +141,14 @@ function handleError(res) {
 
 //audit 
 
-function fetchAuditWorks(token, type, num, callback) {
+function fetchAuditWorks(token, type, num, packageId, callback) {
   wx.request({
     url: TODVIEW_API_BASE_URL + 'reviews/fetch',
     method: 'POST',
     data: {
       'type': type,
-      'num': num
+      'num': num,
+      'packages': [packageId]
     },
     header: {
       'content-type': 'application/json',

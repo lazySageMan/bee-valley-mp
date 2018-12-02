@@ -44,10 +44,16 @@ Page({
   },
 
   navToTask: function (e) {
-    let taskType = e.currentTarget.dataset.tasktype;
-    wx.navigateTo({
-      url: "../" + taskType + "_review/index"
-    })
+    this.taskType = e.currentTarget.dataset.tasktype;
+    this.packageId = e.currentTarget.dataset.packageid;
+
+    // Display only rect type for QTS
+    if (this.taskType === 'rect') {
+      wx.navigateTo({
+        url: "../" + this.taskType + "_review/index?packageId=" + this.packageId
+      })
+    }
+
   }
 
 })
