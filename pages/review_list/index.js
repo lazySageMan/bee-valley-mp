@@ -33,7 +33,6 @@ Page({
     
     let that = this;
     beevalley.listAuthorizedReviewsType(this.data.apitoken, function (res) {
-      console.log(res)
       if (res.statusCode === 200) {
         that.setData({ taskTypes: res.data });
       } else {
