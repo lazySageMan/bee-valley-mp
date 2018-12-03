@@ -7,6 +7,8 @@ App({
     }
   },
 
-  globalData: {}
+  globalData: {
+    priceRatio: 0.8
+  }
 
 })

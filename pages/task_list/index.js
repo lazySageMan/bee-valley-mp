@@ -1,5 +1,6 @@
 const app = getApp()
 let beevalley = require("../../utils/beevalley.js");
+const priceRatio = getApp().globalData.priceRatio
 
 Page({
 
@@ -47,7 +48,7 @@ Page({
     beevalley.listAuthorizedWorkType(this.data.apitoken, function (res) {
       console.log(res)//等待后端改数据类型
       if (res.statusCode === 200) {
-        that.setData({ taskTypes: res.data });
+        that.setData({ taskTypes: that.preprocessData(res.data) });
       } else {
         that.setData({ taskTypes: [] });
       }
@@ -55,6 +56,16 @@ Page({
       wx.hideLoading();
     });
 
+  },
+
+  preprocessData: function(authData) {
+    return authData.map(auth => {
+      let priceRange = auth.priceRange
+      let splits = priceRange.split('-')
+      let newPriceRange = splits.map(s => (parseFloat(s) * priceRatio).toFixed(2)).join('-')
+      auth.priceRange = newPriceRange
+      return auth
+    })
   },
 
   navToTask: function (e) {
