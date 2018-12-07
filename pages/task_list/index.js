@@ -73,7 +73,7 @@ Page({
     this.packageId = e.currentTarget.dataset.packageid;
 
     // Display only rect type for QTS
-    if (this.taskType === 'rect') {
+    if (this.taskType === 'rect' || this.taskType === 'collect') {
       this.setData({
         is_modal_Hidden: !this.data.is_modal_Hidden
       })

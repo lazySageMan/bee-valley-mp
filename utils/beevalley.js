@@ -2,7 +2,7 @@
 // const dayjs = require('./dayjs.min.js');
 const moment = require('./moment.min.js');
 
-const TODVIEW_API_BASE_URL = 'https://api.todview.com/v1/';
+const TODVIEW_API_BASE_URL = 'https://api-uat.todview.com/v1/';
 
 function fetchWorks(token, type, num, packageId, callback) {
   wx.request({
@@ -284,6 +284,22 @@ function renderRect(rect, rectPosition) {
   }
 }
 
+function workFile(token, workId, files, callback){
+  wx.uploadFile({
+    url: TODVIEW_API_BASE_URL + 'works/files',
+    filePath: files[0],
+    formData:{
+      workId: workId
+    },
+    name: "file",
+    header: {
+      // 'content-type': 'x-www-form-urlencoded',
+      'Authorization': 'Bearer ' + token
+    },
+    success: wrap(callback)
+  });
+}
+
 module.exports.fetchWorks = fetchWorks
 exports.downloadWorkFile = downloadWorkFile
 exports.submitWork = submitWork
@@ -300,3 +316,4 @@ exports.calculateWorkarea = calculateWorkarea
 exports.renderInfoBox = renderInfoBox
 exports.startTimer = startTimer
 exports.renderRect = renderRect
+exports.workFile = workFile
