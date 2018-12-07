@@ -4,13 +4,15 @@
             <view class="panel__title">第1步</view>
             <view class="title">任务要求</view>
             <view class="content-list">
-                <view class="list-item">1 每组图片10张以上，同一组目标对象必须是同一个老年人；</view>
-                <view class="list-item">2 老年人应在60岁以上，男女不限；</view>
-                <view class="list-item">3 图像来源可以是监控摄像头，手机自拍，拍别人，不能是网上搜索的图片；</view>
-                <view class="list-item">4 每张图片的人脸必须五官清晰可见，能够准确辨认出身份；</view>
-                <view class="list-item">5 所有图片应避免在同一时刻、同一场景下拍摄，尽量保证场景差异性越大越好（比如在不同的餐厅、景区、商场等）；</view>
-                <view class="list-item">6 所有图片的人脸角度差异性越大越好（比如在保证五官清晰的前提下，有不同角度的侧脸、低头、抬头等）；</view>
-                <view class="list-item">7 同一张图片内若有多张人脸，目标人脸必须最大。</view>
+                <view 
+                    class="list-item" 
+                    wx:for="{{textMessage}}" 
+                    wx:key="index" 
+                    wx:for-index="index" 
+                    wx:for-item="item"
+                >
+                    {{index+1}} {{item}};
+                </view>
             </view>
             <view class="content-img">
                 <image src="{{staticImg[0].src}}" class="img" /> 

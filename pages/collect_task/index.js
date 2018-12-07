@@ -4,20 +4,17 @@ Page({
         staticImg: [],
     },
 
-    takePhotos(e){
-        let indexs = e.currentTarget.dataset.index;
+    takePhotos(e) {
+        let index = e.currentTarget.dataset.index;
 
         wx.chooseImage({
             count: 1,
             sourceType: "camera",
             sizeType: "original",
             success: (res) => {
-                let staticImg = this.data.staticImg.map((item,index) => {
-                    if(index === indexs){
-                        item.photoSrc = res.tempFilePaths[0]
-                    }
-                    return item;
-                })
+                let staticImg = this.data.staticImg
+                staticImg[index].photoSrc = res.tempFilePaths[0];
+                
                 this.setData({
                     staticImg: staticImg
                 })
@@ -25,35 +22,42 @@ Page({
         })
     },
 
-    delete(e){
-        let indexs = e.currentTarget.dataset.index;
+    delete(e) {
+        let index = e.currentTarget.dataset.index;
 
-        let staticImg = this.data.staticImg.map((item,index) => {
-            if(index === indexs){
-                item.photoSrc = ''
-            }
-            return item;
-        })
-
+        let staticImg = this.data.staticImg
+        staticImg[index].photoSrc = '';
         this.setData({
             staticImg: staticImg
         })
     },
 
-    submitWork(){
+    submitWork() {
         let imgArr = this.data.staticImg.map((item) => {
             return item.photoSrc
         })
-        beevalley.workFile(this.token, this.packageId, imgArr, (res) => {
-            console.log(res)
+        beevalley.workFile(this.token, this.id, imgArr, (res) => {
+            if(res.statusCode === 200){
+                wx.showLoading({
+                    title: "上传成功",
+                    mask: true,
+                })
+                this.nextWork();
+            }else{
+                wx.navigateBack({
+                    delta: 1
+                })
+            }
         })
     },
 
-    onLoad: function(options){
-        this.token = wx.getStorageSync('apitoken');
-        this.packageId = options.packageId;
+    nextWork(){
+        wx.showLoading({
+            title: "加载中...",
+            mask: true,
+        })
         beevalley.fetchWorks(this.token, "collect", 1, this.packageId, (res) => {
-            
+            this.id = res.data[0].id;
             let imgArr = res.data[0].meta.samples.map((item) => {
                 return {
                     src: item,
@@ -61,8 +65,16 @@ Page({
                 };
             })
             this.setData({
-                staticImg: imgArr
+                staticImg: imgArr,
+                textMessage: res.data[0].details
             })
+            wx.hideLoading();
         })
+    },
+
+    onLoad: function (options) { 
+        this.token = wx.getStorageSync('apitoken');
+        this.packageId = options.packageId;
+        this.nextWork();
     }
 })
