@@ -419,7 +419,6 @@ Page({
                 title: '不能继续缩小'
             })
         } else {
-          let oldRatio = this.data.ratio;
             ratio -= 1;
             this.setData({
               ratio: ratio
@@ -429,7 +428,7 @@ Page({
               
                 this.updateCircle();
 
-                if (this.data.rectPosition) {
+                if (currentWork.previousWork) {
                   let rectData = {
                     xMin: (currentWork.previousWork.result[0][0].x - currentWork.xOffset)/ratio,
                     yMin: (currentWork.previousWork.result[0][0].y - currentWork.yOffset)/ratio,
@@ -439,17 +438,6 @@ Page({
                   this.data.rectInitialized = true;
 
                   this.data.rectPosition = rectData;
-
-                  // let rectData = {
-                  //   xMin: (this.data.rectPosition.xMin*oldRatio )/ratio,
-                  //   yMin: (this.data.rectPosition.yMin*oldRatio )/ratio, 
-                  //   xMax: (this.data.rectPosition.xMax*oldRatio )/ratio,
-                  //   yMax: (this.data.rectPosition.yMax*oldRatio )/ratio,
-                  // }
-  
-                  // this.data.rectInitialized = true;
-  
-                  // this.data.rectPosition = rectData;
                 }
   
                 beevalley.renderRect(this.rect, this.data.rectPosition);
@@ -464,7 +452,6 @@ Page({
             title: '不能继续放大'
         })
     } else {
-        let oldRatio = this.data.ratio;
         ratio += 1;
         this.setData({
             ratio: ratio
@@ -475,7 +462,7 @@ Page({
             
               this.updateCircle();
 
-              if (this.data.rectPosition) {
+              if (currentWork.previousWork) {
                 let rectData = {
                   xMin: (currentWork.previousWork.result[0][0].x - currentWork.xOffset)/ratio,
                   yMin: (currentWork.previousWork.result[0][0].y - currentWork.yOffset)/ratio,
@@ -485,17 +472,6 @@ Page({
                 this.data.rectInitialized = true;
 
                 this.data.rectPosition = rectData;
-
-                // let rectData = {
-                //   xMin: (this.data.rectPosition.xMin*oldRatio + currentWork.xOffset)/ratio ,
-                //   yMin: (this.data.rectPosition.yMin*oldRatio + currentWork.xOffset)/ratio , 
-                //   xMax: (this.data.rectPosition.xMax*oldRatio + currentWork.xOffset)/ratio ,
-                //   yMax: (this.data.rectPosition.yMax*oldRatio + currentWork.yOffset)/ratio ,
-                // }
-
-                // this.data.rectInitialized = true;
-
-                // this.data.rectPosition = rectData;
               }
 
               beevalley.renderRect(this.rect, this.data.rectPosition);
