@@ -1,41 +1,42 @@
 const beevalley = require("../../utils/beevalley.js");
 Page({
     data: {
-        img1: '/img/1.jpg',
         staticImg: [],
-        showCamera: false
     },
 
-    takePhoto() {
-        const ctx = wx.createCameraContext()
-        ctx.takePhoto({
-            quality: 'high',
+    takePhotos(e){
+        let indexs = e.currentTarget.dataset.index;
+
+        wx.chooseImage({
+            count: 1,
+            sourceType: "camera",
+            sizeType: "original",
             success: (res) => {
                 let staticImg = this.data.staticImg.map((item,index) => {
-                    if(index === this.data.indexPhoto){
-                        item.photoSrc = res.tempImagePath
+                    if(index === indexs){
+                        item.photoSrc = res.tempFilePaths[0]
                     }
                     return item;
                 })
-
                 this.setData({
-                    showCamera: false,
                     staticImg: staticImg
                 })
             }
         })
-
     },
 
-    error(e) {
-        console.log(e.detail)
-    },
+    delete(e){
+        let indexs = e.currentTarget.dataset.index;
 
-    takePhotos(e){
-        let index = e.currentTarget.dataset.index;
+        let staticImg = this.data.staticImg.map((item,index) => {
+            if(index === indexs){
+                item.photoSrc = ''
+            }
+            return item;
+        })
+
         this.setData({
-            indexPhoto: index,
-            showCamera: true
+            staticImg: staticImg
         })
     },
 
