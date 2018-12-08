@@ -38,11 +38,10 @@ Page({
         })
         beevalley.workFile(this.token, this.id, imgArr, (res) => {
             if(res.statusCode === 200){
-                wx.showLoading({
-                    title: "上传成功",
-                    mask: true,
+                wx.showToast({
+                    title: "上传成功"
                 })
-                this.nextWork();
+                // TODO
             }else{
                 wx.navigateBack({
                     delta: 1
