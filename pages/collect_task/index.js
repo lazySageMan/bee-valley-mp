@@ -19,7 +19,7 @@ Page({
                     
                     if(res.statusCode === 200) {
                         
-                        this.taskId.push(JSON.parse(res.data)[0]);
+                        this.taskId.push({name: index, id: JSON.parse(res.data)[0]});
                         this.setData({
                             staticImg: staticImg
                         })
@@ -35,6 +35,8 @@ Page({
 
         let staticImg = this.data.staticImg
         staticImg[index].photoSrc = '';
+        this.taskId = this.taskId.filter((item) => item.name !== index)
+        console.log(this.taskId)
         this.setData({
             staticImg: staticImg
         })
@@ -48,7 +50,7 @@ Page({
             })
             return ;
         }else{
-            console.log(this.taskId)
+            this.taskId = this.taskId.map(item => item.id)
             beevalley.submitWork(this.token, this.id, this.taskId, (res) => {
                 if(res.statusCode === 200){
                     wx.showToast({
