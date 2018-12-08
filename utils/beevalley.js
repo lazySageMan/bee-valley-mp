@@ -287,7 +287,7 @@ function renderRect(rect, rectPosition) {
 function workFile(token, workId, files, callback){
   wx.uploadFile({
     url: TODVIEW_API_BASE_URL + 'works/files',
-    filePath: files[0],
+    filePath: files,
     formData:{
       workId: workId
     },
