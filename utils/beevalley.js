@@ -293,7 +293,7 @@ function workFile(token, workId, files, callback){
     },
     name: "file",
     header: {
-      // 'content-type': 'x-www-form-urlencoded',
+      'content-type': 'x-www-form-urlencoded',
       'Authorization': 'Bearer ' + token
     },
     success: wrap(callback)
