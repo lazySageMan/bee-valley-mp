@@ -12,11 +12,19 @@ Page({
             sourceType: "camera",
             sizeType: "original",
             success: (res) => {
-                let staticImg = this.data.staticImg
-                staticImg[index].photoSrc = res.tempFilePaths[0];
                 
-                this.setData({
-                    staticImg: staticImg
+                let staticImg = this.data.staticImg;
+                staticImg[index].photoSrc = res.tempFilePaths[0];
+                beevalley.workFile(this.token, this.id, res.tempFilePaths[0], (res) => {
+                    
+                    if(res.statusCode === 200) {
+                        
+                        this.taskId.push({name: index, id: JSON.parse(res.data)[0]});
+                        this.setData({
+                            staticImg: staticImg
+                        })
+                    } 
+                     
                 })
             }
         })
@@ -27,27 +35,31 @@ Page({
 
         let staticImg = this.data.staticImg
         staticImg[index].photoSrc = '';
+        this.taskId = this.taskId.filter((item) => item.name !== index)
+        console.log(this.taskId)
         this.setData({
             staticImg: staticImg
         })
     },
 
     submitWork() {
-        let imgArr = this.data.staticImg.map((item) => {
-            return item.photoSrc
-        })
-        beevalley.workFile(this.token, this.id, imgArr, (res) => {
-            if(res.statusCode === 200){
-                wx.showToast({
-                    title: "上传成功"
-                })
-                // TODO
-            }else{
-                wx.navigateBack({
-                    delta: 1
-                })
-            }
-        })
+
+        if(this.data.staticImg.length !== this.taskId.length){
+            wx.showToast({
+                title: "请上传任务图片"
+            })
+            return ;
+        }else{
+            this.taskId = this.taskId.map(item => item.id)
+            beevalley.submitWork(this.token, this.id, this.taskId, (res) => {
+                if(res.statusCode === 200){
+                    wx.showToast({
+                        title: "上传成功"
+                    })
+                }
+            })
+        }
+        
     },
 
     nextWork(){
@@ -72,6 +84,7 @@ Page({
     },
 
     onLoad: function (options) { 
+        this.taskId = []
         this.token = wx.getStorageSync('apitoken');
         this.packageId = options.packageId;
         this.nextWork();
