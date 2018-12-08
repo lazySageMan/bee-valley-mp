@@ -15,16 +15,8 @@ Page({
                 
                 let staticImg = this.data.staticImg;
                 staticImg[index].photoSrc = res.tempFilePaths[0];
-                beevalley.workFile(this.token, this.id, res.tempFilePaths[0], (res) => {
-                    
-                    if(res.statusCode === 200) {
-                        
-                        this.taskId.push({name: index, id: JSON.parse(res.data)[0]});
-                        this.setData({
-                            staticImg: staticImg
-                        })
-                    } 
-                     
+                this.setData({
+                    staticImg: staticImg
                 })
             }
         })
@@ -35,28 +27,52 @@ Page({
 
         let staticImg = this.data.staticImg
         staticImg[index].photoSrc = '';
-        this.taskId = this.taskId.filter((item) => item.name !== index)
-        console.log(this.taskId)
         this.setData({
             staticImg: staticImg
         })
     },
 
     submitWork() {
-
-        if(this.data.staticImg.length !== this.taskId.length){
+        let isSubmit = this.data.staticImg.find((item) => item.photoSrc === '');
+        if(isSubmit){
             wx.showToast({
                 title: "请上传任务图片"
             })
             return ;
         }else{
-            this.taskId = this.taskId.map(item => item.id)
-            beevalley.submitWork(this.token, this.id, this.taskId, (res) => {
-                if(res.statusCode === 200){
-                    wx.showToast({
-                        title: "上传成功"
+            new Promise((resove, reject) => {
+                this.data.staticImg.forEach((item) => {
+                    beevalley.workFile(this.token, this.id, item.photoSrc, (res) => {
+                    
+                        if(res.statusCode === 200) {
+                            
+                            this.uploadedImages.push(JSON.parse(res.data)[0]);
+                            if(this.uploadedImages.length === this.data.staticImg.length){
+                                resove(this.uploadedImages);
+                            }
+                        }else{
+                            this.uploadedImages = [];
+                            reject(res)
+                        } 
                     })
-                }
+                })
+                
+            }).then(uploadedImages => {
+                beevalley.submitWork(this.token, this.id, uploadedImages, (res) => {
+                    if(res.statusCode === 200){
+                        wx.showToast({
+                            title: "上传成功"
+                        })
+                    }else{
+                        wx.showToast({
+                            title: "上传失败，请重试"
+                        })
+                    }
+                })
+            }).catch((err) => {
+                wx.showToast({
+                    title: "上传失败，请重试"
+                })
             })
         }
         
@@ -84,7 +100,7 @@ Page({
     },
 
     onLoad: function (options) { 
-        this.taskId = []
+        this.uploadedImages = []
         this.token = wx.getStorageSync('apitoken');
         this.packageId = options.packageId;
         this.nextWork();
