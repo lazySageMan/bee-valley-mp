@@ -110,13 +110,27 @@
                                 margin-top: 5rpx;
                             }
                             .user-photo .take-photo .show-item .delete{
-                                width: 38rpx;
-                                height: 38rpx;
+                                width: 36rpx;
+                                height: 36rpx;
                                 border-radius: 50%;
-                                border: 1rpx solid red;
-                                font-size: 45rpx;
+                                border: 1rpx solid #00CC88;
+                                color: red;
+                                font-size: 25rpx;
                                 line-height: 38rpx;
                                 text-align: center;
+                                padding: 0;
+                                margin: 0;
+                            }
+                            .user-photo .take-photo .show-item .delete1{
+                                height: 38rpx;
+                                width: 100%;
+                                font-size: 25rpx;
+                                line-height: 38rpx;
+                                text-indent: 15rpx;
+                                text-align: left;
+                                color: red;
+                                padding: 0;
+                                margin: 0;
                             }
                         
                             .user-photo .take-photo .show-item .eg{
