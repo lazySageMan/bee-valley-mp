@@ -1,7 +1,7 @@
 <view class="ac_wrap">
     <view class="main-content">
         <view class="task_demand">
-            <view class="panel__title">第1步</view>
+            <!-- <view class="panel__title">第1步</view> -->
             <view class="title">任务要求</view>
             <view class="content-list">
                 <view 
@@ -14,18 +14,14 @@
                     {{index+1}} {{item}};
                 </view>
             </view>
-            <view class="content-img">
+            <!-- <view class="content-img">
                 <image src="{{staticImg[0].src}}" class="img" /> 
-            </view>
+            </view> -->
         </view>
     </view>
 
     <view class="user-photo">
         <view class="user-photo-wrap">
-            <view class="title">
-                <!-- 图片图标 -->
-                <text class="font">拍摄第一张照片</text>
-            </view>
             <view class="take-photo">
                 <view 
                     class="show-item" 
@@ -50,15 +46,15 @@
                     </view>
                 </view>
             </view>
-            <view class="info">请拍摄10组照片</view>
+            <view class="info">请采集{{staticImg.length}}张照片</view>
             <view class="cenggao"></view>
         </view>
     </view>
     
     <view class="cengHeight"></view>
-    <view class="top">
+    <!-- <view class="top">
         <view class="top-info">0/1 已添加</view>
-    </view>
+    </view> -->
 
     <view class="bottom-btn">
         <button type="primary" class="btn" bindtap="submitWork">提交审核</button>
