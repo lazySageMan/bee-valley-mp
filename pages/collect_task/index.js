@@ -112,8 +112,17 @@ Page({
       that.handleError(res)
       wx.hideLoading()
       if (res.data.length > 0) {
-        that.id = res.data[0].id;
-        let imgArr = res.data[0].meta.samples.map((item) => {
+        let work = res.data[0]
+        that.id = work.id;
+        if (work.previousWork) {
+          work.previousWork.result.forEach(f => {
+            beevalley.downloadWorkFiles(this.token, work.id, f, function (res) {
+              // console.log(res)
+              // TODO
+            })
+          })
+        }
+        let imgArr = work.meta.samples.map((item) => {
           return {
             src: item,
             photoSrc: ''
@@ -121,7 +130,7 @@ Page({
         })
         that.setData({
           staticImg: imgArr,
-          textMessage: res.data[0].details
+          textMessage: work.details
         })
       } else {
         wx.showToast({
