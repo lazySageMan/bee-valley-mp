@@ -64,10 +64,10 @@ Page({
         }
       })
     } else {
-      if(this.data.staticImg[this.countIndex].isLoad){ //判断图片是否已经 是上传成功的
+      if (this.data.staticImg[this.countIndex].isLoad) { //判断图片是否已经 是上传成功的
         that.countIndex++;
         that.uploadImg();
-      }else{
+      } else {
         beevalley.workFile(this.token, this.id, this.data.staticImg[this.countIndex].photoSrc, (res) => {
           that.handleError(res)
           if (res.statusCode === 200) {
@@ -122,33 +122,34 @@ Page({
         let imgArr = work.meta.samples.map((item) => {
           return {
             src: item,
-            photoSrc: ''
+            editable: true
           };
         })
         if (work.previousWork) {
           let successImg = this.getDiff(work.previousWork.result, work.meta.rejectedReason);
 
           successImg.forEach(f => {
-            
-            beevalley.downloadWorkFiles(this.token, work.id, f.id,  (res) => {
+            let index = work.previousWork.result.indexOf(f)
+            imgArr[index].editable = false
+
+            beevalley.downloadWorkFiles(this.token, work.id, f, (res) => {
               that.handleError(res);
-              let imageSrc = 'data:image/jpeg;base64,' + wx.arrayBufferToBase64(res.data);
-              imgArr[f.index].photoSrc = imageSrc;
-              imgArr[f.index].isLoad = true;
-              this.uploadedImages[f.index] = f.id;
-              this.setData({//由于是异步所以每次都需要更新数据，
-                staticImg: imgArr
+              // let imageSrc = 'data:image/jpeg;base64,' + wx.arrayBufferToBase64(res.data);
+              let newImgArr = that.data.staticImg
+              newImgArr[index].photoSrc = res.tempFilePath
+              // this.uploadedImages[index] = f;
+              that.setData({//由于是异步所以每次都需要更新数据，
+                staticImg: newImgArr
               })
             })
           })
-        }else{
-          this.setData({
-            staticImg: imgArr,
-            textMessage: work.details
-          })
         }
 
-        
+        this.setData({
+          staticImg: imgArr,
+          textMessage: work.details
+        })
+
       } else {
         wx.showToast({
           title: "没有任务了"
@@ -157,16 +158,8 @@ Page({
     })
   },
 
-  getDiff(arr1, arr2){
-    arr1.forEach((item, index) => { //将不合格的id从arr1中剔除
-      let isFind = arr2.indexOf(item);
-      if(isFind === -1){
-        arr1.splice(index, 1, {id: item, index: index});
-      }
-    })
-
-    arr1 = arr1.filter((item) => item.id);
-    return arr1;
+  getDiff(arr1, arr2) {
+    return arr1.filter(i => arr2.indexOf(i) < 0)
   },
 
   onLoad: function (options) {
@@ -179,7 +172,7 @@ Page({
 
   onUnload: function () {
     if (this.id) {
-      beevalley.cancelWork(this.token, [this.id], function (res) { })
+      // beevalley.cancelWork(this.token, [this.id], function (res) { })
     }
   }
 

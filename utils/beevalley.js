@@ -22,13 +22,13 @@ function fetchWorks(token, type, num, packageId, callback) {
 }
 
 function downloadWorkFiles(token, workId, fileId, callback) {
-  wx.request({
+  wx.downloadFile({
     url: `${TODVIEW_API_BASE_URL}works/${workId}/files/${fileId}`,
-    method: 'GET',
+    // method: 'GET',
     header: {
       'Authorization': 'Bearer ' + token
     },
-    responseType: 'arraybuffer',
+    // responseType: 'arraybuffer',
     success: wrap(callback)
   });
 }
