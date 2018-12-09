@@ -19,7 +19,7 @@
             content: "";
             width: 8rpx;
             height: 55rpx;
-            background: #FF8C00;
+            background: #00CC88;
             display: inline-block;
             position: absolute;
             left: -7.5%;
@@ -79,7 +79,7 @@
                         height:270rpx;
                         background:#F5F5F5	;
                         border-radius: 20rpx;
-                        color:#FF8C00;
+                        color:#00CC88;
                         font-size: 25rpx;
                         margin-top: 20rpx;
                         position: relative;}
@@ -134,7 +134,7 @@
                             line-height: 38rpx;
                             border-top-right-radius: 20rpx;
                             border-bottom-left-radius: 20rpx;
-                            background:#FF8C00;
+                            background:#00CC88;
                             text-align: center;
                             color: #fff;
                         }
@@ -191,8 +191,8 @@
             width: 90%;
             height: 20rpx;
             border-radius: 10rpx;
-            color: #FF8C00;
-            background:#FFEFD5;
+            color: #00CC88;
+            background:rgba(127,255,170,0.5);
             text-align: center;
             line-height: 20rpx;
             font-size: 18rpx;
@@ -216,9 +216,9 @@
             line-height: 7vh;
             outline: none;
             border: none;
-            background: -o-linear-gradient(top,  #FF8C00 100%,#FF6347 100%);
-            background: -webkit-gradient(linear, left top, left bottom, color-stop(100%,#FF8C00), color-stop(100%,	#FF6347)); 
-            background: linear-gradient(to left, #FF8C00 ,#FF6347);
+            background: -o-linear-gradient(top,  rgba(127,255,170,0.5) 100%,#00CC88 100%);
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(100%,rgba(127,255,170,0.5)), color-stop(100%,	#00CC88)); 
+            background: linear-gradient(to left, rgba(127,255,170,0.5) ,#00CC88);
             /* background: red; */
             color: #fff;
             border-radius: 3.5vh;
