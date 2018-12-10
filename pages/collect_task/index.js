@@ -216,7 +216,7 @@ Page({
 
   onUnload: function () {
     if (this.id) {
-      // beevalley.cancelWork(this.token, [this.id], function (res) { })
+      beevalley.cancelWork(this.token, [this.id], function (res) { })
     }
   }
 
