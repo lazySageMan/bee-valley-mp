@@ -26,14 +26,14 @@ Page({
     let index = e.currentTarget.dataset.index;
 
     let staticImg = this.data.staticImg
-    staticImg[index].photoSrc = '';
+    staticImg[index].photoSrc = null;
     this.setData({
       staticImg: staticImg
     })
   },
 
   submitWork() {
-    let imageNotReady = this.data.staticImg.find((item) => item.photoSrc === '');
+    let imageNotReady = this.data.staticImg.find((item) => !item.photoSrc);
     if (imageNotReady) {
       wx.showToast({
         title: "仍有图片未添加"
@@ -50,8 +50,12 @@ Page({
   uploadImg() {
     let that = this
     if (this.countIndex === this.data.staticImg.length) {
-      wx.hideLoading()
-      beevalley.submitWork(this.token, this.id, this.uploadedImages, (res) => {
+
+      let uploadFileIds = this.data.staticImg.map(e => e.fileId).filter(f => f)
+
+      beevalley.submitWork(this.token, this.id, uploadFileIds, (res) => {
+        that.handleError(res)
+        wx.hideLoading()
         if (res.statusCode === 200) {
           wx.showToast({
             title: "上传成功",
@@ -63,19 +67,23 @@ Page({
           })
         }
       })
+
     } else {
-      if (this.data.staticImg[this.countIndex].isLoad) { //判断图片是否已经 是上传成功的
+
+      let ele = this.data.staticImg[this.countIndex]
+
+      if (!ele.shouldUpload) { //判断图片是否已经 是上传成功的
         that.countIndex++;
         that.uploadImg();
       } else {
-        beevalley.workFile(this.token, this.id, this.data.staticImg[this.countIndex].photoSrc, (res) => {
+        beevalley.workFile(this.token, this.id, ele.photoSrc, (res) => {
           that.handleError(res)
           if (res.statusCode === 200) {
-            that.uploadedImages[this.countIndex] = JSON.parse(res.data)[0];  //根据对应的下标，赋值id
+            ele.fileId = JSON.parse(res.data)[0];  //根据对应的下标，赋值id
             that.countIndex++;
             that.uploadImg();
           } else {
-            that.uploadedImages = [];
+            // that.uploadedImages = [];
             that.countIndex = 0;
             wx.hideLoading()
             wx.showToast({
@@ -84,23 +92,38 @@ Page({
           }
         })
       }
+
     }
   },
 
   handleError: function (res) {
     if (res.statusCode === 403) {
       // TODO handle error
-      wx.showModal({
-        title: '任务超时',
-        content: '请稍后重试',
-        showCancel: false,
-        confirmText: "知道了",
-        success: function () {
-          wx.navigateBack({
-            delta: 1
-          })
-        }
-      })
+      if (typeof res.data === 'object' && res.data.code === '20') {
+        wx.showModal({
+          title: '任务配额已用完',
+          content: '请稍后重试',
+          showCancel: false,
+          confirmText: "知道了",
+          success: function () {
+            wx.navigateBack({
+              delta: 1
+            })
+          }
+        })
+      } else {
+        wx.showModal({
+          title: '任务超时',
+          content: '请稍后重试',
+          showCancel: false,
+          confirmText: "知道了",
+          success: function () {
+            wx.navigateBack({
+              delta: 1
+            })
+          }
+        })
+      }
     }
   },
 
@@ -110,7 +133,7 @@ Page({
       mask: true,
     })
     this.id = null
-    this.uploadedImages = [];
+    // this.uploadedImages = [];
     this.countIndex = 0;
     let that = this
     beevalley.fetchWorks(this.token, "collect", 1, this.packageId, (res) => {
@@ -122,7 +145,8 @@ Page({
         let imgArr = work.meta.samples.map((item) => {
           return {
             src: item,
-            editable: true
+            editable: true,
+            shouldUpload: true
           };
         })
         if (work.previousWork) {
@@ -131,6 +155,8 @@ Page({
           successImg.forEach(f => {
             let index = work.previousWork.result.indexOf(f)
             imgArr[index].editable = false
+            imgArr[index].shouldUpload = false
+            imgArr[index].fileId = f
 
             beevalley.downloadWorkFiles(this.token, work.id, f, (res) => {
               that.handleError(res);
@@ -163,7 +189,7 @@ Page({
   },
 
   onLoad: function (options) {
-    this.uploadedImages = [];
+    // this.uploadedImages = [];
     this.countIndex = 0;
     this.token = wx.getStorageSync('apitoken');
     this.packageId = options.packageId;
