@@ -32,13 +32,13 @@
                 >
                     <view class="eg img-item">
                         <view class="eg-item">示例</view>
-                        <image src="{{item.src}}" class="img"></image>
+                        <image src="{{item.src}}" class="img" mode="aspectFit"></image>
                     </view>
                     <view class="img-item">
                         <view class="showImg" wx:if="{{item.photoSrc}}">
                             <view wx:if="{{item.editable}}" class="delete" bindtap="delete" data-index="{{index}}">×</view>
                             <view wx:if="{{!item.editable}}" class="delete1" >图片已通过审核</view>
-                            <image src="{{item.photoSrc}}" class="img"></image>
+                            <image src="{{item.photoSrc}}" class="img" mode="aspectFit"></image>
                         </view>
                         <view class="showIcon" wx:if="{{!item.photoSrc && item.editable}}" bindtap="takePhotos" data-index="{{index}}">
                             <!-- 相机图标 -->
