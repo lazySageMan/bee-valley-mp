@@ -225,17 +225,21 @@
             background: #fff;
         }
         .bottom-btn .btn{
-            width: 90vw;
+            width: 35vw;
             height: 7vh;
             line-height: 7vh;
             outline: none;
             border: none;
-            background: -o-linear-gradient(top,  rgba(127,255,170,0.5) 100%,#00CC88 100%);
+            /* background: -o-linear-gradient(top,  rgba(127,255,170,0.5) 100%,#00CC88 100%);
             background: -webkit-gradient(linear, left top, left bottom, color-stop(100%,rgba(127,255,170,0.5)), color-stop(100%,	#00CC88)); 
-            background: linear-gradient(to left, rgba(127,255,170,0.5) ,#00CC88);
-            /* background: red; */
+            background: linear-gradient(to left, rgba(127,255,170,0.5) ,#00CC88); */
+            background: 00CC88;
             color: #fff;
             border-radius: 3.5vh;
+        }
+
+        .bottom-btn .btn:last-child{
+            background: red;
         }
         
         .cengHeight{
