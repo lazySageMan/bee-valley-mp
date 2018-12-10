@@ -23,7 +23,7 @@ function fetchWorks(token, type, num, packageId, callback) {
 
 function downloadWorkFiles(token, workId, fileId, callback) {
   wx.downloadFile({
-    url: `${TODVIEW_API_BASE_URL}works/${workId}/files/${fileId}`,
+    url: `${TODVIEW_API_BASE_URL}works/${workId}/files/${fileId}?format=jpeg&thumbnail=true`,
     // method: 'GET',
     header: {
       'Authorization': 'Bearer ' + token
