@@ -77,7 +77,7 @@
                     .user-photo .take-photo .show-item .img-item{
                         width: 40%;
                         height:270rpx;
-                        background:#F5F5F5	;
+                        background:#F5F5F5;
                         border-radius: 20rpx;
                         color:#00CC88;
                         font-size: 25rpx;
