@@ -9,7 +9,7 @@ Page({
 
     wx.chooseImage({
       count: 1,
-      sourceType: "camera",
+      // sourceType: "camera",
       sizeType: "original",
       success: (res) => {
 
@@ -44,6 +44,16 @@ Page({
         mask: true,
       })
       this.uploadImg()
+    }
+  },
+
+  cancelWork() {
+    if (this.id) {
+      wx.showLoading({
+        title: "加载中...",
+        mask: true,
+      })
+      beevalley.cancelWork(this.token, [this.id], (res) => this.nextWork())
     }
   },
 

@@ -58,6 +58,7 @@
     </view> -->
 
     <view class="bottom-btn">
-        <button type="primary" class="btn" bindtap="submitWork">提交审核</button>
+        <button type="primary" class="btn" bindtap="submitWork">提交</button>
+        <button type="primary" class="btn" bindtap="cancelWork">放弃</button>
     </view>
 </view>
