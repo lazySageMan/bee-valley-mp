@@ -15,9 +15,17 @@ Page({
 
         let staticImg = this.data.staticImg;
         staticImg[index].photoSrc = res.tempFilePaths[0];
-        this.setData({
-          staticImg: staticImg
-        })
+
+        if(res.tempFiles[0].size <= 10000000){
+          //console.log(res.tempFiles[0].size)
+          this.setData({
+            staticImg: staticImg
+          })
+        }else{
+          wx.showToast({
+            title: "图片不能超过10M"
+          })
+        }
       }
     })
   },
