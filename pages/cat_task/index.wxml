@@ -1,0 +1,52 @@
+<view class="container">
+    <view class="catTask">
+        <image
+            wx:if="{{currentWork.src}}"
+            class="rectAuditImg"
+            src="{{currentWork.src}}"
+            bindload="imageLoad"
+            data-imgId="{{currentWork.id}}"
+        ></image>
+    </view>
+    <view class="showMessage">
+        <icon 
+            type="info" 
+            class="icon" 
+            bindtap="clickIcon" 
+            color="#33CCFF"
+        />
+        {{currentWork.work.description}}
+    </view>
+    <view class="doSomething">
+        <text class="price">￥{{currentWork.price}}</text>       
+        <text class='timer'>{{displayTimer}}</text>
+        
+        <view class="btn">
+            <button type="primary" bindtap="showModel" data-imgId="{{imgDataArr[0].id}}">标属性</button>
+        </view>
+        <view class="btn">
+            <button type="warn" bindtap="rejectWork" data-imgId="{{imgDataArr[0].id}}">放弃</button>
+        </view>
+    </view>
+
+    <view class="showModel" style="display:{{modelHidden ? 'block' : 'none'}}">
+        <view class="showWrap">
+            <view class="tabs">
+                    <text>品牌：</text>
+                    <picker bindchange="bindPickerChange" value="{{brandIndex}}" range="{{brandArray}}" range-key="{{'value'}}">
+                        <view class="picker">{{brandArray[brandIndex].value}} </view>
+                    </picker>
+            </view>
+            <view class="tabs">
+                    <text>型号：</text>
+                    <picker bindchange="bindPickerChange2" value="{{modelIndex}}" range="{{modelArray}}" range-key="{{'value'}}">
+                        <view class="picker">{{modelArray[modelIndex].value}} </view>
+                    </picker>
+            </view>
+        </view>
+        <view class="foot">
+            <view bindtap='submit' class='cancel button1'>提交</view>
+            <view bindtap='cancel' class='submit button1'>返回</view>
+        </view>
+    </view>
+</view>
