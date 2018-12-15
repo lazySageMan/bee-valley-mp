@@ -312,6 +312,28 @@ function workFile(token, workId, files, callback){
   });
 }
 
+function getCarBranch(token, callback){
+  wx.request({
+    url: TODVIEW_API_BASE_URL + 'categories/car/attributes/brand',
+    method: 'GET',
+    header: {
+      'Authorization': 'Bearer ' + token
+    },
+    success: wrap(callback)
+  });
+}
+
+function getCarModel(token, id, callback){
+  wx.request({
+    url: TODVIEW_API_BASE_URL + `categories/car/attributes/model?prerequisite=${id}`,
+    method: 'GET',
+    header: {
+      'Authorization': 'Bearer ' + token
+    },
+    success: wrap(callback)
+  });
+}
+
 module.exports.fetchWorks = fetchWorks
 exports.downloadWorkFile = downloadWorkFile
 exports.submitWork = submitWork
@@ -330,3 +352,5 @@ exports.startTimer = startTimer
 exports.renderRect = renderRect
 exports.workFile = workFile
 exports.downloadWorkFiles = downloadWorkFiles
+exports.getCarBranch = getCarBranch
+exports.getCarModel = getCarModel
