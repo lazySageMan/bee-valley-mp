@@ -124,7 +124,7 @@ function wrap(callback) {
 
 function handleError(res) {
   if (res.statusCode === 401) {
-    wx.removeStorageSync('apitoken');    
+    wx.removeStorageSync('apitoken');
     wx.showModal({
       title: '重新登录',
       content: '登录过期，需要重新登录',
@@ -296,11 +296,11 @@ function renderRect(rect, rectPosition) {
   }
 }
 
-function workFile(token, workId, files, callback){
+function workFile(token, workId, files, callback) {
   wx.uploadFile({
     url: TODVIEW_API_BASE_URL + 'works/files',
     filePath: files,
-    formData:{
+    formData: {
       workId: workId
     },
     name: "file",
@@ -312,7 +312,7 @@ function workFile(token, workId, files, callback){
   });
 }
 
-function getCarBranch(token, callback){
+function getCarBranch(token, callback) {
   wx.request({
     url: TODVIEW_API_BASE_URL + 'categories/car/attributes/brand',
     method: 'GET',
@@ -323,7 +323,7 @@ function getCarBranch(token, callback){
   });
 }
 
-function getCarModel(token, id, callback){
+function getCarModel(token, id, callback) {
   wx.request({
     url: TODVIEW_API_BASE_URL + `categories/car/attributes/model?prerequisite=${id}`,
     method: 'GET',
@@ -332,6 +332,54 @@ function getCarModel(token, id, callback){
     },
     success: wrap(callback)
   });
+}
+
+function handleError(res) {
+  if (res.statusCode === 403) {
+    wx.hideLoading()
+    if (typeof res.data === 'object' && res.data.error && res.data.error.code === '20') {
+      wx.showModal({
+        title: '任务配额已用完',
+        content: '请稍后重试',
+        showCancel: false,
+        confirmText: "知道了",
+        success: function () {
+          wx.navigateBack({
+            delta: 1
+          })
+        }
+      })
+      return false
+    } else {
+      wx.showModal({
+        title: '任务超时',
+        content: '请稍后重试',
+        showCancel: false,
+        confirmText: "知道了",
+        success: function () {
+          wx.navigateBack({
+            delta: 1
+          })
+        }
+      })
+      return false
+    }
+  } else if (res.statusCode !== 200) {
+    wx.hideLoading()
+    wx.showModal({
+      title: '系统错误',
+      content: '请稍后重试',
+      showCancel: false,
+      confirmText: "知道了",
+      success: function () {
+        wx.navigateBack({
+          delta: 1
+        })
+      }
+    })
+    return false
+  }
+  return true
 }
 
 module.exports.fetchWorks = fetchWorks
@@ -354,3 +402,4 @@ exports.workFile = workFile
 exports.downloadWorkFiles = downloadWorkFiles
 exports.getCarBranch = getCarBranch
 exports.getCarModel = getCarModel
+exports.handleError = handleError
