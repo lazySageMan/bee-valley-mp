@@ -1,8 +1,7 @@
 {
   "pages": [
-    
     "pages/index/index",
-    "pages/cat_task/index",
+    "pages/cat_task/index",    
     "pages/rect_review/index",
     "pages/collect_task/index",
     "pages/task_list/index",

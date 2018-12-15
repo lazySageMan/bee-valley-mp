@@ -77,7 +77,7 @@ Page({
       let uploadFileIds = this.data.staticImg.map(e => e.fileId).filter(f => f)
 
       beevalley.submitWork(this.token, this.id, uploadFileIds, (res) => {
-        if (that.handleError(res)) {
+        if (beevalley.handleError(res)) {
           wx.hideLoading()
           wx.showModal({
             title: '成功',
@@ -103,7 +103,7 @@ Page({
         that.uploadImg();
       } else {
         beevalley.workFile(this.token, this.id, ele.photoSrc, (res) => {
-          if (that.handleError(res)) {
+          if (beevalley.handleError(res)) {
             ele.fileId = JSON.parse(res.data)[0];  //根据对应的下标，赋值id
             that.countIndex++;
             that.uploadImg();
@@ -112,54 +112,6 @@ Page({
       }
 
     }
-  },
-
-  handleError: function (res) {
-    if (res.statusCode === 403) {
-      wx.hideLoading()
-      if (typeof res.data === 'object' && res.data.error && res.data.error.code === '20') {
-        wx.showModal({
-          title: '任务配额已用完',
-          content: '请稍后重试',
-          showCancel: false,
-          confirmText: "知道了",
-          success: function () {
-            wx.navigateBack({
-              delta: 1
-            })
-          }
-        })
-        return false
-      } else {
-        wx.showModal({
-          title: '任务超时',
-          content: '请稍后重试',
-          showCancel: false,
-          confirmText: "知道了",
-          success: function () {
-            wx.navigateBack({
-              delta: 1
-            })
-          }
-        })
-        return false
-      }
-    } else if (res.statusCode !== 200) {
-      wx.hideLoading()
-      wx.showModal({
-        title: '系统错误',
-        content: '请稍后重试',
-        showCancel: false,
-        confirmText: "知道了",
-        success: function () {
-          wx.navigateBack({
-            delta: 1
-          })
-        }
-      })
-      return false
-    }
-    return true
   },
 
   nextWork() {
@@ -172,7 +124,7 @@ Page({
       mask: true,
     })
     beevalley.fetchWorks(this.token, "collect", 1, this.packageId, (res) => {
-      if (that.handleError(res)) {
+      if (beevalley.handleError(res)) {
 
         wx.hideLoading()
         if (res.data.length > 0) {
@@ -197,7 +149,7 @@ Page({
               imgArr[index].fileId = f
 
               beevalley.downloadWorkFiles(this.token, work.id, f, (res) => {
-                if (that.handleError(res)) {
+                if (beevalley.handleError(res)) {
                   let newImgArr = that.data.staticImg
                   newImgArr[index].photoSrc = res.tempFilePath
                   that.setData({//由于是异步所以每次都需要更新数据，
