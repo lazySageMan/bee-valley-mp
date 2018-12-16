@@ -19,7 +19,7 @@ Page({
     ratio: 1
   },
 
-  clickIcon(e) {
+  clickIcon() {
 
     if (this.data.currentWork) {
       var info = ''

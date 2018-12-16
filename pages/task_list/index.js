@@ -77,12 +77,15 @@ Page({
   navToTask: function (e) {
     this.taskType = e.currentTarget.dataset.tasktype;
     this.packageId = e.currentTarget.dataset.packageid;
-
     if (this.taskType === 'rect') {
       this.setData({
         is_modal_Hidden: !this.data.is_modal_Hidden
       })
     } else if (this.taskType === 'collect') {
+      wx.navigateTo({
+        url: "../" + this.taskType + "_task/index?packageId=" + this.packageId
+      })
+    } else if(this.taskType === 'attribute'){
       wx.navigateTo({
         url: "../" + this.taskType + "_task/index?packageId=" + this.packageId
       })

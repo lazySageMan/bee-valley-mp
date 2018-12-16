@@ -35,7 +35,7 @@ function downloadWorkFiles(token, workId, fileId, callback) {
 
 function downloadWorkFile(token, workId, options, callback) {
   wx.request({
-    url: options ? `${TODVIEW_API_BASE_URL}works/${workId}/file?format=${options.format}&x=${options.x}&y=${options.y}&width=${options.width}&height=${options.height}` : `${TODVIEW_API_BASE_URL}works/${workId}/file`,
+    url: options.format ? `${TODVIEW_API_BASE_URL}works/${workId}/file?format=${options.format}&x=${options.x}&y=${options.y}&width=${options.width}&height=${options.height}` : `${TODVIEW_API_BASE_URL}works/${workId}/file`,
     method: 'GET',
     header: {
       'Authorization': 'Bearer ' + token

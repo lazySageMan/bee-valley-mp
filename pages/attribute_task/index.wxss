@@ -13,12 +13,7 @@
     display: flex;
     color: red;
     align-items: center;
-    justify-content: space-around;
-  }
-  
-  .showMessage .showInfo{
-    display: flex;
-    align-items: center;
+    justify-content: center;
   }
   
   .showMessage .showBtn{

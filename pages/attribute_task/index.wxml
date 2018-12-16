@@ -4,8 +4,8 @@
             wx:if="{{currentWork.src}}"
             class="rectAuditImg"
             src="{{currentWork.src}}"
+            style="width:100vw"
             bindload="imageLoad"
-            data-imgId="{{currentWork.id}}"
         ></image>
     </view>
     <view class="showMessage">
@@ -15,17 +15,16 @@
             bindtap="clickIcon" 
             color="#33CCFF"
         />
-        {{currentWork.work.description}}
     </view>
     <view class="doSomething">
         <text class="price">￥{{currentWork.price}}</text>       
         <text class='timer'>{{displayTimer}}</text>
         
         <view class="btn">
-            <button type="primary" bindtap="showModel" data-imgId="{{imgDataArr[0].id}}">标属性</button>
+            <button type="primary" bindtap="showModel">标属性</button>
         </view>
         <view class="btn">
-            <button type="warn" bindtap="rejectWork" data-imgId="{{imgDataArr[0].id}}">放弃</button>
+            <button type="warn" bindtap="cancelWork">放弃</button>
         </view>
     </view>
 
@@ -45,8 +44,8 @@
             </view>
         </view>
         <view class="foot">
-            <view bindtap='submit' class='cancel button1'>提交</view>
-            <view bindtap='cancel' class='submit button1'>返回</view>
+            <view bindtap='submitWork' class='cancel button1'>提交</view>
+            <view bindtap='hideModel' class='submit button1'>返回</view>
         </view>
     </view>
 </view>
