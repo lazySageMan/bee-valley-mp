@@ -4,6 +4,7 @@
             wx:if="{{currentWork.src}}"
             class="rectAuditImg"
             src="{{currentWork.src}}"
+            style="width:100vw"
             bindload="imageLoad"
             data-imgId="{{currentWork.id}}"
         ></image>
