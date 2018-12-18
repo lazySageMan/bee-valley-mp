@@ -4,7 +4,8 @@
             wx:if="{{currentWork.src}}"
             class="rectAuditImg"
             src="{{currentWork.src}}"
-            style="width:100vw"
+            style="width:100%"
+            mode="widthFix"
             bindload="imageLoad"
         ></image>
     </view>
@@ -30,16 +31,21 @@
 
     <view class="showModel" style="display:{{modelHidden ? 'block' : 'none'}}">
         <view class="showWrap">
-            <view class="tabs">
-                    <text>品牌：</text>
-                    <picker bindchange="bindPickerChange" value="{{brandIndex}}" range="{{brandArray}}" range-key="{{'value'}}">
-                        <view class="picker">{{brandArray[brandIndex].value}} </view>
-                    </picker>
-            </view>
-            <view class="tabs">
-                    <text>型号：</text>
-                    <picker bindchange="bindPickerChange2" value="{{modelIndex}}" range="{{modelArray}}" range-key="{{'value'}}">
-                        <view class="picker">{{modelArray[modelIndex].value}} </view>
+            <view class="tabs" 
+                wx:for="{{currentWork.attributes}}" 
+                wx:for-item="item"  
+                wx:key="index" 
+                wx:for-index="index"
+            >
+                    <text>{{item.displayName}}：</text>
+                    <picker 
+                        bindchange="bindPickerChange" 
+                        data-item="{{item}}" 
+                        data-index="{{index}}"
+                        range="{{item.dataArray}}" 
+                        range-key="{{'value'}}"
+                    >
+                        <view class="picker">{{item.dataArray[item.indexArray].value}} </view>
                     </picker>
             </view>
         </view>

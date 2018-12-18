@@ -48,7 +48,7 @@ Page({
 
     let that = this;
     beevalley.listAuthorizedWorkType(this.data.apitoken, function (res) {
-      console.log(res) //等待后端改数据类型
+      //console.log(res) 等待后端改数据类型
       if (res.statusCode === 200) {
         that.setData({
           taskTypes: that.preprocessData(res.data)
