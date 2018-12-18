@@ -312,9 +312,9 @@ function workFile(token, workId, files, callback) {
   });
 }
 
-function getCarBranch(token, callback) {
+function getAttribute(token, category, attribute, prerequisiteId, callback) {
   wx.request({
-    url: TODVIEW_API_BASE_URL + 'categories/car/attributes/brand',
+    url: prerequisiteId ? TODVIEW_API_BASE_URL + `categories/${category}/attributes/${attribute}?prerequisite=${prerequisiteId}` : TODVIEW_API_BASE_URL + `categories/${category}/attributes/${attribute}`,
     method: 'GET',
     header: {
       'Authorization': 'Bearer ' + token
@@ -323,16 +323,16 @@ function getCarBranch(token, callback) {
   });
 }
 
-function getCarModel(token, id, callback) {
-  wx.request({
-    url: TODVIEW_API_BASE_URL + `categories/car/attributes/model?prerequisite=${id}`,
-    method: 'GET',
-    header: {
-      'Authorization': 'Bearer ' + token
-    },
-    success: wrap(callback)
-  });
-}
+// function getCarModel(token, id, callback) {
+//   wx.request({
+//     url: TODVIEW_API_BASE_URL + `categories/car/attributes/model?prerequisite=${id}`,
+//     method: 'GET',
+//     header: {
+//       'Authorization': 'Bearer ' + token
+//     },
+//     success: wrap(callback)
+//   });
+// }
 
 function handleError(res) {
   if (res.statusCode === 403) {
@@ -400,6 +400,5 @@ exports.startTimer = startTimer
 exports.renderRect = renderRect
 exports.workFile = workFile
 exports.downloadWorkFiles = downloadWorkFiles
-exports.getCarBranch = getCarBranch
-exports.getCarModel = getCarModel
+exports.getAttribute = getAttribute
 exports.handleError = handleError

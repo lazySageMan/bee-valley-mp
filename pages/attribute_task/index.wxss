@@ -94,6 +94,7 @@
       height: 70rpx;
       line-height: 70rpx;
       text-indent: 1em;
+      overflow: hidden;
   }
 
   .showModel .foot{

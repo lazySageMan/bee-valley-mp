@@ -1,13 +1,7 @@
 const beevalley = require("../../utils/beevalley.js");
 Page({
     data: {
-        brandArray: [],
-        brandIndex: 0,
-
-        modelArray: [],
-        modelIndex: 0,
         modelHidden: false,
-
         currentWork: {}
     },
 
@@ -17,40 +11,70 @@ Page({
         })
     },
 
-    bindPickerChange2(e) {
-        this.setData({
-            modelIndex: e.detail.value
-        })
-    },
-
     bindPickerChange(e) {
-        beevalley.getCarModel(this.apitoken, this.data.brandArray[e.detail.value].id, (res) => {
-            this.setData({
-                modelArray: res.data
-            })
-        })
+        let item = e.currentTarget.dataset.item;
+        let index = e.currentTarget.dataset.index;
+        let selectIndex = e.detail.value;
+        let {
+            attributes
+        } = this.data.currentWork;
+
+        attributes[index].indexArray = selectIndex;
         this.setData({
-            brandIndex: e.detail.value
+            "currentWork.attributes": attributes
         })
+        if (!item.dependency) {
+            let id = item.dataArray[selectIndex].id;
+            let attr = attributes.find((v) => v.dependency === item.attr).attr;
+            beevalley.getAttribute(this.apitoken, this.data.currentWork.category, attr, id, (res) => {
+                if (beevalley.handleError(res)) {
+                    attributes.forEach((v, index) => {
+                        if (v.dependency === item.attr) {
+                            attributes[index].dataArray = res.data;
+                            attributes[index].indexArray = 0;
+                            this.setData({
+                                "currentWork.attributes": attributes
+                            })
+                        }
+                    })
+                }
+
+            })
+        }
     },
 
     submitWork() {
-        // 需要上传的id
-        // console.log(this.data.brandArray[this.data.brandIndex].id, this.data.modelArray[this.data.modelIndex].id) 
-        if(this.data.displayTimer === "超时"){
+        let {
+            currentWork
+        } = this.data;
+        if (this.data.displayTimer === "超时") {
             this.showLoading();
             wx.navigateBack({
                 delta: 1
             })
-        }else{
-            this.setData({
-                modelHidden: false
+        } else {
+            let result = [];
+            currentWork.attributes.forEach((item) => {
+                result.push({
+                    attr: item.attr,
+                    value: item.dataArray[item.indexArray].value
+                })
             })
-            
-            this.nextWork();
+            beevalley.submitWork(this.apitoken, currentWork.id, result, (res) => {
+                if (beevalley.handleError(res)) {
+                    this.setData({
+                        modelHidden: false
+                    })
+                    wx.showToast({
+                        title: '提交成功',
+                        mask: true
+                    })
+                    this.nextWork();
+                }
+            })
         }
 
-        
+
     },
 
     cancelWork() {
@@ -63,7 +87,7 @@ Page({
             beevalley.cancelWork(this.apitoken, [deletedWorkId], (res) => {
                 if (beevalley.handleError(res)) {
                     this.nextWork();
-                } 
+                }
             })
         }
     },
@@ -85,9 +109,9 @@ Page({
         }
     },
 
-    imageLoad(){
+    imageLoad() {
         this.clearTimer();
-        this.timer = beevalley.startTimer( (data) => {
+        this.timer = beevalley.startTimer((data) => {
             this.setData(data);
         }, this.data.currentWork.expiredAt);
     },
@@ -99,19 +123,43 @@ Page({
         }
     },
 
+    getSelect(work) {
+        if (this.index === work.attributes.length) {
+            this.setData({
+                currentWork: work
+            })
+        } else {
+            let id = work.attributes[this.index].dependency ? work.attributes.find((v) => v.attr === work.attributes[this.index].dependency).dataArray[0].id : false;
+
+            beevalley.getAttribute(this.apitoken, work.category, work.attributes[this.index].attr, id, (res) => {
+                if (beevalley.handleError(res)) {
+                    work.attributes[this.index].dataArray = res.data;
+                    work.attributes[this.index].indexArray = 0;
+                    this.index++;
+                    this.getSelect(work);
+                }
+            })
+        }
+    },
+
     nextWork() {
         wx.showLoading({
             title: "加载中",
             mask: true,
         })
-
+        this.index = 0;
+        this.setData({
+            currentWork: {}
+        })
         beevalley.fetchWorks(this.apitoken, "attribute", 1, this.packageId, (res) => {
             if (beevalley.handleError(res)) {
                 let work = {};
-                work.id = res.data[0].id
+                work.id = res.data[0].id;
                 work.price = res.data[0].price;
                 work.details = res.data[0].details;
                 work.expiredAt = res.data[0].expiredAt;
+                work.attributes = res.data[0].meta.attributes;
+                work.category = res.data[0].meta.category;
 
                 beevalley.downloadWorkFile(this.apitoken, work.id, {}, (res4) => {
                     if (beevalley.handleError(res4)) {
@@ -120,38 +168,17 @@ Page({
                         this.setData({
                             currentWork: work
                         });
+                        this.getSelect(work);
                     }
                     wx.hideLoading();
                 })
-                if (this.data.brandArray.length === 0) {
-
-                    beevalley.getCarBranch(this.apitoken, (res2) => {
-                        if (beevalley.handleError(res2)) {
-
-                            this.setData({
-                                brandArray: res2.data
-                            })
-
-                            beevalley.getCarModel(this.apitoken, res2.data[0].id, (res3) => {
-                                if (beevalley.handleError(res3)) {
-
-                                    this.setData({
-                                        modelArray: res3.data
-                                    })
-                                }
-
-                            })
-                        }
-
-                    })
-                }
-
             }
         })
     },
 
     onLoad(options) {
         this.packageId = options.packageId;
+        this.index = 0;
         this.apitoken = wx.getStorageSync('apitoken');
         this.nextWork();
 
