@@ -188,11 +188,11 @@ Page({
 
     beevalley.downloadWorkFile(this.apitoken, work.id, work.downloadOptions, function (res) {
       if (beevalley.handleError(res)) {
-        let imageSrc = 'data:image/jpeg;base64,' + wx.arrayBufferToBase64(res.data);
+        // let imageSrc = 'data:image/jpeg;base64,' + wx.arrayBufferToBase64(res.data);
 
         if (that.data.currentWork && that.data.currentWork.id === work.id) {
           that.setData({
-            'currentWork.src': imageSrc
+            'currentWork.src': res.tempFilePath
           });
         } else {
           let foundIndex = that.data.works.findIndex(w => w.id === work.id);

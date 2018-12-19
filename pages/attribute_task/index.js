@@ -161,7 +161,7 @@ Page({
                 work.attributes = res.data[0].meta.attributes;
                 work.category = res.data[0].meta.category;
 
-                beevalley.downloadWorkFile(this.apitoken, work.id, {}, (res4) => {
+                beevalley.downloadWorkFile(this.apitoken, work.id, null, (res4) => {
                     if (beevalley.handleError(res4)) {
                         work.src = res4.tempFilePath
 
