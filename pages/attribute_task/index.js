@@ -163,7 +163,7 @@ Page({
 
                 beevalley.downloadWorkFile(this.apitoken, work.id, {}, (res4) => {
                     if (beevalley.handleError(res4)) {
-                        work.src = 'data:image/jpeg;base64,' + wx.arrayBufferToBase64(res4.data)
+                        work.src = res4.tempFilePath
 
                         this.setData({
                             currentWork: work
