@@ -145,16 +145,8 @@ Page({
         }
     },
 
-    nextWork() {
-        wx.showLoading({
-            title: "加载中",
-            mask: true,
-        })
-        this.index = 0;
-        this.setData({
-            currentWork: {}
-        })
-        beevalley.fetchWorks(this.apitoken, "attribute", 1, this.packageId, (res) => {
+    fetchWorks(){
+        beevalley.fetchWorks(this.apitoken, "attribute", 3, this.packageId, (res) => {
             if (beevalley.handleError(res)) {
                 if(res.data.length === 0){
                     wx.showToast({
@@ -166,29 +158,50 @@ Page({
                     })
 
                 }else{
-                    let work = {};
-                    work.id = res.data[0].id;
-                    work.price = res.data[0].price;
-                    work.details = res.data[0].details;
-                    work.expiredAt = res.data[0].expiredAt;
-                    work.attributes = res.data[0].meta.attributes;
-                    work.category = res.data[0].meta.category;
-                    work.description = res.data[0].description;
-
-                    beevalley.downloadWorkFile(this.apitoken, work.id, null, (res4) => {
-                        if (beevalley.handleError(res4)) {
-                            work.src = res4.tempFilePath
-
-                            this.setData({
-                                currentWork: work
-                            });
-                            this.getSelect(work);
-                        }
-                        wx.hideLoading();
-                    })
+                    this.work = res.data;
+                    this.nextWork();
                 } 
             }
         })
+    },
+
+    downloadWorkFile(work){
+        beevalley.downloadWorkFile(this.apitoken, work.id, null, (res4) => {
+            if (beevalley.handleError(res4)) {
+                work.src = res4.tempFilePath
+
+                this.setData({
+                    currentWork: work
+                });
+                this.getSelect(work);
+            }
+            wx.hideLoading();
+        })
+    },
+
+    nextWork() {
+        wx.showLoading({
+            title: "加载中",
+            mask: true,
+        })
+        this.index = 0;
+
+        if(this.work.length === 0){
+            this.fetchWorks();
+        }else{
+            let currentWork = this.work.pop();
+            let work = {};
+            work.id = currentWork.id;
+            work.price = currentWork.price;
+            work.details = currentWork.details;
+            work.expiredAt = currentWork.expiredAt;
+            work.attributes = currentWork.meta.attributes;
+            work.category = currentWork.meta.category;
+            work.description = currentWork.description;
+            this.downloadWorkFile(work)
+        }
+
+        
     },
 
     onLoad(options) {
