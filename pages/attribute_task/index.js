@@ -180,6 +180,8 @@ Page({
         } else {
             if(work.attributes[this.index].dependency){
                 this.index++;
+                work.attributes[this.index].dataArray = [];
+                work.attributes[this.index].indexArray = 0;
                 this.getSelect(work);
             }else{
                 beevalley.getAttribute(this.apitoken, work.category, work.attributes[this.index].attr, false, (res) => {
